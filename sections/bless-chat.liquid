@@ -1,0 +1,230 @@
+{% liquid
+  assign section_id = section.id
+  assign embed_script_url = section.settings.embed_script_url
+  assign app_proxy_path = section.settings.app_proxy_path | default: '/apps/bless'
+%}
+
+<section
+  id="chat-section"
+  class="bless-chat"
+  data-section-id="{{ section_id }}"
+  data-embed-url="{{ embed_script_url | escape }}"
+  data-app-proxy-path="{{ app_proxy_path | escape }}"
+>
+  <div class="bless-chat__inner">
+    {% if section.settings.heading != blank %}
+      <h2 class="bless-chat__heading">
+        {{ section.settings.heading | escape }}
+      </h2>
+    {% endif %}
+
+    {% if section.settings.intro_text != blank %}
+      <p class="bless-chat__intro">
+        {{ section.settings.intro_text }}
+      </p>
+    {% endif %}
+
+    <div id="bless-chat-{{ section_id }}" class="bless-chat__embed" data-chat-container></div>
+
+    <div
+      class="bless-chat__status"
+      data-status
+      aria-live="polite"
+      data-loading-text="{{ section.settings.loading_message | escape }}"
+      data-error-text="{{ section.settings.error_message | escape }}"
+      hidden
+    ></div>
+  </div>
+</section>
+
+{% stylesheet %}
+.bless-chat {
+  padding: clamp(3rem, 5vw, 6rem) 0;
+  background-color: rgb(var(--color-light-flesh, 236, 227, 214));
+  color: rgb(var(--color-dark-green, 46, 94, 76));
+}
+
+.bless-chat__inner {
+  width: min(960px, 90vw);
+  margin: 0 auto;
+  display: grid;
+  gap: 1.75rem;
+  justify-items: center;
+  text-align: center;
+}
+
+.bless-chat__heading {
+  font-family: var(--font-heading, 'Cardo', serif);
+  font-size: clamp(2rem, 3vw + 1rem, 3rem);
+  margin: 0;
+}
+
+.bless-chat__intro {
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  font-size: 1.1rem;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 720px;
+}
+
+.bless-chat__embed {
+  width: 100%;
+  min-height: 420px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: rgba(var(--color-light-green, 168, 204, 193), 0.25);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.15);
+}
+
+.bless-chat__status {
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background: rgba(var(--color-avocado, 227, 216, 154), 0.25);
+  color: rgb(var(--color-dark-green, 46, 94, 76));
+}
+
+@media (max-width: 600px) {
+  .bless-chat__embed {
+    border-radius: 18px;
+    min-height: 360px;
+  }
+}
+{% endstylesheet %}
+
+{% javascript %}
+(function () {
+  const sectionId = '{{ section_id }}';
+  const sectionEl = document.querySelector(`[data-section-id="${sectionId}"]`);
+  if (!sectionEl) return;
+
+  const embedUrl = sectionEl.dataset.embedUrl;
+  const appProxyPath = sectionEl.dataset.appProxyPath || '/apps/bless';
+  const statusEl = sectionEl.querySelector('[data-status]');
+  const loadingText = statusEl?.dataset.loadingText || 'Finalising your blessing...';
+  const errorTextDefault = statusEl?.dataset.errorText || 'We could not save your blessing. Please try again.';
+
+  const SCRIPT_DATA_ATTR = 'data-bless-chat-src';
+
+  if (embedUrl && !document.querySelector(`script[${SCRIPT_DATA_ATTR}="${embedUrl}"]`)) {
+    const script = document.createElement('script');
+    script.src = embedUrl;
+    script.defer = true;
+    script.setAttribute(SCRIPT_DATA_ATTR, embedUrl);
+    document.head.appendChild(script);
+  }
+
+  function setStatus(message) {
+    if (!statusEl) return;
+    if (message) {
+      statusEl.textContent = message;
+      statusEl.hidden = false;
+    } else {
+      statusEl.textContent = '';
+      statusEl.hidden = true;
+    }
+  }
+
+  const handlerKey = `__blessChatHandler_${sectionId}`;
+  if (window[handlerKey]) {
+    window.removeEventListener('blessing:ready', window[handlerKey]);
+  }
+
+  window[handlerKey] = async (event) => {
+    const detail = event?.detail;
+    const blessing = detail?.blessing || detail?.text;
+    if (!blessing) return;
+
+    setStatus(loadingText);
+
+    try {
+      const response = await fetch(appProxyPath, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blessing })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Proxy responded with ${response.status}`);
+      }
+
+      const payload = await response.json();
+      const blessingText = payload.blessingText || blessing;
+
+      setStatus('');
+      window.dispatchEvent(
+        new CustomEvent('blessing:update', { detail: { text: blessingText } })
+      );
+    } catch (error) {
+      console.error('Bless chat proxy error', error);
+      setStatus(errorTextDefault);
+      window.dispatchEvent(
+        new CustomEvent('blessing:error', {
+          detail: { message: errorTextDefault, error: String(error) }
+        })
+      );
+    }
+  };
+
+  window.addEventListener('blessing:ready', window[handlerKey]);
+
+  document.addEventListener('shopify:section:unload', (event) => {
+    if (event.detail?.sectionId === sectionId && window[handlerKey]) {
+      window.removeEventListener('blessing:ready', window[handlerKey]);
+      delete window[handlerKey];
+    }
+  });
+})();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Bless chat",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Begin your personalised blessing"
+    },
+    {
+      "type": "richtext",
+      "id": "intro_text",
+      "label": "Intro text",
+      "default": "<p>Our guide will ask a few heartfelt questions to craft a blessing meant just for you. Answer when you are ready.</p>"
+    },
+    {
+      "type": "text",
+      "id": "embed_script_url",
+      "label": "Chatbot embed script URL",
+      "info": "Paste the URL of the chatbot script hosted on Vercel."
+    },
+    {
+      "type": "text",
+      "id": "app_proxy_path",
+      "label": "App proxy path",
+      "default": "/apps/bless",
+      "info": "Path to the Shopify App Proxy that forwards blessings to Vercel."
+    },
+    {
+      "type": "text",
+      "id": "loading_message",
+      "label": "Loading message",
+      "default": "Polishing your blessing..."
+    },
+    {
+      "type": "text",
+      "id": "error_message",
+      "label": "Error message",
+      "default": "We could not save your blessing. Please try again."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bless chat"
+    }
+  ]
+}
+{% endschema %}

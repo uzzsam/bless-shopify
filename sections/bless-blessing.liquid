@@ -1,0 +1,279 @@
+{% liquid
+  assign panel_rgb = section.settings.panel_background | default: '236, 227, 214'
+  assign panel_opacity = section.settings.panel_opacity | default: 60 | times: 0.01
+%}
+
+<section
+  id="blessing-section"
+  class="bless-blessing"
+  data-section-id="{{ section.id }}"
+  data-auto-scroll="{{ section.settings.auto_scroll | default: false }}"
+>
+  <div class="bless-blessing__inner">
+    {% if section.settings.heading != blank %}
+      <h2 class="bless-blessing__heading">
+        {{ section.settings.heading | escape }}
+      </h2>
+    {% endif %}
+
+    <div
+      class="bless-blessing__panel"
+      style="background-color: rgba({{ panel_rgb }}, {{ panel_opacity }})"
+      data-blessing-panel
+    >
+      <p class="bless-blessing__placeholder" data-placeholder>
+        {{ section.settings.placeholder_text | escape }}
+      </p>
+      <div class="bless-blessing__content" data-blessing-output hidden></div>
+
+      {% if section.settings.show_copy_button %}
+        <button type="button" class="bless-blessing__copy" data-copy-trigger>
+          {{ section.settings.copy_button_label | escape }}
+        </button>
+        <span class="bless-blessing__copy-feedback" data-copy-feedback hidden>
+          {{ section.settings.copy_feedback | escape }}
+        </span>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+.bless-blessing {
+  padding: clamp(3.5rem, 6vw, 7rem) 0;
+  background-image: var(--bless-body-background, none);
+  background-color: rgb(var(--color-light-green, 168, 204, 193));
+  display: flex;
+  justify-content: center;
+  color: rgb(var(--color-dark-green, 46, 94, 76));
+}
+
+.bless-blessing__inner {
+  width: min(960px, 90vw);
+  display: grid;
+  gap: 2rem;
+  text-align: center;
+}
+
+.bless-blessing__heading {
+  font-family: var(--font-heading, 'Cardo', serif);
+  font-size: clamp(2.25rem, 3vw + 1.25rem, 3.25rem);
+  margin: 0;
+}
+
+.bless-blessing__panel {
+  position: relative;
+  padding: clamp(2rem, 4vw, 3rem);
+  border-radius: 32px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(var(--color-light-flesh, 236, 227, 214), 0.25);
+}
+
+.bless-blessing__panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+}
+
+.bless-blessing__placeholder,
+.bless-blessing__content {
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  font-size: 1.15rem;
+  line-height: 1.8;
+  margin: 0;
+  white-space: pre-line;
+}
+
+.bless-blessing__panel.is-visible .bless-blessing__content {
+  animation: bless-fade-up 500ms ease forwards;
+}
+
+.bless-blessing__copy {
+  margin-top: 1.75rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 999px;
+  border: none;
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(var(--color-avocado, 227, 216, 154), 0.92);
+  color: rgb(var(--color-dark-green, 46, 94, 76));
+  transition: transform 200ms ease, background-color 200ms ease;
+}
+
+.bless-blessing__copy:hover,
+.bless-blessing__copy:focus {
+  transform: translateY(-1px);
+  background: rgba(var(--color-avocado, 227, 216, 154), 1);
+}
+
+.bless-blessing__copy-feedback {
+  display: inline-block;
+  margin-left: 0.75rem;
+  font-size: 0.95rem;
+  color: rgba(var(--color-dark-green, 46, 94, 76), 0.75);
+}
+
+@keyframes bless-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+{% endstylesheet %}
+
+{% javascript %}
+(function () {
+  const sectionId = '{{ section.id }}';
+  const sectionEl = document.querySelector(`[data-section-id="${sectionId}"]`);
+  if (!sectionEl) return;
+
+  const panelEl = sectionEl.querySelector('[data-blessing-panel]');
+  const placeholderEl = sectionEl.querySelector('[data-placeholder]');
+  const contentEl = sectionEl.querySelector('[data-blessing-output]');
+  const copyTrigger = sectionEl.querySelector('[data-copy-trigger]');
+  const copyFeedback = sectionEl.querySelector('[data-copy-feedback]');
+  const autoScroll = sectionEl.dataset.autoScroll === 'true';
+
+  function revealBlessing(text) {
+    if (!contentEl || !panelEl) return;
+    if (placeholderEl) {
+      placeholderEl.hidden = true;
+    }
+    contentEl.textContent = text;
+    contentEl.hidden = false;
+    panelEl.classList.add('is-visible');
+    if (autoScroll) {
+      panelEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  function resetCopyFeedback() {
+    if (copyFeedback) {
+      copyFeedback.hidden = true;
+    }
+  }
+
+  const updateKey = `__blessBlessingUpdate_${sectionId}`;
+  if (window[updateKey]) {
+    window.removeEventListener('blessing:update', window[updateKey]);
+  }
+  window[updateKey] = (event) => {
+    const detail = event?.detail;
+    const text = detail?.text;
+    if (!text) return;
+    revealBlessing(text);
+    resetCopyFeedback();
+  };
+  window.addEventListener('blessing:update', window[updateKey]);
+
+  const errorKey = `__blessBlessingError_${sectionId}`;
+  if (window[errorKey]) {
+    window.removeEventListener('blessing:error', window[errorKey]);
+  }
+  window[errorKey] = () => resetCopyFeedback();
+  window.addEventListener('blessing:error', window[errorKey]);
+
+  if (copyTrigger && contentEl) {
+    copyTrigger.addEventListener('click', async () => {
+      const text = contentEl.textContent?.trim();
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        if (copyFeedback) {
+          copyFeedback.hidden = false;
+        }
+      } catch (error) {
+        console.error('Unable to copy blessing', error);
+      }
+    });
+  }
+
+  document.addEventListener('shopify:section:unload', (event) => {
+    if (event.detail?.sectionId === sectionId) {
+      if (window[updateKey]) {
+        window.removeEventListener('blessing:update', window[updateKey]);
+        delete window[updateKey];
+      }
+      if (window[errorKey]) {
+        window.removeEventListener('blessing:error', window[errorKey]);
+        delete window[errorKey];
+      }
+    }
+  });
+})();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Blessing reveal",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Your blessing"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_text",
+      "label": "Placeholder text",
+      "default": "Complete the conversation to reveal your personalised blessing."
+    },
+    {
+      "type": "text",
+      "id": "panel_background",
+      "label": "Panel background RGB",
+      "info": "RGB value without opacity (for example: 236, 227, 214).",
+      "default": "236, 227, 214"
+    },
+    {
+      "type": "range",
+      "id": "panel_opacity",
+      "label": "Panel opacity",
+      "default": 60,
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_copy_button",
+      "label": "Show copy to clipboard button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "copy_button_label",
+      "label": "Copy button label",
+      "default": "Copy blessing"
+    },
+    {
+      "type": "text",
+      "id": "copy_feedback",
+      "label": "Copy confirmation text",
+      "default": "Copied!"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_scroll",
+      "label": "Auto-scroll into view when blessing is ready",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Blessing reveal"
+    }
+  ]
+}
+{% endschema %}

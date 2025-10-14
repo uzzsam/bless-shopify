@@ -1,0 +1,255 @@
+{% liquid
+  assign background_video = section.settings.video_background
+  assign overlay_video = section.settings.video_overlay
+  assign overlay_rgb = section.settings.overlay_color | default: '46, 94, 76'
+  assign overlay_alpha = section.settings.overlay_opacity | default: 45 | times: 0.01
+%}
+
+<section id="BlessHero-{{ section.id }}" class="bless-hero">
+  <div class="bless-hero__media-wrap">
+    {% if background_video != blank %}
+      <div class="bless-hero__background">
+        {{
+          background_video
+          | video_tag:
+            autoplay: true,
+            loop: true,
+            muted: true,
+            playsinline: true,
+            controls: false,
+            class: 'bless-hero__background-video'
+        }}
+      </div>
+    {% endif %}
+
+    <div
+      class="bless-hero__overlay"
+      style="background-color: rgba({{ overlay_rgb }}, {{ overlay_alpha }})"
+    ></div>
+  </div>
+
+  <div class="bless-hero__content">
+    {% if overlay_video != blank %}
+      <div class="bless-hero__focus">
+        {{
+          overlay_video
+          | video_tag:
+            autoplay: true,
+            loop: true,
+            muted: true,
+            playsinline: true,
+            controls: false,
+            class: 'bless-hero__focus-video'
+        }}
+      </div>
+    {% endif %}
+
+    {% if section.settings.heading != blank %}
+      <h1 class="bless-hero__heading">
+        {{ section.settings.heading | escape }}
+      </h1>
+    {% endif %}
+
+    {% if section.settings.subheading != blank %}
+      <p class="bless-hero__subheading">
+        {{ section.settings.subheading | escape }}
+      </p>
+    {% endif %}
+
+    {% if section.settings.cta_label != blank %}
+      <a
+        class="bless-hero__cta link"
+        href="{{ section.settings.cta_target | default: '#chat-section' }}"
+      >
+        {{ section.settings.cta_label | escape }}
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+.bless-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(var(--color-dark-green, 46, 94, 76));
+  overflow: hidden;
+  color: rgb(var(--color-light-flesh, 236, 227, 214));
+}
+
+.bless-hero__media-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.bless-hero__background-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  max-width: 1600px;
+  margin: 0 auto;
+  display: block;
+}
+
+.bless-hero__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bless-hero__content {
+  position: relative;
+  z-index: 1;
+  max-width: min(640px, 90vw);
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.bless-hero__focus {
+  margin: 0 auto;
+  max-width: 600px;
+  width: min(100%, 600px);
+}
+
+.bless-hero__focus-video {
+  width: 100%;
+  height: auto;
+  border-radius: 32px;
+  box-shadow: 0 32px 60px rgba(0, 0, 0, 0.35);
+}
+
+.bless-hero__heading {
+  font-family: var(--font-heading, 'Cardo', serif);
+  font-size: clamp(2.5rem, 3vw + 1.5rem, 4rem);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.bless-hero__subheading {
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0;
+  color: rgba(var(--color-light-flesh, 236, 227, 214), 0.85);
+}
+
+.bless-hero__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 999px;
+  background: rgba(var(--color-avocado, 227, 216, 154), 0.92);
+  color: rgb(var(--color-dark-green, 46, 94, 76));
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 200ms ease, background-color 200ms ease;
+}
+
+.bless-hero__cta:hover,
+.bless-hero__cta:focus {
+  transform: translateY(-2px);
+  background: rgba(var(--color-avocado, 227, 216, 154), 1);
+}
+
+@media (max-width: 600px) {
+  .bless-hero__content {
+    padding-inline: 1rem;
+  }
+
+  .bless-hero__focus-video {
+    border-radius: 24px;
+  }
+}
+{% endstylesheet %}
+
+{% javascript %}
+const heroSection = document.getElementById('BlessHero-{{ section.id }}');
+if (heroSection) {
+  const cta = heroSection.querySelector('.bless-hero__cta');
+  if (cta) {
+    const targetSelector = cta.getAttribute('href');
+    if (targetSelector && targetSelector.startsWith('#')) {
+      cta.addEventListener('click', (event) => {
+        const targetElement = document.querySelector(targetSelector);
+        if (targetElement) {
+          event.preventDefault();
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+  }
+}
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Bless hero",
+  "settings": [
+    {
+      "type": "video",
+      "id": "video_background",
+      "label": "Background video"
+    },
+    {
+      "type": "video",
+      "id": "video_overlay",
+      "label": "Overlay focus video"
+    },
+    {
+      "type": "text",
+      "id": "overlay_color",
+      "label": "Overlay RGB value",
+      "info": "Enter an RGB value without opacity (for example: 46, 94, 76).",
+      "default": "46, 94, 76"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "default": 45,
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Blessings for every day"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Discover a personalised blessing crafted just for you, inspired by the spirit of Sidthah."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Begin your blessing"
+    },
+    {
+      "type": "text",
+      "id": "cta_target",
+      "label": "CTA anchor target",
+      "default": "#chat-section",
+      "info": "Provide an anchor (for example: #chat-section) to scroll to when the CTA is clicked."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bless hero"
+    }
+  ]
+}
+{% endschema %}

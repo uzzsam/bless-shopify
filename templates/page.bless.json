@@ -1,0 +1,27 @@
+{
+  "name": "Bless Landing Page",
+  "sections": {
+    "hero": {
+      "type": "bless-hero",
+      "settings": {}
+    },
+    "chat": {
+      "type": "bless-chat",
+      "settings": {}
+    },
+    "blessing": {
+      "type": "bless-blessing",
+      "settings": {}
+    },
+    "product": {
+      "type": "bless-product",
+      "settings": {}
+    }
+  },
+  "order": [
+    "hero",
+    "chat",
+    "blessing",
+    "product"
+  ]
+}
