@@ -42,6 +42,9 @@
         --color-light-flesh: 236, 227, 214;
         --font-heading: 'Cardo', serif;
         --font-body: 'Albert Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        {% if settings.bless_body_background != blank %}
+          --bless-body-background-image: url('{{ settings.bless_body_background | image_url: width: 2400 }}');
+        {% endif %}
       }
 
       body {
@@ -55,6 +58,26 @@
       h5,
       h6 {
         font-family: var(--font-heading);
+      }
+
+      .bless-shared-background {
+        background-image: var(--bless-body-background-image, none);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      .bless-shared-background--overlay {
+        position: relative;
+        isolation: isolate;
+      }
+
+      .bless-shared-background--overlay::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(var(--color-light-flesh, 236, 227, 214), 0.78);
+        z-index: -1;
       }
     </style>
 

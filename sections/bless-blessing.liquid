@@ -5,7 +5,7 @@
 
 <section
   id="blessing-section"
-  class="bless-blessing"
+  class="bless-blessing{% if settings.bless_body_background != blank %} bless-shared-background bless-shared-background--overlay{% endif %}"
   data-section-id="{{ section.id }}"
   data-auto-scroll="{{ section.settings.auto_scroll | default: false }}"
 >
@@ -40,8 +40,10 @@
 
 {% stylesheet %}
 .bless-blessing {
+  position: relative;
+  isolation: isolate;
   padding: clamp(3.5rem, 6vw, 7rem) 0;
-  background-image: var(--bless-body-background, none);
+  background-image: var(--bless-body-background-image, none);
   background-color: rgb(var(--color-light-green, 168, 204, 193));
   display: flex;
   justify-content: center;

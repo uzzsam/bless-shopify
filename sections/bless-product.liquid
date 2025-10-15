@@ -7,11 +7,12 @@
   assign panel_rgb = section.settings.panel_background | default: '65, 65, 65'
   assign panel_opacity = section.settings.panel_opacity | default: 70 | times: 0.01
   assign require_blessing = section.settings.require_blessing | default: true
+  assign form_id = 'BlessProductForm-' | append: section.id
 %}
 
 <section
   id="product-section"
-  class="bless-product"
+  class="bless-product{% if settings.bless_body_background != blank %} bless-shared-background bless-shared-background--overlay{% endif %}"
   data-section-id="{{ section.id }}"
   data-require-blessing="{{ require_blessing }}"
 >
@@ -22,7 +23,7 @@
       </h2>
     {% endif %}
 
-    {% if product %}
+    {% if product and selected_variant %}
       <div
         class="bless-product__card"
         style="background-color: rgba({{ panel_rgb }}, {{ panel_opacity }})"
@@ -31,15 +32,46 @@
         <div class="bless-product__details">
           {% if section.settings.show_media and product.featured_media %}
             <div class="bless-product__media">
-              {{
-                product.featured_media
-                | image_url: width: 760
-                | image_tag:
-                  widths: '400, 600, 760, 900',
-                  sizes: '(min-width: 768px) 360px, 80vw',
-                  alt: product.featured_media.alt | default: product.title,
-                  class: 'bless-product__image'
-              }}
+              {% assign featured_media = product.featured_media %}
+              {% case featured_media.media_type %}
+                {% when 'image' %}
+                  {{
+                    featured_media
+                    | image_url: width: 960
+                    | image_tag:
+                      widths: '400, 600, 760, 900',
+                      sizes: '(min-width: 768px) 360px, 80vw',
+                      alt: featured_media.alt | default: product.title,
+                      class: 'bless-product__image'
+                  }}
+                {% when 'video' %}
+                  {{
+                    featured_media
+                    | video_tag:
+                      controls: true,
+                      muted: true,
+                      loop: false,
+                      playsinline: true,
+                      class: 'bless-product__video'
+                  }}
+                {% when 'external_video' %}
+                  {{
+                    featured_media
+                    | external_video_tag:
+                      class: 'bless-product__video'
+                  }}
+                {% when 'model' %}
+                  {{
+                    featured_media
+                    | model_viewer_tag:
+                      class: 'bless-product__model'
+                  }}
+                {% else %}
+                  {{
+                    featured_media
+                    | media_tag: class: 'bless-product__media-generic'
+                  }}
+              {% endcase %}
             </div>
           {% endif %}
 
@@ -58,8 +90,10 @@
               </div>
             {% endif %}
 
-            {%- form 'product', product, id: 'BlessProductForm-' | append: section.id, novalidate: 'novalidate', class: 'bless-product__form' -%}
-              <input type="hidden" name="id" value="{{ selected_variant.id }}" data-variant-input>
+            {%- form 'product', product, id: form_id, novalidate: 'novalidate', class: 'bless-product__form' -%}
+              {% if selected_variant %}
+                <input type="hidden" name="id" value="{{ selected_variant.id }}" data-variant-input>
+              {% endif %}
               <input type="hidden" name="properties[{{ section.settings.property_key }}]" data-blessing-input>
 
               {% if section.settings.show_variant_picker and product.has_only_default_variant == false %}
@@ -119,8 +153,10 @@
 
 {% stylesheet %}
 .bless-product {
+  position: relative;
+  isolation: isolate;
   padding: clamp(3.5rem, 6vw, 7rem) 0;
-  background: rgb(var(--color-light-flesh, 236, 227, 214));
+  background-color: rgb(var(--color-light-flesh, 236, 227, 214));
   color: rgb(var(--color-dark-green, 46, 94, 76));
   display: flex;
   justify-content: center;
@@ -160,6 +196,14 @@
 }
 
 .bless-product__image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.bless-product__video,
+.bless-product__model,
+.bless-product__media-generic {
   width: 100%;
   height: auto;
   display: block;

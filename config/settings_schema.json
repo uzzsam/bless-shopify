@@ -2284,5 +2284,16 @@
         "default": "equal-width-buttons"
       }
     ]
+  },
+  {
+    "name": "Bless landing",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "bless_body_background",
+        "label": "Bless sections background image",
+        "info": "Displayed behind the chat, blessing, and product sections."
+      }
+    ]
   }
 ]
