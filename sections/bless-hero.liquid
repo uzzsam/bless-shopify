@@ -5,20 +5,9 @@
   assign overlay_alpha = section.settings.overlay_opacity | default: 45 | times: 0.01
   assign content_padding_top = section.settings.content_padding_top | default: 48
   assign content_padding_bottom = section.settings.content_padding_bottom | default: 48
-  assign header_overlap_offset = section.settings.header_overlap_offset | default: 0
-  assign hero_style = ''
-  if header_overlap_offset > 0
-    assign hero_style = 'margin-top:-' | append: header_overlap_offset | append: 'px;'
-  endif
 %}
 
-<section
-  id="BlessHero-{{ section.id }}"
-  class="bless-hero"
-  {% if hero_style != blank %}
-    style="{{ hero_style }}"
-  {% endif %}
->
+<section id="BlessHero-{{ section.id }}" class="bless-hero">
   <div class="bless-hero__media-wrap">
     {% if background_video != blank %}
       <div class="bless-hero__background">
@@ -102,11 +91,9 @@
 }
 
 .bless-hero__background-video {
-  width: 100%;
+  width: 100vw;
   height: 100%;
   object-fit: cover;
-  max-width: 1600px;
-  margin: 0 auto;
   display: block;
 }
 
@@ -119,7 +106,7 @@
 .bless-hero__content {
   position: relative;
   z-index: 1;
-  max-width: min(640px, 90vw);
+  max-width: min(620px, 92vw);
   margin: 0 auto;
   text-align: center;
   padding-inline: 1.5rem;
@@ -132,8 +119,8 @@
 
 .bless-hero__focus {
   margin: 0 auto;
-  max-width: 600px;
-  width: min(100%, 600px);
+  max-width: clamp(260px, 22vw + 160px, 420px);
+  width: min(100%, clamp(260px, 22vw + 160px, 420px));
   display: flex;
   justify-content: center;
 }
@@ -144,7 +131,7 @@
   aspect-ratio: 9 / 16;
   max-height: min(90vh, 920px);
   object-fit: cover;
-  border-radius: 32px;
+  border-radius: 0 0 32px 32px;
   box-shadow: 0 32px 60px rgba(0, 0, 0, 0.35);
 }
 
@@ -189,7 +176,7 @@
   }
 
   .bless-hero__focus-video {
-    border-radius: 24px;
+    border-radius: 0 0 24px 24px;
   }
 }
 {% endstylesheet %}
@@ -243,17 +230,6 @@ if (heroSection) {
       "max": 100,
       "step": 5,
       "unit": "%"
-    },
-    {
-      "type": "range",
-      "id": "header_overlap_offset",
-      "label": "Header overlap offset",
-      "info": "Reduce the top margin so the hero video sits behind the header.",
-      "default": 0,
-      "min": 0,
-      "max": 200,
-      "step": 4,
-      "unit": "px"
     },
     {
       "type": "range",

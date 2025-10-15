@@ -12,7 +12,7 @@
 
 <section
   id="product-section"
-  class="bless-product{% if settings.bless_body_background != blank %} bless-shared-background bless-shared-background--overlay{% endif %}"
+  class="bless-product"
   data-section-id="{{ section.id }}"
   data-require-blessing="{{ require_blessing }}"
 >
@@ -156,7 +156,7 @@
   position: relative;
   isolation: isolate;
   padding: clamp(3.5rem, 6vw, 7rem) 0;
-  background-color: rgb(var(--color-light-flesh, 236, 227, 214));
+  background-color: transparent;
   color: rgb(var(--color-dark-green, 46, 94, 76));
   display: flex;
   justify-content: center;

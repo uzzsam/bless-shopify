@@ -6,7 +6,7 @@
 
 <section
   id="chat-section"
-  class="bless-chat{% if settings.bless_body_background != blank %} bless-shared-background bless-shared-background--overlay{% endif %}"
+  class="bless-chat"
   data-section-id="{{ section_id }}"
   data-embed-url="{{ embed_script_url | escape }}"
   data-app-proxy-path="{{ app_proxy_path | escape }}"
@@ -42,7 +42,7 @@
   position: relative;
   isolation: isolate;
   padding: clamp(3rem, 5vw, 6rem) 0;
-  background-color: rgb(var(--color-light-flesh, 236, 227, 214));
+  background-color: transparent;
   color: rgb(var(--color-dark-green, 46, 94, 76));
 }
 
