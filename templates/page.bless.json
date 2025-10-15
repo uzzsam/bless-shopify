@@ -1,21 +1,70 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
-  "name": "Bless Landing Page",
   "sections": {
     "hero": {
       "type": "bless-hero",
-      "settings": {}
+      "settings": {
+        "video_background": "shopify://files/videos/stream-medium.mp4",
+        "video_overlay": "shopify://files/videos/Sidthah_hero_video_16_9.mov",
+        "overlay_color": "46, 94, 76",
+        "overlay_opacity": 0,
+        "heading": "Blessings for every day",
+        "subheading": "Discover a personalised blessing crafted just for you, inspired by the spirit of Sidthah.",
+        "cta_label": "Begin your blessing",
+        "cta_target": "#chat-section"
+      }
     },
     "chat": {
       "type": "bless-chat",
-      "settings": {}
+      "settings": {
+        "heading": "Begin your personalised blessing",
+        "intro_text": "<p>Our guide will ask a few heartfelt questions to craft a blessing meant just for you. Answer when you are ready.</p>",
+        "embed_script_url": "",
+        "app_proxy_path": "/apps/bless",
+        "loading_message": "Polishing your blessing...",
+        "error_message": "We could not save your blessing. Please try again."
+      }
     },
     "blessing": {
       "type": "bless-blessing",
-      "settings": {}
+      "settings": {
+        "heading": "Your blessing",
+        "placeholder_text": "Complete the conversation to reveal your personalised blessing.",
+        "panel_background": "236, 227, 214",
+        "panel_opacity": 60,
+        "show_copy_button": true,
+        "copy_button_label": "Copy blessing",
+        "copy_feedback": "Copied!",
+        "auto_scroll": true
+      }
     },
     "product": {
       "type": "bless-product",
-      "settings": {}
+      "settings": {
+        "product": "",
+        "heading": "Carry your blessing with you",
+        "panel_background": "65, 65, 65",
+        "panel_opacity": 70,
+        "show_media": true,
+        "show_description": false,
+        "show_price": true,
+        "show_variant_picker": true,
+        "show_variant_prices": false,
+        "show_quantity_selector": true,
+        "require_blessing": true,
+        "variant_label": "Choose your option",
+        "property_key": "Blessing",
+        "button_label": "Add blessing to cart",
+        "cart_note": "We will include this blessing with your order."
+      }
     }
   },
   "order": [
