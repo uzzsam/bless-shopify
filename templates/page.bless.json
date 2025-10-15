@@ -16,7 +16,7 @@
         "video_overlay": "shopify://files/videos/Sidthah_hero_video_16_9.mov",
         "overlay_color": "46, 94, 76",
         "overlay_opacity": 0,
-        "header_overlap_offset": 68,
+        "header_overlap_offset": 0,
         "content_padding_top": 0,
         "content_padding_bottom": 16,
         "heading": "Blessings for every day",
@@ -30,7 +30,7 @@
       "settings": {
         "heading": "Begin your personalised blessing",
         "intro_text": "<p>Our guide will ask a few heartfelt questions to craft a blessing meant just for you. Answer when you are ready.</p>",
-        "embed_script_url": "",
+        "embed_script_url": "https://bless-test-brown.vercel.app/api/chat",
         "app_proxy_path": "/apps/bless",
         "loading_message": "Polishing your blessing...",
         "error_message": "We could not save your blessing. Please try again."
