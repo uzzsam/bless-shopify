@@ -46,7 +46,7 @@
           <div class="bless-product__content">
             <h3 class="bless-product__title">{{ product.title | escape }}</h3>
 
-            {% if section.settings.show_price && selected_variant %}
+            {% if section.settings.show_price and selected_variant %}
               <p class="bless-product__price">
                 {{ selected_variant.price | money_with_currency }}
               </p>
