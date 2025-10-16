@@ -10,6 +10,9 @@
   data-section-id="{{ section_id }}"
   data-embed-url="{{ embed_script_url | escape }}"
   data-app-proxy-path="{{ app_proxy_path | escape }}"
+  data-api-url="{{ section.settings.chat_api_url | escape }}"
+  data-placeholder="{{ section.settings.input_placeholder | escape }}"
+  data-loading-text="{{ section.settings.loading_message | escape }}"
 >
   <div class="bless-chat__inner">
     {% if section.settings.heading != blank %}
@@ -212,9 +215,22 @@
     },
     {
       "type": "text",
+      "id": "chat_api_url",
+      "label": "Chat API endpoint",
+      "default": "https://bless-test-brown.vercel.app/api/chat",
+      "info": "The Vercel endpoint that powers the conversation."
+    },
+    {
+      "type": "text",
+      "id": "input_placeholder",
+      "label": "Input placeholder",
+      "default": "Talk to Sidthah"
+    },
+    {
+      "type": "text",
       "id": "loading_message",
       "label": "Loading message",
-      "default": "Polishing your blessing..."
+      "default": "Breathe and await your blessing from Sidthah..."
     },
     {
       "type": "text",
