@@ -107,18 +107,51 @@
 
   const embedUrl = sectionEl.dataset.embedUrl;
   const appProxyPath = sectionEl.dataset.appProxyPath || '/apps/bless';
+  const apiUrl = sectionEl.dataset.apiUrl;
+  const placeholder = sectionEl.dataset.placeholder;
+  const loadingMessage = sectionEl.dataset.loadingText;
+  const targetSelector = `#bless-chat-${sectionId}`;
   const statusEl = sectionEl.querySelector('[data-status]');
   const loadingText = statusEl?.dataset.loadingText || 'Finalising your blessing...';
   const errorTextDefault = statusEl?.dataset.errorText || 'We could not save your blessing. Please try again.';
 
   const SCRIPT_DATA_ATTR = 'data-bless-chat-src';
 
-  if (embedUrl && !document.querySelector(`script[${SCRIPT_DATA_ATTR}="${embedUrl}"]`)) {
-    const script = document.createElement('script');
-    script.src = embedUrl;
-    script.defer = true;
-    script.setAttribute(SCRIPT_DATA_ATTR, embedUrl);
-    document.head.appendChild(script);
+  const mountWidget = () => {
+    if (window.BlessChat?.mount) {
+      window.BlessChat.mount(targetSelector, {
+        apiUrl: apiUrl || undefined,
+        placeholder: placeholder || undefined,
+        loadingText: loadingMessage || undefined
+      });
+    }
+  };
+
+  if (embedUrl) {
+    let script = document.querySelector(`script[${SCRIPT_DATA_ATTR}="${embedUrl}"]`);
+    if (!script) {
+      script = document.createElement('script');
+      script.src = embedUrl;
+      script.defer = true;
+      script.setAttribute(SCRIPT_DATA_ATTR, embedUrl);
+      script.addEventListener('load', () => {
+        script?.setAttribute('data-bless-chat-ready', 'true');
+        mountWidget();
+      });
+      document.head.appendChild(script);
+    } else if (script.getAttribute('data-bless-chat-ready') === 'true') {
+      mountWidget();
+    } else {
+      script.addEventListener('load', () => {
+        script?.setAttribute('data-bless-chat-ready', 'true');
+        mountWidget();
+      });
+      if (window.BlessChat?.mount) {
+        mountWidget();
+      }
+    }
+  } else {
+    mountWidget();
   }
 
   function setStatus(message) {
