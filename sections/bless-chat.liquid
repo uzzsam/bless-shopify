@@ -116,43 +116,79 @@
   const errorTextDefault = statusEl?.dataset.errorText || 'We could not save your blessing. Please try again.';
 
   const SCRIPT_DATA_ATTR = 'data-bless-chat-src';
+  const debug = (...args) => {
+    try {
+      console.info(`[BlessChat][${sectionId}]`, ...args);
+    } catch (_ignore) {
+      /* no-op */
+    }
+  };
 
   const mountWidget = () => {
     if (window.BlessChat?.mount) {
+      debug('Mounting widget', { targetSelector, apiUrl, placeholder, loadingMessage });
       window.BlessChat.mount(targetSelector, {
         apiUrl: apiUrl || undefined,
         placeholder: placeholder || undefined,
         loadingText: loadingMessage || undefined
       });
+      return true;
     }
+    debug('BlessChat.mount not available yet');
+    return false;
   };
 
   if (embedUrl) {
     let script = document.querySelector(`script[${SCRIPT_DATA_ATTR}="${embedUrl}"]`);
     if (!script) {
+      debug('Creating script tag', embedUrl);
       script = document.createElement('script');
       script.src = embedUrl;
       script.defer = true;
       script.setAttribute(SCRIPT_DATA_ATTR, embedUrl);
       script.addEventListener('load', () => {
         script?.setAttribute('data-bless-chat-ready', 'true');
+        debug('Script loaded');
         mountWidget();
+      });
+      script.addEventListener('error', (event) => {
+        debug('Script failed to load', event?.message || event);
       });
       document.head.appendChild(script);
     } else if (script.getAttribute('data-bless-chat-ready') === 'true') {
+      debug('Reusing existing script (ready)');
       mountWidget();
     } else {
       script.addEventListener('load', () => {
         script?.setAttribute('data-bless-chat-ready', 'true');
+        debug('Script loaded (existing tag)');
         mountWidget();
       });
+      script.addEventListener('error', (event) => {
+        debug('Script failed to load (existing tag)', event?.message || event);
+      });
       if (window.BlessChat?.mount) {
+        debug('Mounting with existing BlessChat instance');
         mountWidget();
       }
     }
   } else {
+    debug('No embed URL provided; attempting immediate mount');
     mountWidget();
   }
+
+  let attemptCount = 0;
+  const mountInterval = setInterval(() => {
+    attemptCount += 1;
+    if (mountWidget() || attemptCount > 20) {
+      clearInterval(mountInterval);
+      if (attemptCount > 20) {
+        debug('Stopped retrying mount after 20 attempts');
+      }
+    }
+  }, 250);
+
+  debug('Initial BlessChat availability', { hasBlessChat: Boolean(window.BlessChat) });
 
   function setStatus(message) {
     if (!statusEl) return;
