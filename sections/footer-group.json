@@ -214,8 +214,9 @@
         "section_height": "",
         "section_height_custom": 50,
         "color_scheme": "scheme-2",
-        "background_media": "none",
+        "background_media": "image",
         "video_position": "cover",
+        "background_image": "shopify://shop_images/footer-gradient.jpg",
         "background_image_position": "cover",
         "border": "none",
         "border_width": 1,
@@ -223,9 +224,9 @@
         "border_radius": 0,
         "toggle_overlay": true,
         "overlay_color": "#414141",
-        "overlay_style": "solid",
+        "overlay_style": "gradient",
         "gradient_direction": "to top",
-        "padding-block-start": 40,
+        "padding-block-start": 100,
         "padding-block-end": 0
       }
     },
