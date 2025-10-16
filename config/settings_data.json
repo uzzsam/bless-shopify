@@ -359,7 +359,7 @@
       },
       "scheme-de94e0ef-f9f2-475c-9e18-01945bb2b13e": {
         "settings": {
-          "background": "#414141",
+          "background": "#41414100",
           "foreground_heading": "#ffffff",
           "foreground": "#ece3d6",
           "primary": "#a8ccc1",
@@ -676,5 +676,8 @@
         }
       }
     }
+  },
+  "platform_customizations": {
+    "custom_css": []
   }
 }
