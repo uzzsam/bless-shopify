@@ -31,7 +31,7 @@
         "intro_text": "<p>Sidthah is aware of a collective human knowledge and wisdom to gift you positive affirmation for you or a loved one. Talk to Sidthah when you are ready.</p>",
         "embed_script_url": "https://bless-test-brown.vercel.app/bless-chat-widget.js",
         "app_proxy_path": "/apps/bless",
-        "chat_api_url": "https://bless-test-brown.vercel.app/api/chat",
+        "chat_api_url": "https://bless-test-brown.vercel.app/bless-chat-widget.js",
         "input_placeholder": "Talk to Sidthah",
         "loading_message": "Breathe and await your blessing from Sidthah...",
         "error_message": "Please try again."
