@@ -101,9 +101,12 @@
 
 {% javascript %}
 (function () {
-  const sectionId = '{{ section_id }}';
-  const sectionEl = document.querySelector(`[data-section-id="${sectionId}"]`);
-  if (!sectionEl) return;
+  const scriptEl = document.currentScript;
+  const sectionEl = scriptEl?.closest('[data-section-id]');
+  if (!sectionEl) {
+    return;
+  }
+  const sectionId = sectionEl.dataset.sectionId || '{{ section_id }}';
 
   const embedUrl = sectionEl.dataset.embedUrl;
   const appProxyPath = sectionEl.dataset.appProxyPath || '/apps/bless';
