@@ -400,22 +400,6 @@
             "padding-inline-end": 0
           },
           "blocks": {
-            "product_card_gallery_Gn6P7T": {
-              "type": "_product-card-gallery",
-              "name": "t:names.product_card_media",
-              "settings": {
-                "image_ratio": "square",
-                "border": "none",
-                "border_width": 0,
-                "border_opacity": 0,
-                "border_radius": 10,
-                "padding-block-start": 50,
-                "padding-block-end": 50,
-                "padding-inline-start": 50,
-                "padding-inline-end": 50
-              },
-              "blocks": {}
-            },
             "group_AUJmQt": {
               "type": "_product-card-group",
               "name": "t:names.group",
@@ -624,11 +608,27 @@
                 "group_pLH7Cd",
                 "group_3Fwdtp"
               ]
+            },
+            "product_card_gallery_Gn6P7T": {
+              "type": "_product-card-gallery",
+              "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "square",
+                "border": "none",
+                "border_width": 0,
+                "border_opacity": 0,
+                "border_radius": 10,
+                "padding-block-start": 50,
+                "padding-block-end": 50,
+                "padding-inline-start": 50,
+                "padding-inline-end": 50
+              },
+              "blocks": {}
             }
           },
           "block_order": [
-            "product_card_gallery_Gn6P7T",
-            "group_AUJmQt"
+            "group_AUJmQt",
+            "product_card_gallery_Gn6P7T"
           ]
         }
       },
@@ -640,11 +640,11 @@
         "max_products": 6,
         "columns": 3,
         "mobile_columns": "1",
-        "mobile_card_size": "60cqw",
+        "mobile_card_size": "44cqw",
         "columns_gap": 1,
         "rows_gap": 1,
         "icons_style": "arrow",
-        "icons_shape": "none",
+        "icons_shape": "circle",
         "section_width": "page-width",
         "horizontal_alignment": "center",
         "gap": 0,

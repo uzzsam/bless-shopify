@@ -30,6 +30,7 @@
     "type_case_h6": "uppercase",
     "page_width": "narrow",
     "card_hover_effect": "subtle-zoom",
+    "badge_sale_color_scheme": "scheme-de94e0ef-f9f2-475c-9e18-01945bb2b13e",
     "button_border_radius_primary": 0,
     "type_font_button_primary": "accent",
     "button_text_case_primary": "uppercase",
@@ -359,7 +360,7 @@
       },
       "scheme-de94e0ef-f9f2-475c-9e18-01945bb2b13e": {
         "settings": {
-          "background": "#41414100",
+          "background": "rgba(0,0,0,0)",
           "foreground_heading": "#ffffff",
           "foreground": "#ece3d6",
           "primary": "#a8ccc1",
