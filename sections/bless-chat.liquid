@@ -107,6 +107,7 @@
   const MAX_SECTION_LOOKUPS = 80;
   const SECTION_LOOKUP_DELAY = 125;
 
+  const scriptEl = document.currentScript;
   let sectionLookupAttempts = 0;
   let currentSectionEl = null;
   let mountIntervalId = null;
@@ -119,6 +120,26 @@
     } catch (_ignore) {
       /* no-op */
     }
+  }
+
+  function resolveSectionElement() {
+    if (scriptEl) {
+      const fromScript = scriptEl.closest('[data-embed-url]');
+      if (fromScript) return fromScript;
+    }
+
+    const byDataset = document.querySelector(
+      `[data-section-id="${sectionId}"][data-embed-url]`
+    );
+    if (byDataset) return byDataset;
+
+    const container = document.getElementById(`shopify-section-${sectionId}`);
+    if (container) {
+      const nested = container.querySelector('[data-embed-url]');
+      if (nested) return nested;
+    }
+
+    return null;
   }
 
   function mountSection(sectionEl) {
@@ -270,16 +291,18 @@
   }
 
   function initialiseSection() {
-    const sectionEl = document.querySelector(`[data-section-id="${sectionId}"]`);
+    const sectionEl = resolveSectionElement();
     return mountSection(sectionEl);
   }
 
   function handleSectionLoad(event) {
     if (event.detail?.sectionId !== sectionId) return;
 
-    const context = event.target instanceof HTMLElement ? event.target : document;
-    const sectionEl = context.querySelector(`[data-section-id="${sectionId}"]`);
-    if (sectionEl) {
+    const target = event.target instanceof HTMLElement ? event.target : null;
+    const sectionEl =
+      target?.querySelector?.('[data-embed-url]') || resolveSectionElement();
+
+    if (sectionEl?.dataset?.blessChatInitialized) {
       delete sectionEl.dataset.blessChatInitialized;
     }
 
