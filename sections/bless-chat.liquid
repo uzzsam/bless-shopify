@@ -123,9 +123,19 @@
   }
 
   function resolveSectionElement() {
+    const chatTarget = document.getElementById(`bless-chat-${sectionId}`);
+    if (chatTarget) {
+      const wrapper = chatTarget.closest('[data-section-id]');
+      if (wrapper && wrapper.dataset && wrapper.dataset.embedUrl !== undefined) {
+        return wrapper;
+      }
+    }
+
     if (scriptEl) {
-      const fromScript = scriptEl.closest('[data-embed-url]');
-      if (fromScript) return fromScript;
+      const scriptWrapper = scriptEl.closest('[data-section-id]');
+      if (scriptWrapper && scriptWrapper.dataset && scriptWrapper.dataset.embedUrl !== undefined) {
+        return scriptWrapper;
+      }
     }
 
     const byDataset = document.querySelector(
@@ -133,9 +143,9 @@
     );
     if (byDataset) return byDataset;
 
-    const container = document.getElementById(`shopify-section-${sectionId}`);
-    if (container) {
-      const nested = container.querySelector('[data-embed-url]');
+    const sectionContainer = document.getElementById(`shopify-section-${sectionId}`);
+    if (sectionContainer) {
+      const nested = sectionContainer.querySelector('[data-embed-url]');
       if (nested) return nested;
     }
 
@@ -299,10 +309,15 @@
     if (event.detail?.sectionId !== sectionId) return;
 
     const target = event.target instanceof HTMLElement ? event.target : null;
-    const sectionEl =
-      target?.querySelector?.('[data-embed-url]') || resolveSectionElement();
+    let sectionEl = null;
+    if (target && typeof target.querySelector === 'function') {
+      sectionEl = target.querySelector('[data-embed-url]');
+    }
+    if (!sectionEl) {
+      sectionEl = resolveSectionElement();
+    }
 
-    if (sectionEl?.dataset?.blessChatInitialized) {
+    if (sectionEl && sectionEl.dataset && sectionEl.dataset.blessChatInitialized) {
       delete sectionEl.dataset.blessChatInitialized;
     }
 
