@@ -102,154 +102,240 @@
 {% javascript %}
 (function () {
   const sectionId = '{{ section_id }}';
-  const sectionEl = document.querySelector(`[data-section-id="${sectionId}"]`);
-  if (!sectionEl) return;
-
-  const embedUrl = sectionEl.dataset.embedUrl;
-  const appProxyPath = sectionEl.dataset.appProxyPath || '/apps/bless';
-  const apiUrl = sectionEl.dataset.apiUrl;
-  const placeholder = sectionEl.dataset.placeholder;
-  const loadingMessage = sectionEl.dataset.loadingText;
-  const targetSelector = `#bless-chat-${sectionId}`;
-  const statusEl = sectionEl.querySelector('[data-status]');
-  const loadingText = statusEl?.dataset.loadingText || 'Finalising your blessing...';
-  const errorTextDefault = statusEl?.dataset.errorText || 'We could not save your blessing. Please try again.';
-
   const SCRIPT_DATA_ATTR = 'data-bless-chat-src';
-  const debug = (...args) => {
+  const handlerKey = `__blessChatHandler_${sectionId}`;
+  const MAX_SECTION_LOOKUPS = 20;
+  const SECTION_LOOKUP_DELAY = 100;
+
+  let sectionLookupAttempts = 0;
+  let currentSectionEl = null;
+  let mountIntervalId = null;
+  let loadListenerAttached = false;
+  let unloadListenerAttached = false;
+
+  function debug(...args) {
     try {
       console.info(`[BlessChat][${sectionId}]`, ...args);
     } catch (_ignore) {
       /* no-op */
     }
-  };
+  }
 
-  const mountWidget = () => {
-    if (window.BlessChat?.mount) {
-      debug('Mounting widget', { targetSelector, apiUrl, placeholder, loadingMessage });
-      window.BlessChat.mount(targetSelector, {
-        apiUrl: apiUrl || undefined,
-        placeholder: placeholder || undefined,
-        loadingText: loadingMessage || undefined
-      });
+  function mountSection(sectionEl) {
+    if (!sectionEl) {
+      return false;
+    }
+
+    if (sectionEl.dataset.blessChatInitialized === 'true') {
       return true;
     }
-    debug('BlessChat.mount not available yet');
-    return false;
-  };
 
-  if (embedUrl) {
-    let script = document.querySelector(`script[${SCRIPT_DATA_ATTR}="${embedUrl}"]`);
-    if (!script) {
-      debug('Creating script tag', embedUrl);
-      script = document.createElement('script');
-      script.src = embedUrl;
-      script.defer = true;
-      script.setAttribute(SCRIPT_DATA_ATTR, embedUrl);
-      script.addEventListener('load', () => {
-        script?.setAttribute('data-bless-chat-ready', 'true');
-        debug('Script loaded');
-        mountWidget();
-      });
-      script.addEventListener('error', (event) => {
-        debug('Script failed to load', event?.message || event);
-      });
-      document.head.appendChild(script);
-    } else if (script.getAttribute('data-bless-chat-ready') === 'true') {
-      debug('Reusing existing script (ready)');
-      mountWidget();
-    } else {
-      script.addEventListener('load', () => {
-        script?.setAttribute('data-bless-chat-ready', 'true');
-        debug('Script loaded (existing tag)');
-        mountWidget();
-      });
-      script.addEventListener('error', (event) => {
-        debug('Script failed to load (existing tag)', event?.message || event);
-      });
+    currentSectionEl = sectionEl;
+    sectionEl.dataset.blessChatInitialized = 'true';
+
+    const embedUrl = sectionEl.dataset.embedUrl;
+    const appProxyPath = sectionEl.dataset.appProxyPath || '/apps/bless';
+    const apiUrl = sectionEl.dataset.apiUrl;
+    const placeholder = sectionEl.dataset.placeholder;
+    const loadingMessage = sectionEl.dataset.loadingText;
+    const targetSelector = `#bless-chat-${sectionId}`;
+    const statusEl = sectionEl.querySelector('[data-status]');
+    const loadingText = statusEl?.dataset.loadingText || 'Finalising your blessing...';
+    const errorTextDefault = statusEl?.dataset.errorText || 'We could not save your blessing. Please try again.';
+
+    const mountWidget = () => {
       if (window.BlessChat?.mount) {
-        debug('Mounting with existing BlessChat instance');
+        debug('Mounting widget', { targetSelector, apiUrl, placeholder, loadingMessage });
+        window.BlessChat.mount(targetSelector, {
+          apiUrl: apiUrl || undefined,
+          placeholder: placeholder || undefined,
+          loadingText: loadingMessage || undefined
+        });
+        return true;
+      }
+      debug('BlessChat.mount not available yet');
+      return false;
+    };
+
+    if (embedUrl) {
+      let script = document.querySelector(`script[${SCRIPT_DATA_ATTR}="${embedUrl}"]`);
+      if (!script) {
+        debug('Creating script tag', embedUrl);
+        script = document.createElement('script');
+        script.src = embedUrl;
+        script.defer = true;
+        script.setAttribute(SCRIPT_DATA_ATTR, embedUrl);
+        script.addEventListener('load', () => {
+          script?.setAttribute('data-bless-chat-ready', 'true');
+          debug('Script loaded');
+          mountWidget();
+        });
+        script.addEventListener('error', (event) => {
+          debug('Script failed to load', event?.message || event);
+        });
+        document.head.appendChild(script);
+      } else if (script.getAttribute('data-bless-chat-ready') === 'true') {
+        debug('Reusing existing script (ready)');
         mountWidget();
+      } else {
+        script.addEventListener('load', () => {
+          script?.setAttribute('data-bless-chat-ready', 'true');
+          debug('Script loaded (existing tag)');
+          mountWidget();
+        });
+        script.addEventListener('error', (event) => {
+          debug('Script failed to load (existing tag)', event?.message || event);
+        });
+        if (window.BlessChat?.mount) {
+          debug('Mounting with existing BlessChat instance');
+          mountWidget();
+        }
       }
-    }
-  } else {
-    debug('No embed URL provided; attempting immediate mount');
-    mountWidget();
-  }
-
-  let attemptCount = 0;
-  const mountInterval = setInterval(() => {
-    attemptCount += 1;
-    if (mountWidget() || attemptCount > 20) {
-      clearInterval(mountInterval);
-      if (attemptCount > 20) {
-        debug('Stopped retrying mount after 20 attempts');
-      }
-    }
-  }, 250);
-
-  debug('Initial BlessChat availability', { hasBlessChat: Boolean(window.BlessChat) });
-
-  function setStatus(message) {
-    if (!statusEl) return;
-    if (message) {
-      statusEl.textContent = message;
-      statusEl.hidden = false;
     } else {
-      statusEl.textContent = '';
-      statusEl.hidden = true;
+      debug('No embed URL provided; attempting immediate mount');
+      mountWidget();
     }
-  }
 
-  const handlerKey = `__blessChatHandler_${sectionId}`;
-  if (window[handlerKey]) {
-    window.removeEventListener('blessing:ready', window[handlerKey]);
-  }
-
-  window[handlerKey] = async (event) => {
-    const detail = event?.detail;
-    const blessing = detail?.blessing || detail?.text;
-    if (!blessing) return;
-
-    setStatus(loadingText);
-
-    try {
-      const response = await fetch(appProxyPath, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ blessing })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Proxy responded with ${response.status}`);
+    if (mountIntervalId) {
+      clearInterval(mountIntervalId);
+    }
+    let attemptCount = 0;
+    mountIntervalId = setInterval(() => {
+      attemptCount += 1;
+      if (mountWidget() || attemptCount > 20) {
+        clearInterval(mountIntervalId);
+        mountIntervalId = null;
+        if (attemptCount > 20) {
+          debug('Stopped retrying mount after 20 attempts');
+        }
       }
+    }, 250);
 
-      const payload = await response.json();
-      const blessingText = payload.blessingText || blessing;
+    debug('Initial BlessChat availability', { hasBlessChat: Boolean(window.BlessChat) });
 
-      setStatus('');
-      window.dispatchEvent(
-        new CustomEvent('blessing:update', { detail: { text: blessingText } })
-      );
-    } catch (error) {
-      console.error('Bless chat proxy error', error);
-      setStatus(errorTextDefault);
-      window.dispatchEvent(
-        new CustomEvent('blessing:error', {
-          detail: { message: errorTextDefault, error: String(error) }
-        })
-      );
+    function setStatus(message) {
+      if (!statusEl) return;
+      if (message) {
+        statusEl.textContent = message;
+        statusEl.hidden = false;
+      } else {
+        statusEl.textContent = '';
+        statusEl.hidden = true;
+      }
     }
-  };
 
-  window.addEventListener('blessing:ready', window[handlerKey]);
+    if (window[handlerKey]) {
+      window.removeEventListener('blessing:ready', window[handlerKey]);
+    }
 
-  document.addEventListener('shopify:section:unload', (event) => {
-    if (event.detail?.sectionId === sectionId && window[handlerKey]) {
+    window[handlerKey] = async (event) => {
+      const detail = event?.detail;
+      const blessing = detail?.blessing || detail?.text;
+      if (!blessing) return;
+
+      setStatus(loadingText);
+
+      try {
+        const response = await fetch(appProxyPath, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ blessing })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Proxy responded with ${response.status}`);
+        }
+
+        const payload = await response.json();
+        const blessingText = payload.blessingText || blessing;
+
+        setStatus('');
+        window.dispatchEvent(
+          new CustomEvent('blessing:update', { detail: { text: blessingText } })
+        );
+      } catch (error) {
+        console.error('Bless chat proxy error', error);
+        setStatus(errorTextDefault);
+        window.dispatchEvent(
+          new CustomEvent('blessing:error', {
+            detail: { message: errorTextDefault, error: String(error) }
+          })
+        );
+      }
+    };
+
+    window.addEventListener('blessing:ready', window[handlerKey]);
+
+    return true;
+  }
+
+  function initialiseSection() {
+    const sectionEl = document.querySelector(`[data-section-id="${sectionId}"]`);
+    return mountSection(sectionEl);
+  }
+
+  function handleSectionLoad(event) {
+    if (event.detail?.sectionId !== sectionId) return;
+
+    const context = event.target instanceof HTMLElement ? event.target : document;
+    const sectionEl = context.querySelector(`[data-section-id="${sectionId}"]`);
+    if (sectionEl) {
+      delete sectionEl.dataset.blessChatInitialized;
+    }
+
+    sectionLookupAttempts = 0;
+    ensureSection();
+  }
+
+  function handleSectionUnload(event) {
+    if (event.detail?.sectionId !== sectionId) return;
+
+    if (mountIntervalId) {
+      clearInterval(mountIntervalId);
+      mountIntervalId = null;
+    }
+    if (currentSectionEl?.dataset?.blessChatInitialized) {
+      delete currentSectionEl.dataset.blessChatInitialized;
+    }
+    currentSectionEl = null;
+
+    if (window[handlerKey]) {
       window.removeEventListener('blessing:ready', window[handlerKey]);
       delete window[handlerKey];
     }
-  });
+  }
+
+  function attachEditorListeners() {
+    if (!loadListenerAttached) {
+      document.addEventListener('shopify:section:load', handleSectionLoad);
+      loadListenerAttached = true;
+    }
+    if (!unloadListenerAttached) {
+      document.addEventListener('shopify:section:unload', handleSectionUnload);
+      unloadListenerAttached = true;
+    }
+  }
+
+  function ensureSection() {
+    if (initialiseSection()) {
+      return;
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ensureSection, { once: true });
+      return;
+    }
+
+    sectionLookupAttempts += 1;
+    if (sectionLookupAttempts <= MAX_SECTION_LOOKUPS) {
+      setTimeout(ensureSection, SECTION_LOOKUP_DELAY);
+    } else {
+      debug('Unable to locate section element for initialization');
+    }
+  }
+
+  attachEditorListeners();
+  ensureSection();
 })();
 {% endjavascript %}
 
