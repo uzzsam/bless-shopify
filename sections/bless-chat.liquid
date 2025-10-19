@@ -101,11 +101,11 @@
 
 {% javascript %}
 (function () {
-  const sectionId = '{{ section_id }}';
+  const sectionId = {{ section_id | json }};
   const SCRIPT_DATA_ATTR = 'data-bless-chat-src';
   const handlerKey = `__blessChatHandler_${sectionId}`;
-  const MAX_SECTION_LOOKUPS = 20;
-  const SECTION_LOOKUP_DELAY = 100;
+  const MAX_SECTION_LOOKUPS = 80;
+  const SECTION_LOOKUP_DELAY = 125;
 
   let sectionLookupAttempts = 0;
   let currentSectionEl = null;
@@ -330,7 +330,7 @@
     if (sectionLookupAttempts <= MAX_SECTION_LOOKUPS) {
       setTimeout(ensureSection, SECTION_LOOKUP_DELAY);
     } else {
-      debug('Unable to locate section element for initialization');
+      debug('Unable to locate section element for initialization', { sectionId });
     }
   }
 
