@@ -106,6 +106,44 @@
   var handlerKey = '__blessChatHandler_' + sectionId;
   var MAX_SECTION_LOOKUPS = 80;
   var SECTION_LOOKUP_DELAY = 125;
+  var scriptNonce = (function () {
+    if (typeof document === 'undefined') return null;
+
+    var current = document.currentScript || null;
+    if (current) {
+      var directNonce =
+        (typeof current.getAttribute === 'function' && current.getAttribute('nonce')) ||
+        current.nonce ||
+        null;
+      if (directNonce) {
+        return directNonce;
+      }
+    }
+
+    if (typeof document.querySelector === 'function') {
+      var meta = document.querySelector('meta[name="csp-nonce"]');
+      if (meta && typeof meta.getAttribute === 'function') {
+        var metaNonce = meta.getAttribute('content');
+        if (metaNonce) {
+          return metaNonce;
+        }
+      }
+    }
+
+    var scripts = document.getElementsByTagName('script');
+    for (var i = scripts.length - 1; i >= 0; i -= 1) {
+      var candidate = scripts[i];
+      if (!candidate || typeof candidate.getAttribute !== 'function') {
+        continue;
+      }
+      var candidateNonce = candidate.getAttribute('nonce');
+      if (candidateNonce) {
+        return candidateNonce;
+      }
+    }
+
+    return null;
+  })();
 
   var sectionLookupAttempts = 0;
   var currentSectionEl = null;
@@ -176,7 +214,7 @@
     sectionEl.setAttribute('data-bless-chat-initialized', 'true');
 
     var embedUrl = sectionEl.getAttribute('data-embed-url');
-    var appProxyPath = sectionEl.getAttribute('data-app-proxy-path') || '/apps/bless';
+    var appProxyPath = sectionEl.getAttribute('data-app-proxy-path');
     var apiUrl = sectionEl.getAttribute('data-api-url');
     var placeholder = sectionEl.getAttribute('data-placeholder');
     var loadingMessage = sectionEl.getAttribute('data-loading-text');
@@ -210,13 +248,16 @@
 
     if (embedUrl) {
       var script = document.querySelector(
-        'script[' + SCRIPT_DATA_ATTR + '=\"' + embedUrl + '\"]'
+        'script[' + SCRIPT_DATA_ATTR + '="' + embedUrl + '"]'
       );
       if (!script) {
         debug('Creating script tag', embedUrl);
         script = document.createElement('script');
         script.src = embedUrl;
         script.defer = true;
+        if (scriptNonce) {
+          script.setAttribute('nonce', scriptNonce);
+        }
         script.setAttribute(SCRIPT_DATA_ATTR, embedUrl);
         script.addEventListener('load', function () {
           script.setAttribute('data-bless-chat-ready', 'true');
@@ -232,6 +273,9 @@
         document.head.appendChild(script);
       } else if (script.getAttribute('data-bless-chat-ready') === 'true') {
         debug('Reusing existing script (ready)');
+        if (scriptNonce && !script.getAttribute('nonce')) {
+          script.setAttribute('nonce', scriptNonce);
+        }
         mountWidget();
       } else {
         script.addEventListener('load', function () {
@@ -295,6 +339,14 @@
       if (!blessing) return;
 
       setStatus(loadingText);
+
+      if (!appProxyPath) {
+        setStatus('');
+        window.dispatchEvent(
+          new CustomEvent('blessing:update', { detail: { text: blessing } })
+        );
+        return;
+      }
 
       fetch(appProxyPath, {
         method: 'POST',
