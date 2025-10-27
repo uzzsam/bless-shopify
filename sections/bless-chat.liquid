@@ -98,6 +98,23 @@
   color: rgb(var(--color-dark-green, 46, 94, 76));
 }
 
+/* 30% black overlays for sections below the chat */
+.bless-overlay-30{ position:relative; z-index:0; }
+.bless-overlay-30::before{
+  content:"";
+  position:absolute; inset:0;
+  background:rgba(0,0,0,.30);   /* 30% black */
+  border-radius:inherit;
+  z-index:-1;                   /* sits behind content but above bg image */
+  pointer-events:none;
+}
+
+
+
+
+
+
+
 @media (max-width: 600px) {
   .bless-chat__embed {
     border-radius: 18px;
