@@ -129,6 +129,15 @@
     transform: translateY(0);
   }
 }
+
+/* Load the Cormorant Upright font used for blessings */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Upright:wght@400;600&display=swap');
+
+/* Apply the decorative font to the blessing lines and center them */
+.bless-blessing__content {
+  font-family: 'Cormorant Upright', serif;
+  text-align: center;
+}
 {% endstylesheet %}
 
 {% javascript %}
@@ -199,16 +208,6 @@
   }
 
   document.addEventListener('shopify:section:unload', (event) => {
-    if (event.detail?.sectionId === sectionId) {
-      if (window[updateKey]) {
-        window.removeEventListener('blessing:update', window[updateKey]);
-        delete window[updateKey];
-      }
-      if (window[errorKey]) {
-        window.removeEventListener('blessing:error', window[errorKey]);
-        delete window[errorKey];
-      }
-    }
   });
 })();
 {% endjavascript %}
