@@ -5,7 +5,7 @@
 
 <section
   id="blessing-section"
-  class="bless-blessing"
+  class="bless-blessing bless-overlay-30"
   data-section-id="{{ section.id }}"
   data-auto-scroll="{{ section.settings.auto_scroll | default: false }}"
 >
@@ -46,7 +46,18 @@
   background: transparent;
   display: flex;
   justify-content: center;
-  color: rgb(var(--color-dark-green, 46, 94, 76));
+  color: #ffffff; /* ensure white base text color */
+}
+
+/* self-contained 30% black overlay (don’t depend on other sections) */
+.bless-overlay-30 { position: relative; z-index: 0; }
+.bless-overlay-30::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.30);
+  border-radius: 0; /* section spans full width */
+  z-index: -1;       /* sits behind content but above bg image */
+  pointer-events: none;
 }
 
 .bless-blessing__inner {
@@ -60,8 +71,10 @@
   font-family: var(--font-heading, 'Cardo', serif);
   font-size: clamp(2.25rem, 3vw + 1.25rem, 3.25rem);
   margin: 0;
+  color: #ffffff; /* white heading */
 }
 
+/* the frosted blessing panel */
 .bless-blessing__panel {
   position: relative;
   padding: clamp(2rem, 4vw, 3rem);
@@ -83,10 +96,20 @@
 .bless-blessing__placeholder,
 .bless-blessing__content {
   font-family: var(--font-body, 'Albert Sans', sans-serif);
-  font-size: 1.15rem;
   line-height: 1.8;
   margin: 0;
   white-space: pre-line;
+  color: #ffffff; /* white for both placeholder + blessing text */
+}
+
+/* Load the Cormorant Upright font used for blessings */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Upright:wght@400;600&display=swap');
+
+/* Apply decorative font + slightly smaller size for better fit */
+.bless-blessing__content {
+  font-family: 'Cormorant Upright', serif;
+  text-align: center;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem); /* slightly smaller than before */
 }
 
 .bless-blessing__panel.is-visible .bless-blessing__content {
@@ -116,27 +139,12 @@
   display: inline-block;
   margin-left: 0.75rem;
   font-size: 0.95rem;
-  color: rgba(var(--color-dark-green, 46, 94, 76), 0.75);
+  color: rgba(255,255,255,0.85);
 }
 
 @keyframes bless-fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Load the Cormorant Upright font used for blessings */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Upright:wght@400;600&display=swap');
-
-/* Apply the decorative font to the blessing lines and center them */
-.bless-blessing__content {
-  font-family: 'Cormorant Upright', serif;
-  text-align: center;
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 {% endstylesheet %}
 
@@ -155,9 +163,7 @@
 
   function revealBlessing(text) {
     if (!contentEl || !panelEl) return;
-    if (placeholderEl) {
-      placeholderEl.hidden = true;
-    }
+    if (placeholderEl) placeholderEl.hidden = true;
     contentEl.textContent = text;
     contentEl.hidden = false;
     panelEl.classList.add('is-visible');
@@ -167,9 +173,7 @@
   }
 
   function resetCopyFeedback() {
-    if (copyFeedback) {
-      copyFeedback.hidden = true;
-    }
+    if (copyFeedback) copyFeedback.hidden = true;
   }
 
   const updateKey = `__blessBlessingUpdate_${sectionId}`;
@@ -198,9 +202,7 @@
       if (!text) return;
       try {
         await navigator.clipboard.writeText(text);
-        if (copyFeedback) {
-          copyFeedback.hidden = false;
-        }
+        if (copyFeedback) copyFeedback.hidden = false;
       } catch (error) {
         console.error('Unable to copy blessing', error);
       }
@@ -208,6 +210,7 @@
   }
 
   document.addEventListener('shopify:section:unload', (event) => {
+    // no-op
   });
 })();
 {% endjavascript %}
@@ -271,9 +274,7 @@
     }
   ],
   "presets": [
-    {
-      "name": "Blessing reveal"
-    }
+    { "name": "Blessing reveal" }
   ]
 }
 {% endschema %}
