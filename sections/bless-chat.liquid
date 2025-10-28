@@ -1,20 +1,13 @@
 {% liquid
-  assign section_id = section.id
-  assign embed_script_url = section.settings.embed_script_url
-  assign app_proxy_path = section.settings.app_proxy_path | default: '/apps/bless'
+  assign widget_src = section.settings.widget_src | default: 'https://bless-test-brown.vercel.app/bless-chat-widget.js'
+  assign panel_rgb = section.settings.panel_background | default: '20, 62, 48'
+  assign panel_opacity = section.settings.panel_opacity | default: 72 | times: 0.01
 %}
 
 <section
   id="chat-section"
-  class="bless-chat"
-  data-section-id="{{ section_id }}"
-  data-bless-chat-section="true"
-  data-embed-url="{{ embed_script_url | escape }}"
-  data-app-proxy-path="{{ app_proxy_path | escape }}"
-  data-api-url="{{ section.settings.chat_api_url | escape }}"
-  data-placeholder="{{ section.settings.input_placeholder | escape }}"
-  data-loading-text="{{ section.settings.loading_message | escape }}"
-  data-error-text="{{ section.settings.error_message | escape }}"
+  class="bless-chat bless-overlay-30"
+  data-section-id="{{ section.id }}"
 >
   <div class="bless-chat__inner">
     {% if section.settings.heading != blank %}
@@ -23,110 +16,131 @@
       </h2>
     {% endif %}
 
-    {% if section.settings.intro_text != blank %}
-      <p class="bless-chat__intro">
-        {{ section.settings.intro_text }}
-      </p>
-    {% endif %}
-
-    <div id="bless-chat-{{ section_id }}" class="bless-chat__embed" data-chat-container></div>
-
     <div
-      class="bless-chat__status"
-      data-status
-      aria-live="polite"
-      data-loading-text="{{ section.settings.loading_message | escape }}"
-      data-error-text="{{ section.settings.error_message | escape }}"
-      hidden
-    ></div>
+      class="bless-chat__panel"
+      style="background-color: rgba({{ panel_rgb }}, {{ panel_opacity }})"
+    >
+      <!-- The chat widget mounts into this container -->
+      <div
+        class="bless-chat__container"
+        data-chat-container
+        data-api-url="{{ section.settings.api_url | escape }}"
+        data-placeholder="{{ section.settings.placeholder | escape }}"
+        data-loading-text="{{ section.settings.loading_text | escape }}"
+      ></div>
+    </div>
   </div>
+
+  <script defer src="{{ widget_src }}"></script>
 </section>
 
 {% stylesheet %}
+/* Section layout */
 .bless-chat {
   position: relative;
   isolation: isolate;
-  padding: clamp(3rem, 5vw, 6rem) 0;
-  /* Apply a 30 % black overlay to the chat background */
-  background-color: rgba(0,0,0,0.3);
-  color: #ffffff;
+  padding: clamp(3.5rem, 6vw, 7rem) 0;
+  display: flex;
+  justify-content: center;
+  background: transparent;
 }
 
+/* Reusable 30% black overlay, same approach as blessing section */
+.bless-overlay-30 { position: relative; z-index: 0; }
+.bless-overlay-30::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.30);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Match width with Blessing section */
 .bless-chat__inner {
   width: min(960px, 90vw);
-  margin: 0 auto;
   display: grid;
-  gap: 1.75rem;
-  justify-items: center;
+  gap: 2rem;
+}
+
+/* Heading: white and NOT uppercase */
+.bless-chat__heading {
+  margin: 0;
+  color: #ffffff;
+  text-transform: none; /* ensure small letters show */
+  font-family: var(--font-heading, 'Cardo', serif);
+  font-size: clamp(2.25rem, 3vw + 1.25rem, 3.25rem);
   text-align: center;
 }
 
-.bless-chat__heading {
-  font-family: var(--font-heading, 'Cardo', serif);
-  font-size: clamp(2rem, 3vw + 1rem, 3rem);
-  margin: 0;
-  color: #ffffff;
-  /* Prevent global styles from forcing uppercase */
+/* Single panel only (remove any layered “under box”) */
+.bless-chat__panel {
+  position: relative;
+  padding: clamp(1.6rem, 3vw, 2.2rem);
+  border-radius: 36px;             /* one radius to rule them all */
+  backdrop-filter: blur(12px);
+  box-shadow: 0 28px 60px rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.25);
+}
+
+/* Optional subtle inner stroke (keeps look consistent with blessing panel) */
+.bless-chat__panel::after {
+  content: "";
+  position: absolute; inset: 10px;
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,.16);
+  pointer-events: none;
+}
+
+/* The element our widget mounts into */
+.bless-chat__container {
+  /* no extra shadow/box here: the widget handles its own bubbles */
+}
+
+/* Make sure any headings the widget renders don’t get uppercased by theme resets */
+.bless-chat h1,
+.bless-chat h2,
+.bless-chat h3,
+.bless-chat h4 {
   text-transform: none;
 }
 
-.bless-chat__intro {
-  font-family: var(--font-body, 'Albert Sans', sans-serif);
-  font-size: 1.1rem;
-  line-height: 1.65;
-  margin: 0;
-  max-width: 720px;
-  color: #ffffff;
-}
-
-.bless-chat__embed {
-  width: 100%;
-  min-height: 420px;
-  border-radius: 24px;
-  overflow: hidden;
-  background: rgba(var(--color-light-green, 168, 204, 193), 0.25);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.15);
-}
-
-.bless-chat__status {
-  font-family: var(--font-body, 'Albert Sans', sans-serif);
-  font-size: 1rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 999px;
-  background: rgba(var(--color-avocado, 227, 216, 154), 0.25);
-  color: rgb(var(--color-dark-green, 46, 94, 76));
-}
-
-/* 30% black overlays for sections below the chat */
-.bless-overlay-30{ position:relative; z-index:0; }
-.bless-overlay-30::before{
-  content:"";
-  position:absolute; inset:0;
-  background:rgba(0,0,0,.30);   /* 30% black */
-  border-radius:inherit;
-  z-index:-1;                   /* sits behind content but above bg image */
-  pointer-events:none;
-}
-
-
-
-
-
-
-
-@media (max-width: 600px) {
-  .bless-chat__embed {
-    border-radius: 18px;
-    min-height: 360px;
-  }
+/* Force the widget to respect our width by not overflowing */
+.bless-chat .bless-chat-shell {
+  width: 100% !important;
+  margin: 0 auto;
 }
 {% endstylesheet %}
 
-{% unless bless_chat_init_script_included %}
-  {{ 'bless-chat-init.js' | asset_url | script_tag }}
-  {% assign bless_chat_init_script_included = true %}
-{% endunless %}
+{% javascript %}
+(function () {
+  const sectionId = '{{ section.id }}';
+  const sectionEl = document.querySelector(`[data-section-id="${sectionId}"]`);
+  if (!sectionEl) return;
+
+  // If the widget script has already mounted elsewhere on the page,
+  // this ensures it also mounts into this section's container.
+  function tryMount() {
+    if (window.BlessChat && typeof window.BlessChat.mount === 'function') {
+      // Mount with defaults from data-*; sizing is controlled by CSS above
+      window.BlessChat.mount('[data-section-id="{{ section.id }}"] [data-chat-container]');
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryMount, { once: true });
+  } else {
+    // Defer to allow the <script src="{{ widget_src }}"> to load
+    setTimeout(tryMount, 0);
+  }
+
+  // Clean up if section is removed in the editor
+  document.addEventListener('shopify:section:unload', (ev) => {
+    if (ev.detail?.sectionId === sectionId) {
+      // no-op; widget is ephemeral and cleans up on next mount
+    }
+  });
+})();
+{% endjavascript %}
 
 {% schema %}
 {
@@ -136,57 +150,52 @@
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "Begin your personalised blessing"
+      "default": "Talk to Sidthah"
     },
     {
-      "type": "richtext",
-      "id": "intro_text",
-      "label": "Intro text",
-      "default": "<p>Our guide will ask a few heartfelt questions to craft a blessing meant just for you. Answer when you are ready.</p>"
-    },
-    {
-      "type": "text",
-      "id": "embed_script_url",
-      "label": "Chatbot embed script URL",
-      "info": "Paste the URL of the chatbot script hosted on Vercel."
+      "type": "url",
+      "id": "widget_src",
+      "label": "Chat widget JS URL",
+      "default": "https://bless-test-brown.vercel.app/bless-chat-widget.js",
+      "info": "Leave as-is unless you host the widget elsewhere."
     },
     {
       "type": "text",
-      "id": "app_proxy_path",
-      "label": "App proxy path",
-      "default": "/apps/bless",
-      "info": "Path to the Shopify App Proxy that forwards blessings to Vercel."
+      "id": "api_url",
+      "label": "API URL override (optional)",
+      "info": "Leave blank to use the widget default."
     },
     {
       "type": "text",
-      "id": "chat_api_url",
-      "label": "Chat API endpoint",
-      "default": "https://bless-test-brown.vercel.app/api/chat",
-      "info": "The Vercel endpoint that powers the conversation."
-    },
-    {
-      "type": "text",
-      "id": "input_placeholder",
+      "id": "placeholder",
       "label": "Input placeholder",
       "default": "Talk to Sidthah"
     },
     {
       "type": "text",
-      "id": "loading_message",
-      "label": "Loading message",
-      "default": "Breathe and await your blessing from Sidthah..."
+      "id": "loading_text",
+      "label": "Loading text",
+      "default": "Listening..."
     },
     {
       "type": "text",
-      "id": "error_message",
-      "label": "Error message",
-      "default": "We could not save your blessing. Please try again."
+      "id": "panel_background",
+      "label": "Panel background RGB",
+      "default": "20, 62, 48"
+    },
+    {
+      "type": "range",
+      "id": "panel_opacity",
+      "label": "Panel opacity",
+      "default": 72,
+      "min": 20,
+      "max": 95,
+      "step": 5,
+      "unit": "%"
     }
   ],
   "presets": [
-    {
-      "name": "Bless chat"
-    }
+    { "name": "Bless chat" }
   ]
 }
 {% endschema %}
