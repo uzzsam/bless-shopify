@@ -1,5 +1,5 @@
 {% liquid
-  assign product = all_products[section.settings.product]
+  assign product = section.settings.product
   assign selected_variant = nil
   if product
     assign selected_variant = product.selected_or_first_available_variant

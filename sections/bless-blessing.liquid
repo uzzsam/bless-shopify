@@ -32,7 +32,7 @@
       </div>
 
       {% if section.settings.show_signup %}
-        {% form 'customer', id: 'BlessSignup-' | append: section.id, class: 'bless-blessing__signup-form' %}
+        {% form 'contact', id: 'BlessSignup-' | append: section.id, class: 'bless-blessing__signup-form' %}
           <input type="hidden" name="contact[tags]" value="Blessing Subscriber">
           <input type="hidden" name="contact[sidthie]" data-signup-sidthie>
           <div class="bless-blessing__signup" data-blessing-signup hidden>
@@ -152,7 +152,8 @@
 .bless-blessing__content {
   font-family: 'Cormorant Upright', serif;
   text-align: center;
-  font-size: clamp(1.05rem, 1.6vw, 1.3rem); /* slightly smaller than before */
+  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+  line-height: 1.6;
 }
 
 .bless-blessing__meta {
