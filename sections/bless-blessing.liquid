@@ -32,7 +32,7 @@
       </div>
 
       {% if section.settings.show_signup %}
-        {% form 'customer', id: 'BlessSignup-' | append: section.id, class: 'bless-blessing__signup-form' %}
+        {% form 'contact', id: 'BlessSignup-' | append: section.id, class: 'bless-blessing__signup-form' %}
           <input type="hidden" name="contact[tags]" value="Blessing Subscriber">
           <input type="hidden" name="contact[sidthie]" data-signup-sidthie>
           <div class="bless-blessing__signup" data-blessing-signup hidden>
@@ -136,14 +136,13 @@
   pointer-events: none;
 }
 
-
 .bless-blessing__placeholder,
 .bless-blessing__content {
-  font-family: 'Cormorant Upright', serif;
-  line-height: 1.65;
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  line-height: 1.8;
   margin: 0;
   white-space: pre-line;
-  color: #ffffff;
+  color: #ffffff; /* white for both placeholder + blessing text */
 }
 
 /* Load the Cormorant Upright font used for blessings */
@@ -153,9 +152,8 @@
 .bless-blessing__content {
   font-family: 'Cormorant Upright', serif;
   text-align: center;
-  font-size: clamp(1.35rem, 2vw, 1.7rem);
-  line-height: 1.7;
-  letter-spacing: 0.015em;
+  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+  line-height: 1.6;
 }
 
 .bless-blessing__meta {
@@ -168,17 +166,14 @@
 
 .bless-blessing__meta-title {
   margin: 0;
-  font-family: 'Cormorant Upright', serif;
-  font-size: clamp(1.45rem, 1.5vw + 1rem, 1.9rem);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: var(--font-heading, 'Cardo', serif);
+  font-size: clamp(1.35rem, 1.2vw + 1rem, 1.75rem);
 }
 
 .bless-blessing__meta-text {
   margin: 0;
-  font-family: 'Cormorant Upright', serif;
-  font-size: clamp(1.1rem, 1.7vw, 1.4rem);
-  line-height: 1.65;
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  line-height: 1.7;
 }
 
 .bless-blessing__signup {
@@ -190,9 +185,9 @@
 
 .bless-blessing__signup-label {
   margin: 0;
-  font-family: 'Cormorant Upright', serif;
-  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
-  color: rgba(255, 255, 255, 0.92);
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .bless-blessing__signup-row {
@@ -432,7 +427,7 @@
       "type": "text",
       "id": "placeholder_text",
       "label": "Placeholder text",
-      "default": ""
+      "default": "Complete the conversation to reveal your personalised blessing."
     },
     {
       "type": "checkbox",
