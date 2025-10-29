@@ -318,24 +318,32 @@
       const hasExplanation = Boolean(detail?.explanation);
 
       if (metaTitleEl) {
-        metaTitleEl.hidden = !hasLabel;
         if (hasLabel) {
           metaTitleEl.textContent = detail.sidthieLabel;
+          metaTitleEl.removeAttribute('hidden');
+        } else {
+          metaTitleEl.setAttribute('hidden', 'hidden');
         }
       }
 
       if (metaTextEl) {
-        metaTextEl.hidden = !hasExplanation;
         if (hasExplanation) {
           metaTextEl.textContent = detail.explanation;
+          metaTextEl.removeAttribute('hidden');
+        } else {
+          metaTextEl.setAttribute('hidden', 'hidden');
         }
       }
 
-      metaWrapper.hidden = !(hasLabel || hasExplanation);
+      if (hasLabel || hasExplanation) {
+        metaWrapper.removeAttribute('hidden');
+      } else {
+        metaWrapper.setAttribute('hidden', 'hidden');
+      }
     }
 
     if (signupWrapper) {
-      signupWrapper.hidden = false;
+      signupWrapper.removeAttribute('hidden');
       if (signupPrompt) {
         if (defaultSignupPrompt.includes('{sidthie}')) {
           signupPrompt.textContent = defaultSignupPrompt.replace(
