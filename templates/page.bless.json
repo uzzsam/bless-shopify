@@ -61,7 +61,7 @@
         "product": "lumasara-shop-224072-8840",
         "heading": "Carry your blessing with you",
         "panel_background": "65, 65, 65",
-        "panel_opacity": 60,
+        "panel_opacity": 40,
         "show_media": true,
         "show_description": true,
         "show_price": true,
