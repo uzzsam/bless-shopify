@@ -410,13 +410,13 @@
   // -------- Dynamic (AJAX) product card ----------
   // Map Sidthie -> product handle (override if your handles differ)
   const SIDTHIE_TO_HANDLE = {
-    NALAMERA: {{ section.settings.nalamera_handle | json }},
-    LUMASARA: {{ section.settings.lumasara_handle | json }},
-    WELAMORA: {{ section.settings.welamora_handle | json }},
-    NIRALUMA: {{ section.settings.niraluma_handle | json }},
-    RAKAWELA: {{ section.settings.rakawela_handle | json }},
-    OLANWELA: {{ section.settings.olanwela_handle | json }},
-    MORASARA: {{ section.settings.morasara_handle | json }}
+    NALAMERA: {{ section.settings.nalamera_handle | default: 'nalamera' | json }},
+    LUMASARA: {{ section.settings.lumasara_handle | default: 'lumasara' | json }},
+    WELAMORA: {{ section.settings.welamora_handle | default: 'welamora' | json }},
+    NIRALUMA: {{ section.settings.niraluma_handle | default: 'niraluma' | json }},
+    RAKAWELA: {{ section.settings.rakawela_handle | default: 'rakawela' | json }},
+    OLANWELA: {{ section.settings.olanwela_handle | default: 'olanwela' | json }},
+    MORASARA: {{ section.settings.morasara_handle | default: 'morasara' | json }}
   };
 
   async function fetchProductByHandle(handle) {
