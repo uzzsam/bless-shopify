@@ -26,6 +26,49 @@
       </p>
       <div class="bless-blessing__content" data-blessing-output hidden></div>
 
+      <div class="bless-blessing__meta" data-blessing-meta hidden>
+        <h3 class="bless-blessing__meta-title" data-sidthie-title hidden></h3>
+        <p class="bless-blessing__meta-text" data-sidthie-excerpt hidden></p>
+      </div>
+
+      {% if section.settings.show_signup %}
+        {% form 'customer', id: 'BlessSignup-' | append: section.id, class: 'bless-blessing__signup-form' %}
+          <input type="hidden" name="contact[tags]" value="Blessing Subscriber">
+          <input type="hidden" name="contact[sidthie]" data-signup-sidthie>
+          <div class="bless-blessing__signup" data-blessing-signup hidden>
+            <label
+              class="bless-blessing__signup-label"
+              data-signup-prompt
+              data-default-prompt="{{ section.settings.signup_prompt | escape }}"
+            >
+              {{ section.settings.signup_prompt | escape }}
+            </label>
+            <div class="bless-blessing__signup-row">
+              <input
+                type="email"
+                name="contact[email]"
+                class="bless-blessing__signup-input"
+                placeholder="{{ section.settings.signup_placeholder | escape }}"
+                required
+              >
+              <button type="submit" class="bless-blessing__signup-button">
+                {{ section.settings.signup_button_label | escape }}
+              </button>
+            </div>
+            {% if form.posted_successfully? %}
+              <p class="bless-blessing__signup-feedback">
+                {{ section.settings.signup_success | escape }}
+              </p>
+            {% endif %}
+            {% if form.errors %}
+              <p class="bless-blessing__signup-feedback bless-blessing__signup-feedback--error">
+                {{ form.errors | default_errors }}
+              </p>
+            {% endif %}
+          </div>
+        {% endform %}
+      {% endif %}
+
       {% if section.settings.show_copy_button %}
         <button type="button" class="bless-blessing__copy" data-copy-trigger>
           {{ section.settings.copy_button_label | escape }}
@@ -112,6 +155,83 @@
   font-size: clamp(1.05rem, 1.6vw, 1.3rem); /* slightly smaller than before */
 }
 
+.bless-blessing__meta {
+  margin-top: 1.75rem;
+  display: grid;
+  gap: 0.75rem;
+  text-align: left;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.bless-blessing__meta-title {
+  margin: 0;
+  font-family: var(--font-heading, 'Cardo', serif);
+  font-size: clamp(1.35rem, 1.2vw + 1rem, 1.75rem);
+}
+
+.bless-blessing__meta-text {
+  margin: 0;
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  line-height: 1.7;
+}
+
+.bless-blessing__signup {
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  display: grid;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.bless-blessing__signup-label {
+  margin: 0;
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.bless-blessing__signup-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.bless-blessing__signup-input {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 0.8rem 1rem;
+  border-radius: 18px;
+  border: none;
+  font-size: 1rem;
+}
+
+.bless-blessing__signup-button {
+  padding: 0.8rem 1.75rem;
+  border-radius: 999px;
+  border: none;
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(var(--color-avocado, 227, 216, 154), 0.92);
+  color: rgb(var(--color-dark-green, 46, 94, 76));
+  transition: transform 200ms ease, background-color 200ms ease;
+}
+
+.bless-blessing__signup-button:hover,
+.bless-blessing__signup-button:focus {
+  transform: translateY(-1px);
+  background: rgba(var(--color-avocado, 227, 216, 154), 1);
+}
+
+.bless-blessing__signup-feedback {
+  margin: 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.bless-blessing__signup-feedback--error {
+  color: rgba(255, 180, 171, 0.95);
+}
+
 .bless-blessing__panel.is-visible .bless-blessing__content {
   animation: bless-fade-up 500ms ease forwards;
 }
@@ -146,6 +266,17 @@
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+@media (max-width: 520px) {
+  .bless-blessing__signup-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bless-blessing__signup-button {
+    width: 100%;
+  }
+}
 {% endstylesheet %}
 
 {% javascript %}
@@ -157,16 +288,69 @@
   const panelEl = sectionEl.querySelector('[data-blessing-panel]');
   const placeholderEl = sectionEl.querySelector('[data-placeholder]');
   const contentEl = sectionEl.querySelector('[data-blessing-output]');
+  const metaWrapper = sectionEl.querySelector('[data-blessing-meta]');
+  const metaTitleEl = sectionEl.querySelector('[data-sidthie-title]');
+  const metaTextEl = sectionEl.querySelector('[data-sidthie-excerpt]');
+  const signupWrapper = sectionEl.querySelector('[data-blessing-signup]');
+  const signupPrompt = sectionEl.querySelector('[data-signup-prompt]');
+  const signupSidthieInput = sectionEl.querySelector('[data-signup-sidthie]');
   const copyTrigger = sectionEl.querySelector('[data-copy-trigger]');
   const copyFeedback = sectionEl.querySelector('[data-copy-feedback]');
   const autoScroll = sectionEl.dataset.autoScroll === 'true';
+  const defaultSignupPrompt = signupPrompt?.getAttribute('data-default-prompt') || signupPrompt?.textContent || '';
 
-  function revealBlessing(text) {
+  function revealBlessing(detail) {
     if (!contentEl || !panelEl) return;
-    if (placeholderEl) placeholderEl.hidden = true;
-    contentEl.textContent = text;
+    const blessing = detail?.blessing || detail?.text;
+    if (!blessing) return;
+
+    if (placeholderEl) {
+      placeholderEl.hidden = true;
+    }
+
+    contentEl.textContent = blessing;
     contentEl.hidden = false;
     panelEl.classList.add('is-visible');
+
+    if (metaWrapper) {
+      const hasLabel = Boolean(detail?.sidthieLabel);
+      const hasExplanation = Boolean(detail?.explanation);
+
+      if (metaTitleEl) {
+        metaTitleEl.hidden = !hasLabel;
+        if (hasLabel) {
+          metaTitleEl.textContent = detail.sidthieLabel;
+        }
+      }
+
+      if (metaTextEl) {
+        metaTextEl.hidden = !hasExplanation;
+        if (hasExplanation) {
+          metaTextEl.textContent = detail.explanation;
+        }
+      }
+
+      metaWrapper.hidden = !(hasLabel || hasExplanation);
+    }
+
+    if (signupWrapper) {
+      signupWrapper.hidden = false;
+      if (signupPrompt) {
+        if (defaultSignupPrompt.includes('{sidthie}')) {
+          signupPrompt.textContent = defaultSignupPrompt.replace(
+            '{sidthie}',
+            detail?.sidthieLabel || 'your Sidthie'
+          );
+        } else if (detail?.sidthieLabel) {
+          signupPrompt.textContent = `${defaultSignupPrompt} (${detail.sidthieLabel})`;
+        }
+      }
+
+      if (signupSidthieInput) {
+        signupSidthieInput.value = detail?.sidthie || detail?.sidthieLabel || '';
+      }
+    }
+
     if (autoScroll) {
       panelEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -182,9 +366,8 @@
   }
   window[updateKey] = (event) => {
     const detail = event?.detail;
-    const text = detail?.text;
-    if (!text) return;
-    revealBlessing(text);
+    if (!detail) return;
+    revealBlessing(detail);
     resetCopyFeedback();
   };
   window.addEventListener('blessing:update', window[updateKey]);
@@ -193,7 +376,13 @@
   if (window[errorKey]) {
     window.removeEventListener('blessing:error', window[errorKey]);
   }
-  window[errorKey] = () => resetCopyFeedback();
+  window[errorKey] = () => {
+    resetCopyFeedback();
+    if (metaWrapper) metaWrapper.hidden = true;
+    if (signupWrapper) signupWrapper.hidden = true;
+    if (contentEl) contentEl.hidden = true;
+    if (placeholderEl) placeholderEl.hidden = false;
+  };
   window.addEventListener('blessing:error', window[errorKey]);
 
   if (copyTrigger && contentEl) {
@@ -230,6 +419,36 @@
       "id": "placeholder_text",
       "label": "Placeholder text",
       "default": "Complete the conversation to reveal your personalised blessing."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_signup",
+      "label": "Show signup form",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "signup_prompt",
+      "label": "Signup prompt",
+      "default": "Would you like to receive your Sidthie and blessing and free monthly wisdoms from Sidthah?"
+    },
+    {
+      "type": "text",
+      "id": "signup_placeholder",
+      "label": "Email placeholder",
+      "default": "Enter your email"
+    },
+    {
+      "type": "text",
+      "id": "signup_button_label",
+      "label": "Signup button label",
+      "default": "Receive wisdom"
+    },
+    {
+      "type": "text",
+      "id": "signup_success",
+      "label": "Signup success message",
+      "default": "Thank you. Your wisdom will arrive soon."
     },
     {
       "type": "text",

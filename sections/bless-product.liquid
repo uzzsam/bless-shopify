@@ -21,6 +21,7 @@
     <h2 class="bless-product__heading">
       {{ section.settings.heading | default: 'Would you like to affirm your Sidthie by wearing a pendant?' | escape }}
     </h2>
+    <p class="bless-product__intention" data-product-sidthie hidden></p>
 
     {% if product and selected_variant %}
       <!-- Static (Liquid) mode -->
@@ -191,6 +192,13 @@
   margin: 0;
 }
 
+.bless-product__intention {
+  margin: 0;
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
 .bless-product__card {
   padding: clamp(2.2rem, 4vw, 3.2rem);
   border-radius: 36px;
@@ -334,21 +342,40 @@
   const blessingInput = sectionEl.querySelector('[data-blessing-input]');
   const submitButton = sectionEl.querySelector('[data-submit]');
   const requireBlessing = sectionEl.dataset.requireBlessing === 'true';
+  const sidthieLabelEl = sectionEl.querySelector('[data-product-sidthie]');
   const dynamicBody = sectionEl.querySelector('[data-dynamic-body]');
 
   // Gate purchase until blessing arrives
-  function enableFormWithBlessing(text) {
+  function enableFormWithBlessing(text, detail) {
     if (blessingInput) blessingInput.value = text;
+    sectionEl.dataset.latestBlessing = text;
+    if (detail?.sidthie) {
+      sectionEl.dataset.latestSidthie = detail.sidthie;
+    }
     // Dynamic card buttons also use [data-submit]
     if (requireBlessing && submitButton) submitButton.disabled = false;
+    if (requireBlessing) {
+      sectionEl.querySelectorAll('[data-submit]').forEach((button) => {
+        button.disabled = false;
+      });
+    }
     sectionEl.classList.add('bless-product--active');
+
+    if (sidthieLabelEl) {
+      const label = detail?.sidthieLabel || detail?.sidthie;
+      if (label) {
+        sidthieLabelEl.hidden = false;
+        sidthieLabelEl.textContent = `Your chosen Sidthie: ${label}`;
+      }
+    }
   }
   const updateKey = `__blessProductUpdate_${sectionId}`;
   if (window[updateKey]) window.removeEventListener('blessing:update', window[updateKey]);
   window[updateKey] = (event) => {
-    const text = event?.detail?.text;
+    const detail = event?.detail;
+    const text = detail?.text;
     if (!text) return;
-    enableFormWithBlessing(text);
+    enableFormWithBlessing(text, detail);
   };
   window.addEventListener('blessing:update', window[updateKey]);
 
@@ -356,6 +383,12 @@
   if (window[errorKey]) window.removeEventListener('blessing:error', window[errorKey]);
   window[errorKey] = () => {
     if (requireBlessing && submitButton) submitButton.disabled = true;
+    if (requireBlessing) {
+      sectionEl.querySelectorAll('[data-submit]').forEach((button) => {
+        button.disabled = true;
+      });
+    }
+    if (sidthieLabelEl) sidthieLabelEl.hidden = true;
   };
   window.addEventListener('blessing:error', window[errorKey]);
 
@@ -377,7 +410,13 @@
   // -------- Dynamic (AJAX) product card ----------
   // Map Sidthie -> product handle (override if your handles differ)
   const SIDTHIE_TO_HANDLE = {
-    // e.g. 'LUMASARA': 'lumasara-pendant'
+    NALAMERA: {{ section.settings.nalamera_handle | json }},
+    LUMASARA: {{ section.settings.lumasara_handle | json }},
+    WELAMORA: {{ section.settings.welamora_handle | json }},
+    NIRALUMA: {{ section.settings.niraluma_handle | json }},
+    RAKAWELA: {{ section.settings.rakawela_handle | json }},
+    OLANWELA: {{ section.settings.olanwela_handle | json }},
+    MORASARA: {{ section.settings.morasara_handle | json }}
   };
 
   async function fetchProductByHandle(handle) {
@@ -438,7 +477,13 @@
     const blessing = dynamicBody.querySelector('[data-ajax-blessing]');
 
     // Mirror blessing from event gate
+    const storedBlessing = sectionEl.dataset.latestBlessing;
     if (blessingInput?.value) blessing.value = blessingInput.value;
+    else if (storedBlessing) blessing.value = storedBlessing;
+
+    if (requireBlessing && btn) {
+      btn.disabled = !blessing.value;
+    }
 
     btn?.addEventListener('click', async (e) => {
       e.preventDefault();
@@ -473,16 +518,26 @@
     if (window[sKey]) window.removeEventListener('sidthie:selected', window[sKey]);
 
     window[sKey] = async (ev) => {
-      const sidthie = (ev?.detail?.sidthie || '').toString().trim();
-      if (!sidthie) return;
+      const rawSidthie = (ev?.detail?.sidthie || '').toString().trim();
+      if (!rawSidthie) return;
 
-      const handle = SIDTHIE_TO_HANDLE[sidthie] || sidthie.toLowerCase();
-      dynamicBody.innerHTML = `<p class="bless-product__empty">Loading ${sidthie}…</p>`;
+      const label = (ev?.detail?.sidthieLabel || '').toString().trim();
+      sectionEl.dataset.latestSidthie = rawSidthie;
+      if (sidthieLabelEl) {
+        sidthieLabelEl.hidden = false;
+        sidthieLabelEl.textContent = `Your chosen Sidthie: ${label || rawSidthie}`;
+      }
+
+      const key = rawSidthie.toUpperCase();
+      const mappedHandle = (SIDTHIE_TO_HANDLE[key] || '').trim();
+      const handle = mappedHandle ? mappedHandle : rawSidthie.toLowerCase();
+
+      dynamicBody.innerHTML = `<p class="bless-product__empty">Loading ${rawSidthie}…</p>`;
       try {
         const p = await fetchProductByHandle(handle);
         renderDynamicCard(p);
       } catch (e) {
-        dynamicBody.innerHTML = `<p class="bless-product__empty">Could not find a product for “${sidthie}”.</p>`;
+        dynamicBody.innerHTML = `<p class="bless-product__empty">Could not find a product for “${rawSidthie}”.</p>`;
       }
     };
 
@@ -610,6 +665,53 @@
       "id": "cart_note",
       "label": "Cart note",
       "default": "We will include this blessing with your order."
+    },
+    {
+      "type": "header",
+      "content": "Sidthie product handles"
+    },
+    {
+      "type": "text",
+      "id": "nalamera_handle",
+      "label": "NALAMERA handle",
+      "info": "Leave blank to use “nalamera”.",
+      "default": ""
+    },
+    {
+      "type": "text",
+      "id": "lumasara_handle",
+      "label": "LUMASARA handle",
+      "default": ""
+    },
+    {
+      "type": "text",
+      "id": "welamora_handle",
+      "label": "WELAMORA handle",
+      "default": ""
+    },
+    {
+      "type": "text",
+      "id": "niraluma_handle",
+      "label": "NIRALUMA handle",
+      "default": ""
+    },
+    {
+      "type": "text",
+      "id": "rakawela_handle",
+      "label": "RAKAWELA handle",
+      "default": ""
+    },
+    {
+      "type": "text",
+      "id": "olanwela_handle",
+      "label": "OLANWELA handle",
+      "default": ""
+    },
+    {
+      "type": "text",
+      "id": "morasara_handle",
+      "label": "MORASARA handle",
+      "default": ""
     }
   ],
   "presets": [
