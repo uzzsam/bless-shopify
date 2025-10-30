@@ -32,42 +32,31 @@
       </div>
 
       {% if section.settings.show_signup %}
-        {% form 'contact', id: 'BlessSignup-' | append: section.id, class: 'bless-blessing__signup-form' %}
-          {{ form | hidden_inputs }}
-          <input type="hidden" name="contact[tags]" value="Blessing Subscriber">
-          <input type="hidden" name="contact[sidthie]" data-signup-sidthie>
-          <div class="bless-blessing__signup" data-blessing-signup hidden>
-            <label
-              class="bless-blessing__signup-label"
-              data-signup-prompt
-              data-default-prompt="{{ section.settings.signup_prompt | escape }}"
+        <form class="bless-blessing__signup bless-blessing__signup-form" data-blessing-signup hidden novalidate>
+          <input type="hidden" name="sidthie" data-signup-sidthie>
+          <label
+            class="bless-blessing__signup-label"
+            data-signup-prompt
+            data-default-prompt="{{ section.settings.signup_prompt | escape }}"
+          >
+            {{ section.settings.signup_prompt | escape }}
+          </label>
+          <div class="bless-blessing__signup-row">
+            <input
+              type="email"
+              name="email"
+              class="bless-blessing__signup-input"
+              placeholder="{{ section.settings.signup_placeholder | escape }}"
+              required
             >
-              {{ section.settings.signup_prompt | escape }}
-            </label>
-            <div class="bless-blessing__signup-row">
-              <input
-                type="email"
-                name="contact[email]"
-                class="bless-blessing__signup-input"
-                placeholder="{{ section.settings.signup_placeholder | escape }}"
-                required
-              >
-              <button type="submit" class="bless-blessing__signup-button">
-                {{ section.settings.signup_button_label | escape }}
-              </button>
-            </div>
-            {% if form.posted_successfully? %}
-              <p class="bless-blessing__signup-feedback">
-                {{ section.settings.signup_success | escape }}
-              </p>
-            {% endif %}
-            {% if form.errors %}
-              <p class="bless-blessing__signup-feedback bless-blessing__signup-feedback--error">
-                {{ form.errors | default_errors }}
-              </p>
-            {% endif %}
+            <button type="submit" class="bless-blessing__signup-button" data-signup-submit>
+              {{ section.settings.signup_button_label | escape }}
+            </button>
           </div>
-        {% endform %}
+          <p class="bless-blessing__signup-feedback" data-signup-feedback hidden>
+            {{ section.settings.signup_success | escape }}
+          </p>
+        </form>
       {% endif %}
 
       {% if section.settings.show_copy_button %}

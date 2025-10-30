@@ -1,12 +1,11 @@
 {% liquid
-  assign product_handle = section.settings.product
+  assign selected_product = section.settings.product
   assign product = nil
   assign selected_variant = nil
-  if product_handle != blank
-    assign product = all_products[product_handle]
-  endif
-  if product
-    assign selected_variant = product.selected_or_first_available_variant
+
+  if selected_product != blank
+    assign product = selected_product
+    assign selected_variant = selected_product.selected_or_first_available_variant
   endif
 
   assign panel_rgb = section.settings.panel_background | default: '65, 65, 65'
@@ -674,49 +673,6 @@
       "type": "header",
       "content": "Sidthie product handles"
     },
-    {
-      "type": "text",
-      "id": "nalamera_handle",
-      "label": "NALAMERA handle",
-      "info": "Leave blank to use “nalamera”.",
-      "default": ""
-    },
-    {
-      "type": "text",
-      "id": "lumasara_handle",
-      "label": "LUMASARA handle",
-      "default": ""
-    },
-    {
-      "type": "text",
-      "id": "welamora_handle",
-      "label": "WELAMORA handle",
-      "default": ""
-    },
-    {
-      "type": "text",
-      "id": "niraluma_handle",
-      "label": "NIRALUMA handle",
-      "default": ""
-    },
-    {
-      "type": "text",
-      "id": "rakawela_handle",
-      "label": "RAKAWELA handle",
-      "default": ""
-    },
-    {
-      "type": "text",
-      "id": "olanwela_handle",
-      "label": "OLANWELA handle",
-      "default": ""
-    },
-    {
-      "type": "text",
-      "id": "morasara_handle",
-      "label": "MORASARA handle",
-      "default": ""
-    }
   ],
   "presets": [
     {
