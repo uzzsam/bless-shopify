@@ -32,7 +32,7 @@
       </div>
 
       {% if section.settings.show_signup %}
-        {% form 'contact', id: 'BlessSignup-' | append: section.id, class: 'bless-blessing__signup-form' %}
+        {% form 'customer', id: 'BlessSignup-' | append: section.id, class: 'bless-blessing__signup-form' %}
           <input type="hidden" name="contact[tags]" value="Blessing Subscriber">
           <input type="hidden" name="contact[sidthie]" data-signup-sidthie>
           <div class="bless-blessing__signup" data-blessing-signup hidden>
