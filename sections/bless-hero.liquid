@@ -36,21 +36,15 @@
   >
     {% if overlay_video != blank %}
       <div class="bless-hero__focus">
-        {{
-          overlay_video
-          | video_tag:
-            autoplay: false,
-            loop: true,
-            muted: false,
-            playsinline: true,
-            controls: false,
-            preload: 'metadata',
-            class: 'bless-hero__focus-video'
-        }}
-        <button type="button" class="bless-hero__play-toggle" aria-pressed="false">
-          <span class="sr-only">Play Sidthah video</span>
-          <span class="bless-hero__play-icon" aria-hidden="true">&#9658;</span>
-        </button>
+        <video
+          class="bless-hero__focus-video"
+          preload="metadata"
+          playsinline
+          controls
+        >
+          <source src="{{ overlay_video.sources.first.url }}" type="{{ overlay_video.sources.first.mime_type }}">
+          Your browser does not support the video tag.
+        </video>
       </div>
     {% endif %}
 
@@ -180,53 +174,14 @@
   background: rgba(var(--color-avocado, 227, 216, 154), 1);
 }
 
-.bless-hero__play-toggle {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: 84px;
-  height: 84px;
-  border-radius: 999px;
-  border: 2px solid rgba(255,255,255,0.85);
-  background: rgba(0, 0, 0, 0.45);
+.bless-hero__focus video::-webkit-media-controls-panel {
+  background: rgba(0,0,0,0.35);
+}
+
+.bless-hero__focus video::-webkit-media-controls-play-button,
+.bless-hero__focus video::-webkit-media-controls-volume-slider 
+{
   color: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease, opacity 180ms ease;
-  backdrop-filter: blur(4px);
-  z-index: 2;
-}
-
-.bless-hero__play-toggle:hover,
-.bless-hero__play-toggle:focus-visible {
-  background: rgba(0, 0, 0, 0.6);
-  border-color: rgba(255,255,255,0.95);
-  transform: scale(1.02);
-}
-
-.bless-hero__play-toggle.is-hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.bless-hero__play-icon {
-  font-size: 2rem;
-  line-height: 1;
-  margin-left: 4px;
-}
-
-.bless-hero .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
 }
 
 @media (max-width: 600px) {
