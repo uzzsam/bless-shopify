@@ -3,7 +3,7 @@
   assign overlay_video = section.settings.video_overlay
   assign overlay_rgb = section.settings.overlay_color | default: '46, 94, 76'
   assign overlay_alpha = section.settings.overlay_opacity | default: 45 | times: 0.01
-  assign content_padding_top = section.settings.content_padding_top | default: 48
+  assign content_padding_top = section.settings.content_padding_top | default: 0
   assign content_padding_bottom = section.settings.content_padding_bottom | default: 48
 %}
 
@@ -46,12 +46,21 @@
             controls: false,
             class: 'bless-hero__focus-video'
         }}
+        <button type="button" class="bless-hero__audio-toggle" aria-pressed="false">
+          <span class="sr-only">Toggle sound</span>
+          <span class="bless-hero__audio-icon bless-hero__audio-icon--muted" aria-hidden="true">🔇</span>
+          <span class="bless-hero__audio-icon bless-hero__audio-icon--playing" aria-hidden="true">🔊</span>
+        </button>
       </div>
     {% endif %}
 
     {% if section.settings.heading != blank %}
+      {% assign hero_heading_raw = section.settings.heading | strip %}
+      {% assign hero_heading_lower = hero_heading_raw | downcase %}
+      {% assign hero_heading_first = hero_heading_lower | slice: 0, 1 | upcase %}
+      {% assign hero_heading_rest = hero_heading_lower | slice: 1 %}
       <h1 class="bless-hero__heading">
-        {{ section.settings.heading | escape }}
+        {{ hero_heading_first }}{{ hero_heading_rest }}
       </h1>
     {% endif %}
 
@@ -77,11 +86,12 @@
   position: relative;
   min-height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   background-color: rgb(var(--color-dark-green, 46, 94, 76));
   overflow: hidden;
   color: rgb(var(--color-light-flesh, 236, 227, 214));
+  padding-top: clamp(0px, 3vw, 48px);
 }
 
 .bless-hero__media-wrap {
@@ -119,17 +129,18 @@
 
 .bless-hero__focus {
   margin: 0 auto;
-  max-width: clamp(260px, 22vw + 160px, 420px);
-  width: min(100%, clamp(260px, 22vw + 160px, 420px));
+  max-width: clamp(240px, 22vw + 160px, 420px);
+  width: min(100%, clamp(240px, 22vw + 160px, 420px));
   display: flex;
   justify-content: center;
+  position: relative;
 }
 
 .bless-hero__focus-video {
   width: 100%;
   height: auto;
   aspect-ratio: 9 / 16;
-  max-height: min(90vh, 920px);
+  max-height: min(85vh, 860px);
   object-fit: cover;
   border-radius: 0 0 32px 32px;
   box-shadow: 0 32px 60px rgba(0, 0, 0, 0.35);
@@ -140,6 +151,7 @@
   font-size: clamp(2.5rem, 3vw + 1.5rem, 4rem);
   line-height: 1.1;
   margin: 0;
+  text-transform: none;
 }
 
 .bless-hero__subheading {
@@ -170,6 +182,69 @@
   background: rgba(var(--color-avocado, 227, 216, 154), 1);
 }
 
+.bless-hero__audio-toggle {
+  position: absolute;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.6);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.bless-hero__audio-toggle:hover,
+.bless-hero__audio-toggle:focus-visible,
+.bless-hero__audio-toggle.is-active {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(255,255,255,0.85);
+  transform: translateY(-1px);
+}
+
+.bless-hero__audio-icon {
+  display: none;
+  font-size: 1.2rem;
+}
+
+.bless-hero__audio-icon--muted {
+  display: inline;
+}
+
+.bless-hero__audio-toggle.is-active .bless-hero__audio-icon--muted {
+  display: none;
+}
+
+.bless-hero__audio-toggle.is-active .bless-hero__audio-icon--playing {
+  display: inline;
+}
+
+.bless-landing .header,
+.bless-landing .header a,
+.bless-landing .header button,
+.bless-landing .header svg,
+.bless-landing .header span {
+  color: #ffffff;
+  fill: #ffffff;
+}
+
+.bless-hero .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 @media (max-width: 600px) {
   .bless-hero__content {
     padding-inline: 1rem;
@@ -196,6 +271,20 @@ if (heroSection) {
         }
       });
     }
+  }
+
+  const focusVideo = heroSection.querySelector('.bless-hero__focus-video');
+  const audioToggle = heroSection.querySelector('.bless-hero__audio-toggle');
+  if (focusVideo && audioToggle) {
+    audioToggle.addEventListener('click', () => {
+      const enableAudio = focusVideo.muted;
+      focusVideo.muted = !enableAudio;
+      audioToggle.setAttribute('aria-pressed', enableAudio ? 'true' : 'false');
+      audioToggle.classList.toggle('is-active', enableAudio);
+      if (enableAudio) {
+        focusVideo.play().catch(() => {});
+      }
+    });
   }
 }
 {% endjavascript %}
@@ -235,7 +324,7 @@ if (heroSection) {
       "type": "range",
       "id": "content_padding_top",
       "label": "Content top padding",
-      "default": 48,
+      "default": 0,
       "min": 0,
       "max": 200,
       "step": 4,
