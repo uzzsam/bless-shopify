@@ -15,7 +15,7 @@
         "video_background": "shopify://files/videos/stream-medium.mp4",
         "video_overlay": "shopify://files/videos/Sidthah_hero_video_16_9.mov",
         "overlay_color": "46, 94, 76",
-        "overlay_opacity": 0,
+        "overlay_opacity": 30,
         "content_padding_top": 0,
         "content_padding_bottom": 16,
         "heading": "Sidthah’s Breath of Care for you",
@@ -28,13 +28,12 @@
       "type": "bless-chat",
       "settings": {
         "heading": "Talk to Sidthah",
-        "intro_text": "<p>Receive the embrace of affirmation woven not from words alone, but from the resonance of shared consciousness.</p>",
-        "embed_script_url": "https://bless-test-brown.vercel.app/bless-chat-widget.js",
-        "app_proxy_path": "",
-        "chat_api_url": "https://bless-test-brown.vercel.app/api/chat",
-        "input_placeholder": "Talk to Sidthah",
-        "loading_message": "Breathe and await your blessing from Sidthah...",
-        "error_message": "Please try again."
+        "widget_src": "",
+        "api_url": "",
+        "placeholder": "Talk to Sidthah",
+        "loading_text": "Listening...",
+        "panel_background": "236, 227, 214",
+        "panel_opacity": 20
       }
     },
     "blessing": {
@@ -47,6 +46,11 @@
         "signup_placeholder": "Enter your email",
         "signup_button_label": "Receive wisdom",
         "signup_success": "Thank you. Your wisdom will arrive soon.",
+        "signup_consent_label": "Yes, send me this blessing and future wisdom emails.",
+        "signup_consent_default": true,
+        "signup_error": "We could not save your email. Please try again.",
+        "signup_invalid": "Please enter a valid email address.",
+        "signup_endpoint": "",
         "panel_background": "236, 227, 214",
         "panel_opacity": 10,
         "show_copy_button": false,
