@@ -63,9 +63,10 @@
       .bless-landing {
         background-image: var(--bless-body-background-image, none);
         background-size: cover;
-        background-position: center top;
+        background-position: center calc(var(--bless-bg-offset, 0px));
         background-repeat: no-repeat;
-        background-attachment: scroll;
+        background-attachment: fixed;
+        background-color: #184135;
       }
     </style>
 
@@ -118,5 +119,32 @@
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}
     {% endif %}
+
+    <script>
+      (function () {
+        const body = document.body;
+        if (!body || !body.classList.contains('bless-landing')) return;
+
+        let ticking = false;
+        const update = () => {
+          const offset = Math.max(-window.scrollY * 0.3, -800);
+          body.style.setProperty('--bless-bg-offset', offset + 'px');
+          ticking = false;
+        };
+
+        update();
+
+        window.addEventListener(
+          'scroll',
+          () => {
+            if (!ticking) {
+              window.requestAnimationFrame(update);
+              ticking = true;
+            }
+          },
+          { passive: true }
+        );
+      })();
+    </script>
   </body>
 </html>
