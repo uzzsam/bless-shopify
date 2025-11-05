@@ -11,8 +11,18 @@
 >
   <div class="bless-blessing__inner">
     {% if section.settings.heading != blank %}
+      {% assign raw_heading = section.settings.heading | strip %}
+      {% assign heading_words = raw_heading | downcase | split: ' ' %}
+      {% capture formatted_heading %}
+        {% for word in heading_words %}
+          {% assign cleaned = word | strip %}
+          {% if cleaned != blank %}
+            {{- cleaned | capitalize -}}{% unless forloop.last %} {% endunless %}
+          {% endif %}
+        {% endfor %}
+      {% endcapture %}
       <h2 class="bless-blessing__heading">
-        {{ section.settings.heading | escape }}
+        {{ formatted_heading | strip | escape }}
       </h2>
     {% endif %}
 

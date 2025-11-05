@@ -1,7 +1,7 @@
 {% liquid
   assign widget_src = section.settings.widget_src | default: 'https://bless-test-brown.vercel.app/bless-chat-widget.js'
-  assign panel_rgb = section.settings.panel_background | default: '20, 62, 48'
-  assign panel_opacity = section.settings.panel_opacity | default: 72 | times: 0.01
+  assign panel_rgb = section.settings.panel_background | default: '236, 227, 214'
+  assign panel_opacity = section.settings.panel_opacity | default: 45 | times: 0.01
 %}
 
 <section
@@ -75,19 +75,19 @@
 /* Single panel only (remove any layered “under box”) */
 .bless-chat__panel {
   position: relative;
-  padding: clamp(1.6rem, 3vw, 2.2rem);
-  border-radius: 36px;             /* one radius to rule them all */
-  backdrop-filter: blur(12px);
+  padding: clamp(1.9rem, 3.6vw, 2.8rem);
+  border-radius: 32px;
+  backdrop-filter: blur(14px);
   box-shadow: 0 28px 60px rgba(0,0,0,.18);
-  border: 1px solid rgba(255,255,255,.25);
+  border: 1px solid rgba(var(--color-light-flesh, 236, 227, 214), 0.25);
 }
 
-/* Optional subtle inner stroke (keeps look consistent with blessing panel) */
 .bless-chat__panel::after {
   content: "";
-  position: absolute; inset: 10px;
-  border-radius: 28px;
-  border: 1px solid rgba(255,255,255,.16);
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(255,255,255,0.18);
   pointer-events: none;
 }
 
@@ -181,15 +181,15 @@
       "type": "text",
       "id": "panel_background",
       "label": "Panel background RGB",
-      "default": "20, 62, 48"
+      "default": "236, 227, 214"
     },
     {
       "type": "range",
       "id": "panel_opacity",
       "label": "Panel opacity",
-      "default": 72,
-      "min": 20,
-      "max": 95,
+      "default": 45,
+      "min": 10,
+      "max": 100,
       "step": 5,
       "unit": "%"
     }
