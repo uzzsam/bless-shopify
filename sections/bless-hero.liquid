@@ -39,17 +39,17 @@
         {{
           overlay_video
           | video_tag:
-            autoplay: true,
+            autoplay: false,
             loop: true,
-            muted: true,
+            muted: false,
             playsinline: true,
             controls: false,
+            preload: 'metadata',
             class: 'bless-hero__focus-video'
         }}
-        <button type="button" class="bless-hero__audio-toggle" aria-pressed="false">
-          <span class="sr-only">Toggle sound</span>
-          <span class="bless-hero__audio-icon bless-hero__audio-icon--muted" aria-hidden="true">🔇</span>
-          <span class="bless-hero__audio-icon bless-hero__audio-icon--playing" aria-hidden="true">🔊</span>
+        <button type="button" class="bless-hero__play-toggle" aria-pressed="false">
+          <span class="sr-only">Play Sidthah video</span>
+          <span class="bless-hero__play-icon" aria-hidden="true">&#9658;</span>
         </button>
       </div>
     {% endif %}
@@ -180,47 +180,41 @@
   background: rgba(var(--color-avocado, 227, 216, 154), 1);
 }
 
-.bless-hero__audio-toggle {
+.bless-hero__play-toggle {
   position: absolute;
-  bottom: 1.25rem;
-  right: 1.25rem;
-  width: 48px;
-  height: 48px;
+  inset: 0;
+  margin: auto;
+  width: 84px;
+  height: 84px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.75);
+  border: 2px solid rgba(255,255,255,0.85);
   background: rgba(0, 0, 0, 0.45);
   color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease, opacity 180ms ease;
   backdrop-filter: blur(4px);
+  z-index: 2;
 }
 
-.bless-hero__audio-toggle:hover,
-.bless-hero__audio-toggle:focus-visible,
-.bless-hero__audio-toggle.is-active {
+.bless-hero__play-toggle:hover,
+.bless-hero__play-toggle:focus-visible {
   background: rgba(0, 0, 0, 0.6);
-  border-color: rgba(255,255,255,0.85);
-  transform: translateY(-1px);
+  border-color: rgba(255,255,255,0.95);
+  transform: scale(1.02);
 }
 
-.bless-hero__audio-icon {
-  display: none;
-  font-size: 1.4rem;
+.bless-hero__play-toggle.is-hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
-.bless-hero__audio-icon--muted {
-  display: inline;
-}
-
-.bless-hero__audio-toggle.is-active .bless-hero__audio-icon--muted {
-  display: none;
-}
-
-.bless-hero__audio-toggle.is-active .bless-hero__audio-icon--playing {
-  display: inline;
+.bless-hero__play-icon {
+  font-size: 2rem;
+  line-height: 1;
+  margin-left: 4px;
 }
 
 .bless-hero .sr-only {
@@ -238,6 +232,8 @@
 @media (max-width: 600px) {
   .bless-hero__content {
     padding-inline: 1rem;
+    padding-top: clamp(24px, 8vw, 64px);
+    padding-bottom: clamp(24px, 10vw, 80px);
   }
 
   .bless-hero__focus-video {
@@ -264,27 +260,42 @@ if (heroSection) {
   }
 
   const focusVideo = heroSection.querySelector('.bless-hero__focus-video');
-  const audioToggle = heroSection.querySelector('.bless-hero__audio-toggle');
-  if (focusVideo && audioToggle) {
-    const setAudioState = (isActive) => {
-      audioToggle.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-      audioToggle.classList.toggle('is-active', isActive);
+  const playToggle = heroSection.querySelector('.bless-hero__play-toggle');
+  if (focusVideo && playToggle) {
+    focusVideo.pause();
+    focusVideo.muted = false;
+    focusVideo.defaultMuted = false;
+
+    const syncState = () => {
+      if (focusVideo.paused) {
+        playToggle.classList.remove('is-hidden');
+        playToggle.setAttribute('aria-pressed', 'false');
+      } else {
+        playToggle.classList.add('is-hidden');
+        playToggle.setAttribute('aria-pressed', 'true');
+      }
     };
 
-    setAudioState(false);
-
-    audioToggle.addEventListener('click', () => {
-      const shouldEnable = focusVideo.muted;
-      focusVideo.muted = !shouldEnable;
-      focusVideo.defaultMuted = !shouldEnable;
-      if (shouldEnable) {
-        focusVideo.removeAttribute('muted');
-        focusVideo.play().catch(() => {});
+    playToggle.addEventListener('click', () => {
+      if (focusVideo.paused) {
+        const playPromise = focusVideo.play();
+        if (playPromise && typeof playPromise.then === 'function') {
+          playPromise.catch(() => {
+            focusVideo.muted = false;
+            focusVideo.play().catch(() => {});
+          });
+        }
       } else {
-        focusVideo.setAttribute('muted', 'muted');
+        focusVideo.pause();
       }
-      setAudioState(shouldEnable);
+      syncState();
     });
+
+    focusVideo.addEventListener('pause', syncState);
+    focusVideo.addEventListener('ended', syncState);
+    focusVideo.addEventListener('play', syncState);
+
+    syncState();
   }
 }
 {% endjavascript %}
