@@ -32,7 +32,16 @@
       </div>
 
       {% if section.settings.show_signup %}
-        <form class="bless-blessing__signup bless-blessing__signup-form" data-blessing-signup hidden novalidate>
+        <form
+          class="bless-blessing__signup bless-blessing__signup-form"
+          data-blessing-signup
+          hidden
+          novalidate
+          data-signup-endpoint="{{ section.settings.signup_endpoint | escape }}"
+          data-success-message="{{ section.settings.signup_success | escape }}"
+          data-error-message="{{ section.settings.signup_error | escape }}"
+          data-invalid-message="{{ section.settings.signup_invalid | escape }}"
+        >
           <input type="hidden" name="sidthie" data-signup-sidthie>
           <label
             class="bless-blessing__signup-label"
@@ -53,6 +62,16 @@
               {{ section.settings.signup_button_label | escape }}
             </button>
           </div>
+          <label class="bless-blessing__signup-consent">
+            <input
+              type="checkbox"
+              name="accepts_marketing"
+              data-signup-consent
+              {% if section.settings.signup_consent_default %}checked{% endif %}
+              data-default-checked="{{ section.settings.signup_consent_default }}"
+            >
+            <span>{{ section.settings.signup_consent_label | escape }}</span>
+          </label>
           <p class="bless-blessing__signup-feedback" data-signup-feedback hidden>
             {{ section.settings.signup_success | escape }}
           </p>
@@ -207,6 +226,20 @@
   transition: transform 200ms ease, background-color 200ms ease;
 }
 
+.bless-blessing__signup-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.bless-blessing__signup-consent input[type="checkbox"] {
+  margin-top: 0.2rem;
+  accent-color: rgba(var(--color-avocado, 227, 216, 154), 0.92);
+}
+
 .bless-blessing__signup-button:hover,
 .bless-blessing__signup-button:focus {
   transform: translateY(-1px);
@@ -289,11 +322,63 @@
   const copyFeedback = sectionEl.querySelector('[data-copy-feedback]');
   const autoScroll = sectionEl.dataset.autoScroll === 'true';
   const defaultSignupPrompt = signupPrompt?.getAttribute('data-default-prompt') || signupPrompt?.textContent || '';
+  const signupForm = signupWrapper instanceof HTMLFormElement ? signupWrapper : null;
+  const signupEmailInput = signupForm?.querySelector('input[type="email"]') || null;
+  const signupConsentInput = signupForm?.querySelector('[data-signup-consent]') || null;
+  const signupFeedbackEl = signupForm?.querySelector('[data-signup-feedback]') || null;
+  const signupSubmitButton = signupForm?.querySelector('[data-signup-submit]') || null;
+  const signupEndpoint =
+    (signupForm?.getAttribute('data-signup-endpoint') || '').trim() || '/contact';
+  const signupSuccessMessage = signupForm?.getAttribute('data-success-message') || signupFeedbackEl?.textContent || '';
+  const signupErrorMessage = signupForm?.getAttribute('data-error-message') || 'We could not save your email. Please try again.';
+  const signupInvalidMessage = signupForm?.getAttribute('data-invalid-message') || 'Please enter a valid email address.';
+  const consentDefaultChecked = signupConsentInput
+    ? signupConsentInput.dataset.defaultChecked !== 'false'
+    : false;
+  let signupSubmitting = false;
+  let latestBlessingDetail = null;
+
+  if (signupConsentInput) {
+    signupConsentInput.checked = consentDefaultChecked;
+  }
+
+  function setSignupFeedback(message, isError) {
+    if (!signupFeedbackEl) return;
+    if (!message) {
+      signupFeedbackEl.hidden = true;
+      signupFeedbackEl.classList.remove('bless-blessing__signup-feedback--error');
+      return;
+    }
+    signupFeedbackEl.textContent = message;
+    signupFeedbackEl.hidden = false;
+    signupFeedbackEl.classList.toggle('bless-blessing__signup-feedback--error', Boolean(isError));
+  }
+
+  function clearSignupFeedback() {
+    setSignupFeedback('', false);
+  }
+
+  function isValidEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
 
   function revealBlessing(detail) {
     if (!contentEl || !panelEl) return;
-    const blessing = detail?.blessing || detail?.text;
+    const normalizedDetail = detail
+      ? Object.assign({}, detail, {
+          blessing: detail.blessing || detail.text || '',
+          text: detail.blessing || detail.text || ''
+        })
+      : null;
+    const blessing = normalizedDetail?.blessing;
     if (!blessing) return;
+
+    latestBlessingDetail = normalizedDetail;
+
+    if (signupWrapper) {
+      signupWrapper.removeAttribute('hidden');
+      clearSignupFeedback();
+    }
 
     if (placeholderEl) {
       placeholderEl.hidden = true;
@@ -304,12 +389,12 @@
     panelEl.classList.add('is-visible');
 
     if (metaWrapper) {
-      const hasLabel = Boolean(detail?.sidthieLabel);
-      const hasExplanation = Boolean(detail?.explanation);
+      const hasLabel = Boolean(normalizedDetail?.sidthieLabel);
+      const hasExplanation = Boolean(normalizedDetail?.explanation);
 
       if (metaTitleEl) {
         if (hasLabel) {
-          metaTitleEl.textContent = detail.sidthieLabel;
+          metaTitleEl.textContent = normalizedDetail.sidthieLabel;
           metaTitleEl.removeAttribute('hidden');
         } else {
           metaTitleEl.setAttribute('hidden', 'hidden');
@@ -318,7 +403,7 @@
 
       if (metaTextEl) {
         if (hasExplanation) {
-          metaTextEl.textContent = detail.explanation;
+          metaTextEl.textContent = normalizedDetail.explanation;
           metaTextEl.removeAttribute('hidden');
         } else {
           metaTextEl.setAttribute('hidden', 'hidden');
@@ -333,20 +418,20 @@
     }
 
     if (signupWrapper) {
-      signupWrapper.removeAttribute('hidden');
       if (signupPrompt) {
         if (defaultSignupPrompt.includes('{sidthie}')) {
           signupPrompt.textContent = defaultSignupPrompt.replace(
             '{sidthie}',
-            detail?.sidthieLabel || 'your Sidthie'
+            normalizedDetail?.sidthieLabel || 'your Sidthie'
           );
-        } else if (detail?.sidthieLabel) {
-          signupPrompt.textContent = `${defaultSignupPrompt} (${detail.sidthieLabel})`;
+        } else if (normalizedDetail?.sidthieLabel) {
+          signupPrompt.textContent = `${defaultSignupPrompt} (${normalizedDetail.sidthieLabel})`;
         }
       }
 
       if (signupSidthieInput) {
-        signupSidthieInput.value = detail?.sidthie || detail?.sidthieLabel || '';
+        signupSidthieInput.value =
+          normalizedDetail?.sidthie || normalizedDetail?.sidthieLabel || '';
       }
     }
 
@@ -357,6 +442,90 @@
 
   function resetCopyFeedback() {
     if (copyFeedback) copyFeedback.hidden = true;
+  }
+
+  if (signupForm) {
+    signupForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (signupSubmitting) return;
+      if (!signupEmailInput) return;
+
+      clearSignupFeedback();
+
+      const email = signupEmailInput.value.trim();
+      if (!isValidEmail(email)) {
+        setSignupFeedback(signupInvalidMessage, true);
+        signupEmailInput.focus();
+        return;
+      }
+
+      if (!latestBlessingDetail || !latestBlessingDetail.blessing) {
+        setSignupFeedback(signupErrorMessage, true);
+        return;
+      }
+
+      signupSubmitting = true;
+      if (signupSubmitButton) signupSubmitButton.disabled = true;
+
+      const detail = latestBlessingDetail;
+      const formData = new FormData();
+      formData.append('form_type', 'customer');
+      formData.append('utf8', '✓');
+      formData.append('contact[email]', email);
+      formData.append(
+        'contact[accepts_marketing]',
+        signupConsentInput && signupConsentInput.checked ? 'true' : 'false'
+      );
+
+      const tags = ['Bless Chat'];
+      if (detail.sidthieLabel) {
+        tags.push('Sidthie: ' + detail.sidthieLabel);
+      }
+      formData.append('contact[tags]', tags.join(', '));
+
+      const messageParts = [];
+      if (detail.sidthieLabel) {
+        messageParts.push('Sidthie: ' + detail.sidthieLabel);
+      }
+      if (detail.explanation) {
+        messageParts.push('Explanation: ' + detail.explanation);
+      }
+      messageParts.push('Blessing:\n' + detail.blessing);
+      formData.append('contact[body]', messageParts.join('\n\n'));
+
+      fetch(signupEndpoint, {
+        method: 'POST',
+        body: formData,
+        headers: { Accept: 'text/html,application/xhtml+xml' }
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Request failed with status ' + response.status);
+          }
+          return response.text();
+        })
+        .then(() => {
+          setSignupFeedback(
+            signupSuccessMessage || 'Thank you. Your wisdom will arrive soon.',
+            false
+          );
+          signupEmailInput.value = '';
+          if (signupConsentInput) {
+            signupConsentInput.checked = consentDefaultChecked;
+          }
+        })
+        .catch((error) => {
+          console.error('Bless signup error', error);
+          setSignupFeedback(
+            signupErrorMessage || signupInvalidMessage,
+            true
+          );
+        })
+        .finally(() => {
+          signupSubmitting = false;
+          if (signupSubmitButton) signupSubmitButton.disabled = false;
+        });
+    });
   }
 
   const updateKey = `__blessBlessingUpdate_${sectionId}`;
@@ -377,6 +546,10 @@
   }
   window[errorKey] = () => {
     resetCopyFeedback();
+    clearSignupFeedback();
+    signupSubmitting = false;
+    latestBlessingDetail = null;
+    if (signupSubmitButton) signupSubmitButton.disabled = false;
     if (metaWrapper) metaWrapper.hidden = true;
     if (signupWrapper) signupWrapper.hidden = true;
     if (contentEl) contentEl.hidden = true;
@@ -448,6 +621,36 @@
       "id": "signup_success",
       "label": "Signup success message",
       "default": "Thank you. Your wisdom will arrive soon."
+    },
+    {
+      "type": "text",
+      "id": "signup_consent_label",
+      "label": "Consent label",
+      "default": "Yes, send me this blessing and future wisdom emails."
+    },
+    {
+      "type": "checkbox",
+      "id": "signup_consent_default",
+      "label": "Consent checked by default",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "signup_error",
+      "label": "Signup error message",
+      "default": "We could not save your email. Please try again."
+    },
+    {
+      "type": "text",
+      "id": "signup_invalid",
+      "label": "Invalid email message",
+      "default": "Please enter a valid email address."
+    },
+    {
+      "type": "url",
+      "id": "signup_endpoint",
+      "label": "Signup endpoint override",
+      "info": "Leave blank to submit to the store contact form."
     },
     {
       "type": "text",

@@ -121,10 +121,15 @@
 
       setStatus(state, state.loadingMessage || 'Finalising your blessing...');
 
+      var payloadDetail = Object.assign({}, detail, {
+        blessing: blessing,
+        text: blessing
+      });
+
       if (!state.appProxyPath) {
         setStatus(state, '');
         window.dispatchEvent(
-          new CustomEvent('blessing:update', { detail: { text: blessing } })
+          new CustomEvent('blessing:update', { detail: payloadDetail })
         );
         return;
       }
@@ -145,9 +150,11 @@
             (payload && typeof payload.blessingText === 'string'
               ? payload.blessingText
               : '') || blessing;
+          payloadDetail.blessing = text;
+          payloadDetail.text = text;
           setStatus(state, '');
           window.dispatchEvent(
-            new CustomEvent('blessing:update', { detail: { text: text } })
+            new CustomEvent('blessing:update', { detail: payloadDetail })
           );
         })
         .catch(function (error) {
