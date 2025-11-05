@@ -10,7 +10,7 @@
 {
   "current": {
     "logo": "shopify://shop_images/sidthah_logo_white.png",
-    "logo_inverse": "shopify://shop_images/sidthah_logo_black.png",
+    "logo_inverse": "shopify://shop_images/sidthah_logo_white.png",
     "logo_height": 70,
     "logo_height_mobile": 28,
     "favicon": "shopify://shop_images/spirals-merged.png",
