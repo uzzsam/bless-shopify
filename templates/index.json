@@ -13,7 +13,7 @@
       "type": "bless-hero",
       "settings": {
         "video_background": "shopify://files/videos/stream-medium.mp4",
-        "video_overlay": "shopify://files/videos/Sidthah_hero_video_16_9.mov",
+        "video_overlay": "shopify://files/videos/Sidthahwithaudio.mp4",
         "overlay_color": "46, 94, 76",
         "overlay_opacity": 30,
         "content_padding_top": 0,
