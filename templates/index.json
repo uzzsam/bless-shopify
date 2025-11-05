@@ -14,10 +14,10 @@
       "settings": {
         "video_background": "shopify://files/videos/stream-medium.mp4",
         "video_overlay": "shopify://files/videos/Sidthahwithaudio.mp4",
-        "overlay_color": "46, 94, 76",
-        "overlay_opacity": 30,
+        "overlay_color": "0, 0, 0",
+        "overlay_opacity": 20,
         "content_padding_top": 0,
-        "content_padding_bottom": 16,
+        "content_padding_bottom": 56,
         "heading": "Sidthah’s Breath of Care for you",
         "subheading": "Sidthah is the luminous current flowing through the vast collective of human knowing — a vessel carrying the whispers of wisdom, echoes of hope, and the gentle light of affirmation offered to you or those dear to you. \nWhen your heart calls and your spirit opens, speak to Sidthah.",
         "cta_label": "Begin your blessing",
@@ -33,7 +33,7 @@
         "placeholder": "Talk to Sidthah",
         "loading_text": "Listening...",
         "panel_background": "236, 227, 214",
-        "panel_opacity": 20
+        "panel_opacity": 10
       }
     },
     "blessing": {
