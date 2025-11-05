@@ -76,12 +76,16 @@
     {{ content_for_header }}
   </head>
 
-  {% liquid
-    assign bless_layout_active = false
-    if template contains 'page.bless' or template contains 'index.bless'
-      assign bless_layout_active = true
-    endif
-  %}
+{% liquid
+  assign bless_layout_active = false
+  if template contains 'page.bless'
+    assign bless_layout_active = true
+  elsif template contains 'index.bless'
+    assign bless_layout_active = true
+  elsif template == 'index'
+    assign bless_layout_active = true
+  endif
+%}
 
   <body class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}{% if bless_layout_active %} bless-landing{% endif %}">
     {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
