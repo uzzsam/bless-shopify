@@ -55,12 +55,8 @@
     {% endif %}
 
     {% if section.settings.heading != blank %}
-      {% assign hero_heading_raw = section.settings.heading | strip %}
-      {% assign hero_heading_lower = hero_heading_raw | downcase %}
-      {% assign hero_heading_first = hero_heading_lower | slice: 0, 1 | upcase %}
-      {% assign hero_heading_rest = hero_heading_lower | slice: 1 %}
       <h1 class="bless-hero__heading">
-        {{ hero_heading_first }}{{ hero_heading_rest }}
+        {{ section.settings.heading | escape }}
       </h1>
     {% endif %}
 
@@ -86,12 +82,12 @@
   position: relative;
   min-height: 100vh;
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: center;
   background-color: rgb(var(--color-dark-green, 46, 94, 76));
   overflow: hidden;
   color: rgb(var(--color-light-flesh, 236, 227, 214));
-  padding-top: clamp(0px, 3vw, 48px);
+  padding-top: 0;
 }
 
 .bless-hero__media-wrap {
@@ -120,17 +116,21 @@
   margin: 0 auto;
   text-align: center;
   padding-inline: 1.5rem;
+  padding-top: clamp(32px, 6vw, 80px);
+  padding-bottom: clamp(32px, 8vw, 96px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   gap: 1.25rem;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .bless-hero__focus {
   margin: 0 auto;
-  max-width: clamp(240px, 22vw + 160px, 420px);
-  width: min(100%, clamp(240px, 22vw + 160px, 420px));
+  width: min(100%, clamp(260px, 20vw + 220px, 520px));
+  height: min(88vh, 920px);
   display: flex;
   justify-content: center;
   position: relative;
@@ -138,9 +138,7 @@
 
 .bless-hero__focus-video {
   width: 100%;
-  height: auto;
-  aspect-ratio: 9 / 16;
-  max-height: min(85vh, 860px);
+  height: 100%;
   object-fit: cover;
   border-radius: 0 0 32px 32px;
   box-shadow: 0 32px 60px rgba(0, 0, 0, 0.35);
@@ -186,17 +184,18 @@
   position: absolute;
   bottom: 1.25rem;
   right: 1.25rem;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.6);
-  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255,255,255,0.75);
+  background: rgba(0, 0, 0, 0.45);
   color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+  backdrop-filter: blur(4px);
 }
 
 .bless-hero__audio-toggle:hover,
@@ -209,7 +208,7 @@
 
 .bless-hero__audio-icon {
   display: none;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
 }
 
 .bless-hero__audio-icon--muted {
@@ -229,8 +228,8 @@
 .bless-landing .header button,
 .bless-landing .header svg,
 .bless-landing .header span {
-  color: #ffffff;
-  fill: #ffffff;
+  color: #ffffff !important;
+  fill: #ffffff !important;
 }
 
 .bless-hero .sr-only {
@@ -276,14 +275,24 @@ if (heroSection) {
   const focusVideo = heroSection.querySelector('.bless-hero__focus-video');
   const audioToggle = heroSection.querySelector('.bless-hero__audio-toggle');
   if (focusVideo && audioToggle) {
+    const setAudioState = (isActive) => {
+      audioToggle.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      audioToggle.classList.toggle('is-active', isActive);
+    };
+
+    setAudioState(false);
+
     audioToggle.addEventListener('click', () => {
-      const enableAudio = focusVideo.muted;
-      focusVideo.muted = !enableAudio;
-      audioToggle.setAttribute('aria-pressed', enableAudio ? 'true' : 'false');
-      audioToggle.classList.toggle('is-active', enableAudio);
-      if (enableAudio) {
+      const shouldEnable = focusVideo.muted;
+      focusVideo.muted = !shouldEnable;
+      focusVideo.defaultMuted = !shouldEnable;
+      if (shouldEnable) {
+        focusVideo.removeAttribute('muted');
         focusVideo.play().catch(() => {});
+      } else {
+        focusVideo.setAttribute('muted', 'muted');
       }
+      setAudioState(shouldEnable);
     });
   }
 }
