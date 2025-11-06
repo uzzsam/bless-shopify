@@ -206,12 +206,12 @@
   bottom: 1.4rem;
   transform: translateX(-50%);
   display: inline-flex;
-  gap: 0.8rem;
-  padding: 0.75rem 1.3rem;
+  gap: 0.65rem;
+  padding: 0.65rem 1.2rem;
   border-radius: 999px;
   background: rgba(0,0,0,0.45);
   backdrop-filter: blur(4px);
-  box-shadow: 0 18px 34px rgba(0,0,0,0.35);
+  box-shadow: 0 16px 28px rgba(0,0,0,0.35);
   align-items: center;
 }
 
@@ -219,7 +219,7 @@
   border: none;
   background: transparent;
   color: #ffffff;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   line-height: 1;
   cursor: pointer;
   transition: transform 160ms ease, opacity 160ms ease;
@@ -232,19 +232,13 @@
 
 .bless-hero__control:hover,
 .bless-hero__control:focus-visible {
-  transform: scale(1.1);
-  opacity: 0.9;
+  transform: scale(1.08);
+  opacity: 0.85;
 }
 
 .bless-hero__control--play span[aria-hidden="true"] {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   line-height: 1;
-}
-
-.bless-hero__sound-icon {
-  width: 28px;
-  height: 28px;
-  display: block;
 }
 
 .bless-hero__sound-icon-wrapper,
@@ -254,6 +248,12 @@
   justify-content: center;
 }
 
+.bless-hero__sound-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
 .bless-hero__control--mute {
   color: transparent;
 }
@@ -261,10 +261,11 @@
 .bless-hero__mute-slash {
   display: none;
   position: absolute;
-  width: 30px;
+  width: 24px;
   height: 2px;
   background: #fff;
   transform: rotate(45deg);
+  border-radius: 1px;
 }
 
 .bless-hero__control--mute.is-muted .bless-hero__mute-slash {
@@ -272,7 +273,7 @@
 }
 
 .bless-hero__control--mute.is-muted .bless-hero__sound-icon {
-  opacity: 0.75;
+  opacity: 0.7;
 }
 
 .bless-hero__control-bar {
@@ -281,12 +282,12 @@
   bottom: 1.4rem;
   transform: translateX(-50%);
   display: inline-flex;
-  gap: 0.8rem;
-  padding: 0.75rem 1.3rem;
+  gap: 0.65rem;
+  padding: 0.65rem 1.2rem;
   border-radius: 999px;
   background: rgba(0,0,0,0.45);
   backdrop-filter: blur(4px);
-  box-shadow: 0 18px 34px rgba(0,0,0,0.35);
+  box-shadow: 0 16px 28px rgba(0,0,0,0.35);
   align-items: center;
 }
 
@@ -294,7 +295,7 @@
   border: none;
   background: transparent;
   color: #ffffff;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   line-height: 1;
   cursor: pointer;
   transition: transform 160ms ease, opacity 160ms ease;
@@ -307,47 +308,40 @@
 
 .bless-hero__control:hover,
 .bless-hero__control:focus-visible {
-  transform: scale(1.12);
-  opacity: 0.9;
+  transform: scale(1.08);
+  opacity: 0.85;
+}
+
+.bless-hero__control--play span[aria-hidden="true"] {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.bless-hero__sound-icon-wrapper,
+.bless-hero__sound-glyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .bless-hero__sound-icon {
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   display: block;
 }
 
-.bless-hero__control--mute {
-  color: transparent;
-}
-
-.bless-hero__mute-slash {
+.bless-hero__control--mute .bless-hero__mute-slash {
   display: none;
+  position: absolute;
+  width: 22px;
+  height: 2px;
+  background: #fff;
+  transform: rotate(45deg);
+  border-radius: 1px;
 }
 
 .bless-hero__control--mute.is-muted .bless-hero__mute-slash {
   display: block;
-  position: absolute;
-  width: 30px;
-  height: 2px;
-  background: #fff;
-  transform: rotate(45deg);
-}
-
-.bless-hero__control--mute.is-muted .bless-hero__sound-icon {
-  opacity: 0.75;
-}
-
-.bless-hero .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
 }
 
 @media (max-width: 600px) {
@@ -407,48 +401,52 @@ if (heroSection) {
       if (!muteButton) return;
       const isMuted = focusVideo.muted;
       muteButton.classList.toggle('is-muted', isMuted);
-      srMute && (srMute.textContent = isMuted ? 'Unmute video' : 'Mute video');
+      if (srMute) srMute.textContent = isMuted ? 'Unmute video' : 'Mute video';
       if (muteGlyph) {
         muteGlyph.textContent = isMuted ? '🔇' : '🔊';
       }
-      if (muteIconWrapper) {
-        muteIconWrapper.classList.toggle('is-muted', isMuted);
-      }
       if (muteIconImg) {
-        muteIconImg.style.opacity = isMuted ? '0.75' : '1';
+        muteIconImg.style.opacity = isMuted ? '0.7' : '1';
+      }
+      if (muteIconWrapper && !muteIconImg && !muteGlyph) {
+        muteButton.textContent = isMuted ? '🔇' : '🔊';
       }
     };
 
-    const showControls = () => {
-      controlBar.hidden = false;
-      syncPlayState();
-      syncMuteState();
-    };
+    controlBar.hidden = false;
 
     focusVideo.muted = false;
     focusVideo.defaultMuted = false;
     focusVideo.removeAttribute('muted');
 
-    if (focusVideo.readyState >= 2) {
+    const initialise = () => {
       focusVideo.pause();
       focusVideo.currentTime = 0;
-      showControls();
+      syncPlayState();
+      syncMuteState();
+    };
+
+    if (focusVideo.readyState >= 2) {
+      initialise();
     } else {
-      focusVideo.addEventListener('loadeddata', () => {
-        focusVideo.pause();
-        focusVideo.currentTime = 0;
-        showControls();
-      }, { once: true });
-      focusVideo.load();
+      focusVideo.addEventListener('loadeddata', initialise, { once: true });
     }
 
     playButton?.addEventListener('click', () => {
       if (focusVideo.paused) {
-        focusVideo.play().catch(() => {});
+        const playPromise = focusVideo.play();
+        if (playPromise && typeof playPromise.then === 'function') {
+          playPromise.then(syncPlayState).catch((error) => {
+            console.warn('Hero video play failed', error);
+            syncPlayState();
+          });
+        } else {
+          syncPlayState();
+        }
       } else {
         focusVideo.pause();
+        syncPlayState();
       }
-      syncPlayState();
     });
 
     muteButton?.addEventListener('click', () => {
