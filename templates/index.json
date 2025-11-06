@@ -29,7 +29,7 @@
       "settings": {
         "heading": "Talk to Sidthah",
         "widget_src": "https://bless-test-brown.vercel.app/bless-chat-widget.js",
-        "api_url": "",
+        "api_url": "https://bless-test-brown.vercel.app/api/chat",
         "placeholder": "Talk to Sidthah",
         "loading_text": "Listening...",
         "panel_background": "236, 227, 214",
