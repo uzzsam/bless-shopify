@@ -35,6 +35,7 @@
     style="padding-top: {{ content_padding_top }}px; padding-bottom: {{ content_padding_bottom }}px;"
   >
     {% if overlay_video != blank %}
+      {% assign poster_image = overlay_video.preview_image %}
       <div class="bless-hero__focus">
         {{
           overlay_video
@@ -43,10 +44,15 @@
             loop: true,
             muted: false,
             playsinline: true,
-            controls: true,
+            controls: false,
             preload: 'metadata',
+            poster: poster_image | image_url: width: 900,
             class: 'bless-hero__focus-video'
         }}
+        <div class="bless-hero__controls" hidden>
+          <button type="button" class="bless-hero__control" data-control="play" aria-label="Play video">►</button>
+          <button type="button" class="bless-hero__control" data-control="mute" aria-label="Mute video">🔊</button>
+        </div>
       </div>
     {% endif %}
 
@@ -180,9 +186,33 @@
   background: rgba(0,0,0,0.35);
 }
 
-.bless-hero__focus video::-webkit-media-controls-play-button,
-.bless-hero__focus video::-webkit-media-controls-volume-slider {
+.bless-hero__controls {
+  position: absolute;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
+  display: inline-flex;
+  gap: 0.65rem;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+}
+
+.bless-hero__control {
+  border: none;
+  background: transparent;
   color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: transform 160ms ease, color 160ms ease;
+}
+
+.bless-hero__control:hover,
+.bless-hero__control:focus-visible {
+  transform: scale(1.12);
+  color: rgba(255,255,255,0.92);
 }
 
 @media (max-width: 600px) {
@@ -216,13 +246,56 @@ if (heroSection) {
   }
 
   const focusVideo = heroSection.querySelector('.bless-hero__focus-video');
-  if (focusVideo) {
-    focusVideo.muted = false;
-    focusVideo.defaultMuted = false;
-    focusVideo.removeAttribute('muted');
-    focusVideo.play().catch(() => {
+  const controls = heroSection.querySelector('.bless-hero__controls');
+  if (focusVideo && controls) {
+    const playButton = controls.querySelector('[data-control="play"]');
+    const muteButton = controls.querySelector('[data-control="mute"]');
+
+    const syncPlayState = () => {
+      playButton.textContent = focusVideo.paused ? '►' : '❚❚';
+      playButton.setAttribute('aria-label', focusVideo.paused ? 'Play video' : 'Pause video');
+    };
+
+    const syncMuteState = () => {
+      muteButton.textContent = focusVideo.muted ? '🔇' : '🔊';
+      muteButton.setAttribute('aria-label', focusVideo.muted ? 'Unmute video' : 'Mute video');
+    };
+
+    const showControls = () => {
+      controls.hidden = false;
+    };
+
+    focusVideo.addEventListener('loadeddata', () => {
       focusVideo.pause();
       focusVideo.currentTime = 0;
+      focusVideo.muted = false;
+      focusVideo.defaultMuted = false;
+      focusVideo.removeAttribute('muted');
+      showControls();
+      syncPlayState();
+      syncMuteState();
+    }, { once: true });
+
+    playButton.addEventListener('click', () => {
+      if (focusVideo.paused) {
+        focusVideo.play().catch(() => {});
+      } else {
+        focusVideo.pause();
+      }
+      syncPlayState();
+    });
+
+    muteButton.addEventListener('click', () => {
+      focusVideo.muted = !focusVideo.muted;
+      syncMuteState();
+    });
+
+    focusVideo.addEventListener('play', syncPlayState);
+    focusVideo.addEventListener('pause', syncPlayState);
+    focusVideo.addEventListener('ended', () => {
+      focusVideo.currentTime = 0;
+      focusVideo.pause();
+      syncPlayState();
     });
   }
 }
