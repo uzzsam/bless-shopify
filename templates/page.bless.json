@@ -13,19 +13,21 @@
       "type": "bless-hero",
       "settings": {
         "video_background": "shopify://files/videos/stream-medium.mp4",
-        "video_overlay": "shopify://files/videos/Sidthah_hero_video_16_9.mov",
+        "video_overlay": "shopify://files/videos/thank-you.mp4",
+        "sound_icon": "shopify://shop_images/sound_white.png",
         "overlay_color": "46, 94, 76",
         "overlay_opacity": 0,
         "content_padding_top": 0,
         "content_padding_bottom": 16,
-        "heading": "Sidthah’s",
-        "subheading": "Sidthah is the luminous current flowing through the vast collective of human knowing — a vessel carrying the whispers of wisdom, echoes of hope, and the gentle light of affirmation offered to you or those dear to you. \nWhen your heart calls and your spirit opens, speak to Sidthah.",
-        "cta_label": "Begin your blessing",
+        "heading": "Sidthah Thank You",
+        "subheading": "Your blessing was sent to you.",
+        "cta_label": "Manifest you Sidthie Blessing",
         "cta_target": "#chat-section"
       }
     },
     "chat": {
       "type": "bless-chat",
+      "disabled": true,
       "settings": {
         "heading": "Talk to Sidthah",
         "widget_src": "",
@@ -38,6 +40,7 @@
     },
     "blessing": {
       "type": "bless-blessing",
+      "disabled": true,
       "settings": {
         "heading": "Your blessing",
         "placeholder_text": "",
@@ -62,7 +65,7 @@
     "product": {
       "type": "bless-product",
       "settings": {
-        "product": "",
+        "product": "lumasara",
         "heading": "Carry your blessing with you",
         "panel_background": "65, 65, 65",
         "panel_opacity": 40,
