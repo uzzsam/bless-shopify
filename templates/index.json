@@ -28,7 +28,7 @@
       "type": "bless-chat",
       "settings": {
         "heading": "Talk to Sidthah",
-        "widget_src": "",
+        "widget_src": "https://bless-test-brown.vercel.app/bless-chat-widget.js",
         "api_url": "",
         "placeholder": "Talk to Sidthah",
         "loading_text": "Listening...",
