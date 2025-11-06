@@ -14,6 +14,7 @@
       "settings": {
         "video_background": "shopify://files/videos/stream-medium.mp4",
         "video_overlay": "shopify://files/videos/Sidthahwithaudio.mp4",
+        "sound_icon": "shopify://shop_images/sound_white.png",
         "overlay_color": "0, 0, 0",
         "overlay_opacity": 30,
         "content_padding_top": 0,
