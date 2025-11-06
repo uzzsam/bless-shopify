@@ -55,11 +55,18 @@
             class: 'bless-hero__focus-video'
         }}
         <div class="bless-hero__control-bar" hidden>
-          <button type="button" class="bless-hero__control" data-control="play" aria-label="Play video">
+          <button type="button" class="bless-hero__control bless-hero__control--play" data-control="play">
+            <span class="sr-only">Play video</span>
             <span aria-hidden="true">►</span>
           </button>
-          <button type="button" class="bless-hero__control" data-control="mute" aria-label="Mute video">
-            <span aria-hidden="true">🔊</span>
+          <button type="button" class="bless-hero__control bless-hero__control--mute" data-control="mute">
+            <span class="sr-only">Mute video</span>
+            {% if section.settings.sound_icon != blank %}
+              <img class="bless-hero__sound-icon" src="{{ section.settings.sound_icon | image_url: width: 64 }}" alt="" loading="lazy">
+            {% else %}
+              <span aria-hidden="true">🔊</span>
+            {% endif %}
+            <span class="bless-hero__mute-slash" aria-hidden="true"></span>
           </button>
         </div>
       </div>
@@ -198,12 +205,12 @@
   bottom: 1.4rem;
   transform: translateX(-50%);
   display: inline-flex;
-  gap: 0.75rem;
-  padding: 0.7rem 1.2rem;
+  gap: 0.8rem;
+  padding: 0.75rem 1.3rem;
   border-radius: 999px;
   background: rgba(0,0,0,0.45);
   backdrop-filter: blur(4px);
-  box-shadow: 0 16px 32px rgba(0,0,0,0.35);
+  box-shadow: 0 18px 34px rgba(0,0,0,0.35);
   align-items: center;
 }
 
@@ -214,17 +221,57 @@
   font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
-  transition: transform 160ms ease, color 160ms ease;
+  transition: transform 160ms ease, opacity 160ms ease;
   padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .bless-hero__control:hover,
 .bless-hero__control:focus-visible {
   transform: scale(1.12);
-  color: rgba(255,255,255,0.9);
+  opacity: 0.9;
+}
+
+.bless-hero__sound-icon {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.bless-hero__control--mute {
+  color: transparent;
+}
+
+.bless-hero__mute-slash {
+  display: none;
+}
+
+.bless-hero__control--mute.is-muted .bless-hero__mute-slash {
+  display: block;
+  position: absolute;
+  width: 30px;
+  height: 2px;
+  background: #fff;
+  transform: rotate(45deg);
+}
+
+.bless-hero__control--mute.is-muted .bless-hero__sound-icon {
+  opacity: 0.75;
+}
+
+.bless-hero .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @media (max-width: 600px) {
@@ -265,27 +312,37 @@ if (heroSection) {
 
     const syncPlayState = () => {
       if (!playButton) return;
-      playButton.textContent = focusVideo.paused ? '►' : '❚❚';
+      playButton.querySelector('[aria-hidden="true"]').textContent = focusVideo.paused ? '►' : '❚❚';
       playButton.setAttribute('aria-label', focusVideo.paused ? 'Play video' : 'Pause video');
     };
 
     const syncMuteState = () => {
       if (!muteButton) return;
-      muteButton.textContent = focusVideo.muted ? '🔇' : '🔊';
+      muteButton.classList.toggle('is-muted', focusVideo.muted);
       muteButton.setAttribute('aria-label', focusVideo.muted ? 'Unmute video' : 'Mute video');
+    };
+
+    const makeVisible = () => {
+      controlBar.hidden = false;
+      syncPlayState();
+      syncMuteState();
     };
 
     focusVideo.muted = false;
     focusVideo.defaultMuted = false;
     focusVideo.removeAttribute('muted');
 
-    focusVideo.addEventListener('loadeddata', () => {
+    if (focusVideo.readyState >= 1) {
       focusVideo.pause();
       focusVideo.currentTime = 0;
-      controlBar.hidden = false;
-      syncPlayState();
-      syncMuteState();
-    }, { once: true });
+      makeVisible();
+    } else {
+      focusVideo.addEventListener('loadeddata', () => {
+        focusVideo.pause();
+        focusVideo.currentTime = 0;
+        makeVisible();
+      }, { once: true });
+    }
 
     if (playButton) {
       playButton.addEventListener('click', () => {
@@ -329,6 +386,12 @@ if (heroSection) {
       "type": "video",
       "id": "video_overlay",
       "label": "Overlay focus video"
+    },
+    {
+      "type": "image_picker",
+      "id": "sound_icon",
+      "label": "Sound icon",
+      "info": "Upload a white sound icon to use for the mute toggle."
     },
     {
       "type": "text",
