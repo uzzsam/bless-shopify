@@ -220,6 +220,10 @@ if (heroSection) {
     focusVideo.muted = false;
     focusVideo.defaultMuted = false;
     focusVideo.removeAttribute('muted');
+    focusVideo.play().catch(() => {
+      focusVideo.pause();
+      focusVideo.currentTime = 0;
+    });
   }
 }
 {% endjavascript %}
