@@ -36,15 +36,17 @@
   >
     {% if overlay_video != blank %}
       <div class="bless-hero__focus">
-        <video
-          class="bless-hero__focus-video"
-          preload="metadata"
-          playsinline
-          controls
-        >
-          <source src="{{ overlay_video.sources.first.url }}" type="{{ overlay_video.sources.first.mime_type }}">
-          Your browser does not support the video tag.
-        </video>
+        {{
+          overlay_video
+          | video_tag:
+            autoplay: false,
+            loop: true,
+            muted: false,
+            playsinline: true,
+            controls: true,
+            preload: 'metadata',
+            class: 'bless-hero__focus-video'
+        }}
       </div>
     {% endif %}
 
@@ -179,8 +181,7 @@
 }
 
 .bless-hero__focus video::-webkit-media-controls-play-button,
-.bless-hero__focus video::-webkit-media-controls-volume-slider 
-{
+.bless-hero__focus video::-webkit-media-controls-volume-slider {
   color: #fff;
 }
 
@@ -215,42 +216,10 @@ if (heroSection) {
   }
 
   const focusVideo = heroSection.querySelector('.bless-hero__focus-video');
-  const playToggle = heroSection.querySelector('.bless-hero__play-toggle');
-  if (focusVideo && playToggle) {
-    focusVideo.pause();
+  if (focusVideo) {
     focusVideo.muted = false;
     focusVideo.defaultMuted = false;
-
-    const syncState = () => {
-      if (focusVideo.paused) {
-        playToggle.classList.remove('is-hidden');
-        playToggle.setAttribute('aria-pressed', 'false');
-      } else {
-        playToggle.classList.add('is-hidden');
-        playToggle.setAttribute('aria-pressed', 'true');
-      }
-    };
-
-    playToggle.addEventListener('click', () => {
-      if (focusVideo.paused) {
-        const playPromise = focusVideo.play();
-        if (playPromise && typeof playPromise.then === 'function') {
-          playPromise.catch(() => {
-            focusVideo.muted = false;
-            focusVideo.play().catch(() => {});
-          });
-        }
-      } else {
-        focusVideo.pause();
-      }
-      syncState();
-    });
-
-    focusVideo.addEventListener('pause', syncState);
-    focusVideo.addEventListener('ended', syncState);
-    focusVideo.addEventListener('play', syncState);
-
-    syncState();
+    focusVideo.removeAttribute('muted');
   }
 }
 {% endjavascript %}
