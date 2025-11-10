@@ -29,8 +29,8 @@
       "type": "bless-chat",
       "settings": {
         "heading": "Talk to Sidthah",
-        "widget_src": "",
-        "api_url": "",
+        "widget_src": "https://bless-chat-uzy.vercel.app/bless-chat-widget.js",
+        "api_url": "https://bless-chat-uzy.vercel.app/api/chat",
         "placeholder": "Talk to Sidthah",
         "loading_text": "Listening...",
         "panel_background": "236, 227, 214",
