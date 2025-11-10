@@ -244,27 +244,30 @@
 
 .bless-hero__control {
   border: none;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.15);
   color: #ffffff;
-  font-size: 1.15rem;
+  font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
-  transition: transform 160ms ease, opacity 160ms ease;
-  padding: 0;
+  transition: all 160ms ease;
+  padding: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
 }
 
 .bless-hero__control:hover,
 .bless-hero__control:focus-visible {
-  transform: scale(1.08);
-  opacity: 0.85;
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.12);
 }
 
 .bless-hero__control--play span[aria-hidden="true"] {
-  font-size: 1.15rem;
+  font-size: 1.5rem;
   line-height: 1;
 }
 
@@ -320,27 +323,30 @@
 
 .bless-hero__control {
   border: none;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.15);
   color: #ffffff;
-  font-size: 1.15rem;
+  font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
-  transition: transform 160ms ease, opacity 160ms ease;
-  padding: 0;
+  transition: all 160ms ease;
+  padding: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
 }
 
 .bless-hero__control:hover,
 .bless-hero__control:focus-visible {
-  transform: scale(1.08);
-  opacity: 0.85;
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.12);
 }
 
 .bless-hero__control--play span[aria-hidden="true"] {
-  font-size: 1.15rem;
+  font-size: 1.5rem;
   line-height: 1;
 }
 
@@ -464,20 +470,31 @@ if (heroSection) {
         focusVideo.addEventListener('loadedmetadata', initialise, { once: true });
       }
 
-      playButton?.addEventListener('click', () => {
+      playButton?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Play button clicked, video paused:', focusVideo.paused, 'readyState:', focusVideo.readyState);
+
         if (focusVideo.paused) {
           const playPromise = focusVideo.play();
+          console.log('Attempting to play video, promise:', !!playPromise);
+
           if (playPromise && typeof playPromise.then === 'function') {
             playPromise
-              .then(syncPlayState)
+              .then(() => {
+                console.log('Video play succeeded');
+                syncPlayState();
+              })
               .catch((error) => {
-                console.warn('Hero video play failed', error);
+                console.error('Hero video play failed:', error);
                 syncPlayState();
               });
           } else {
+            console.log('No play promise returned');
             syncPlayState();
           }
         } else {
+          console.log('Video is playing, pausing...');
           focusVideo.pause();
           syncPlayState();
         }
