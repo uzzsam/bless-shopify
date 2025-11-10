@@ -1,1 +1,105 @@
-{"sections":{"main":{"type":"main-page","blocks":{"heading":{"type":"text","name":"Title","settings":{"text":"<h1>{{ closest.page.title }}<\/h1>","width":"100%","type_preset":"h2"}},"page-content":{"type":"page-content","settings":{}}},"block_order":["heading","page-content"],"settings":{"gap":32,"padding-block-start":40,"padding-block-end":80}}},"order":["main"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "blocks": {
+        "heading": {
+          "type": "text",
+          "name": "Title",
+          "disabled": true,
+          "settings": {
+            "text": "<h1>{{ closest.page.title }}</h1>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h2",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "page-content": {
+          "type": "page-content",
+          "disabled": true,
+          "settings": {},
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "page-content"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "gap": 32,
+        "color_scheme": "",
+        "padding-block-start": 40,
+        "padding-block-end": 80
+      }
+    },
+    "bless_hero_VYqKg4": {
+      "type": "bless-hero",
+      "name": "Bless hero",
+      "settings": {
+        "video_background": "shopify://files/videos/stream-medium.mp4",
+        "video_overlay": "shopify://files/videos/thank-you.mp4",
+        "sound_icon": "shopify://shop_images/sound_white.png",
+        "overlay_color": "46, 94, 76",
+        "overlay_opacity": 45,
+        "content_padding_top": 0,
+        "content_padding_bottom": 48,
+        "heading": "Thank you",
+        "subheading": "Wear your Sidthie .",
+        "cta_label": "Discover your Sidthie",
+        "cta_target": "#chat-section"
+      }
+    },
+    "bless_product_UBbhCD": {
+      "type": "bless-product",
+      "name": "Bless product",
+      "settings": {
+        "product": "lumasara",
+        "heading": "Would you like to affirm your Sidthie by wearing a pendant?",
+        "panel_background": "65, 65, 65",
+        "panel_opacity": 70,
+        "show_media": true,
+        "show_description": false,
+        "show_price": true,
+        "show_variant_picker": true,
+        "show_variant_prices": false,
+        "show_quantity_selector": true,
+        "require_blessing": true,
+        "variant_label": "Choose your option",
+        "property_key": "Blessing",
+        "button_label": "Add blessing to cart",
+        "cart_note": "We will include this blessing with your order."
+      }
+    }
+  },
+  "order": [
+    "main",
+    "bless_hero_VYqKg4",
+    "bless_product_UBbhCD"
+  ]
+}
