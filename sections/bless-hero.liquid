@@ -391,18 +391,9 @@
 {% endstylesheet %}
 
 {% javascript %}
-console.log('Bless Hero: Script loading...');
-
-function initBlessHero() {
-  console.log('Bless Hero: Initializing...');
-  const heroSection = document.getElementById('BlessHero-{{ section.id }}');
-  console.log('Bless Hero: Section found?', !!heroSection);
-
-  if (!heroSection) {
-    console.warn('Bless Hero: Could not find section #BlessHero-{{ section.id }}');
-    return;
-  }
-
+// CTA scroll functionality
+const heroSection = document.getElementById('BlessHero-{{ section.id }}');
+if (heroSection) {
   const cta = heroSection.querySelector('.bless-hero__cta');
   if (cta) {
     const targetSelector = cta.getAttribute('href');
@@ -416,142 +407,8 @@ function initBlessHero() {
       });
     }
   }
-
-  // Handle custom video controls for overlay video
-  console.log('Bless Hero: Looking for focus wrapper...');
-  const focusWrapper = heroSection.querySelector('.bless-hero__focus-wrapper');
-  console.log('Bless Hero: Focus wrapper found?', !!focusWrapper);
-
-  if (focusWrapper) {
-    const focusVideo = focusWrapper.querySelector('.bless-hero__focus-video');
-    const controlBar = focusWrapper.querySelector('.bless-hero__control-bar');
-
-    console.log('Bless Hero: Video element found?', focusVideo instanceof HTMLMediaElement);
-    console.log('Bless Hero: Control bar found?', !!controlBar);
-    console.log('Bless Hero: Video readyState:', focusVideo?.readyState);
-
-    if (focusVideo instanceof HTMLMediaElement && controlBar) {
-      const playButton = controlBar.querySelector('[data-control="play"]');
-      const muteButton = controlBar.querySelector('[data-control="mute"]');
-
-      console.log('Bless Hero: Play button found?', !!playButton);
-      console.log('Bless Hero: Mute button found?', !!muteButton);
-      const playIcon = playButton?.querySelector('[aria-hidden="true"]') || null;
-      const muteIconWrapper = muteButton?.querySelector('.bless-hero__sound-icon-wrapper') || null;
-      const muteGlyph = muteButton?.querySelector('.bless-hero__sound-glyph') || null;
-      const muteIconImg = muteButton?.querySelector('.bless-hero__sound-icon') || null;
-
-      const syncPlayState = () => {
-        if (!playButton || !playIcon) return;
-        if (focusVideo.paused) {
-          playIcon.textContent = '►';
-          playButton.setAttribute('aria-label', 'Play');
-          playButton.setAttribute('title', 'Play');
-        } else {
-          playIcon.textContent = '❚❚';
-          playButton.setAttribute('aria-label', 'Pause');
-          playButton.setAttribute('title', 'Pause');
-        }
-      };
-
-      const syncMuteState = () => {
-        if (!muteButton) return;
-        const isMuted = focusVideo.muted;
-        muteButton.classList.toggle('is-muted', isMuted);
-        muteButton.setAttribute('aria-label', isMuted ? 'Unmute' : 'Mute');
-        muteButton.setAttribute('title', isMuted ? 'Unmute' : 'Mute');
-        if (muteGlyph) {
-          muteGlyph.textContent = isMuted ? '🔇' : '🔊';
-        }
-        if (muteIconImg) {
-          muteIconImg.style.opacity = isMuted ? '0.7' : '1';
-        }
-        if (muteIconWrapper && !muteIconImg && !muteGlyph) {
-          muteButton.textContent = isMuted ? '🔇' : '🔊';
-        }
-      };
-
-      // Ensure video is unmuted for custom controls
-      focusVideo.muted = false;
-      focusVideo.defaultMuted = false;
-      focusVideo.removeAttribute('muted');
-
-      const initialise = () => {
-        focusVideo.pause();
-        focusVideo.currentTime = 0;
-        syncPlayState();
-        syncMuteState();
-      };
-
-      // Initialize when video is ready
-      if (focusVideo.readyState >= 2) {
-        initialise();
-      } else {
-        focusVideo.addEventListener('loadedmetadata', initialise, { once: true });
-      }
-
-      console.log('Bless Hero: Attaching play button event listener...');
-      playButton?.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('=== PLAY BUTTON CLICKED ===');
-        console.log('Video paused:', focusVideo.paused, 'readyState:', focusVideo.readyState);
-
-        if (focusVideo.paused) {
-          const playPromise = focusVideo.play();
-          console.log('Attempting to play video, promise:', !!playPromise);
-
-          if (playPromise && typeof playPromise.then === 'function') {
-            playPromise
-              .then(() => {
-                console.log('Video play succeeded');
-                syncPlayState();
-              })
-              .catch((error) => {
-                console.error('Hero video play failed:', error);
-                syncPlayState();
-              });
-          } else {
-            console.log('No play promise returned');
-            syncPlayState();
-          }
-        } else {
-          console.log('Video is playing, pausing...');
-          focusVideo.pause();
-          syncPlayState();
-        }
-      });
-
-      muteButton?.addEventListener('click', () => {
-        focusVideo.muted = !focusVideo.muted;
-        syncMuteState();
-      });
-
-      focusVideo.addEventListener('play', syncPlayState);
-      focusVideo.addEventListener('pause', syncPlayState);
-      focusVideo.addEventListener('ended', () => {
-        focusVideo.pause();
-        focusVideo.currentTime = 0;
-        syncPlayState();
-      });
-
-      focusVideo.addEventListener('error', () => {
-        console.warn('Bless hero focus video encountered an error');
-      });
-    }
-  }
 }
-
-// Try to initialize immediately
-initBlessHero();
-
-// Also try after DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initBlessHero);
-}
-
-// Also try after a delay
-setTimeout(initBlessHero, 100);
+// Video controls are handled by hero-video-controls.js global script
 {% endjavascript %}
 
 {% schema %}
