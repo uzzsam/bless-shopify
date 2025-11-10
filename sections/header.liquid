@@ -1,5 +1,3 @@
-
-
 {% liquid
   assign order = 'logo,menu,localization,search,mobile_search,actions'
 
@@ -42,26 +40,31 @@
       assign transparent_color_scheme = 'color-' | append: section.settings.color_scheme_top
     endif
   endif
+%}
 
-  capture logo
-    content_for 'block', type: '_header-logo', id: 'header-logo'
-  endcapture
+{% comment %}
+  The following replaces invalid content_for tags.
+  We directly render the header components instead.
+{% endcomment %}
+{% capture logo %}
+  {% render 'header-logo', id: 'header-logo' %}
+{% endcapture %}
 
-  capture menu
-    content_for 'block', type: '_header-menu', id: 'header-menu'
-  endcapture
+{% capture menu %}
+  {% render 'header-menu', id: 'header-menu' %}
+{% endcapture %}
 
-  capture mobile_menu
-    content_for 'block', type: '_header-menu', id: 'header-menu', variant: 'mobile'
-  endcapture
+{% capture mobile_menu %}
+  {% render 'header-menu', id: 'header-menu', variant: 'mobile' %}
+{% endcapture %}
 
-  capture navigation_bar
-    content_for 'block', type: '_header-menu', id: 'header-menu', variant: 'navigation_bar', transparent: transparent
-  endcapture
+{% capture navigation_bar %}
+  {% render 'header-menu', id: 'header-menu', variant: 'navigation_bar', transparent: transparent %}
+{% endcapture %}
 
-  capture actions
-    render 'header-actions'
-  endcapture
+{% capture actions %}
+  {% render 'header-actions' %}
+{% endcapture %}
 
   if shop.customer_accounts_enabled
     assign search_class = 'mobile:hidden'
