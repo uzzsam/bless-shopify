@@ -408,14 +408,24 @@ if (heroSection) {
   }
 
   // Handle custom video controls for overlay video
+  console.log('Bless Hero: Looking for focus wrapper...');
   const focusWrapper = heroSection.querySelector('.bless-hero__focus-wrapper');
+  console.log('Bless Hero: Focus wrapper found?', !!focusWrapper);
+
   if (focusWrapper) {
     const focusVideo = focusWrapper.querySelector('.bless-hero__focus-video');
     const controlBar = focusWrapper.querySelector('.bless-hero__control-bar');
 
+    console.log('Bless Hero: Video element found?', focusVideo instanceof HTMLMediaElement);
+    console.log('Bless Hero: Control bar found?', !!controlBar);
+    console.log('Bless Hero: Video readyState:', focusVideo?.readyState);
+
     if (focusVideo instanceof HTMLMediaElement && controlBar) {
       const playButton = controlBar.querySelector('[data-control="play"]');
       const muteButton = controlBar.querySelector('[data-control="mute"]');
+
+      console.log('Bless Hero: Play button found?', !!playButton);
+      console.log('Bless Hero: Mute button found?', !!muteButton);
       const playIcon = playButton?.querySelector('[aria-hidden="true"]') || null;
       const muteIconWrapper = muteButton?.querySelector('.bless-hero__sound-icon-wrapper') || null;
       const muteGlyph = muteButton?.querySelector('.bless-hero__sound-glyph') || null;
@@ -470,10 +480,12 @@ if (heroSection) {
         focusVideo.addEventListener('loadedmetadata', initialise, { once: true });
       }
 
+      console.log('Bless Hero: Attaching play button event listener...');
       playButton?.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Play button clicked, video paused:', focusVideo.paused, 'readyState:', focusVideo.readyState);
+        console.log('=== PLAY BUTTON CLICKED ===');
+        console.log('Video paused:', focusVideo.paused, 'readyState:', focusVideo.readyState);
 
         if (focusVideo.paused) {
           const playPromise = focusVideo.play();
