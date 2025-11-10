@@ -76,7 +76,7 @@
               loop: true,
               muted: false,
               playsinline: true,
-              controls: true,
+              controls: false,
               preload: 'metadata',
               poster: poster_url,
               class: 'bless-hero__focus-video'
@@ -90,7 +90,7 @@
             loop: true,
             muted: false,
             playsinline: true,
-            controls: true,
+            controls: false,
             preload: 'metadata',
             poster: poster_url,
             class: 'bless-hero__focus-video'
@@ -268,6 +268,15 @@
   object-fit: cover;
   border-radius: 0 0 32px 32px;
   box-shadow: 0 32px 60px rgba(0, 0, 0, 0.35);
+  display: block;
+}
+
+.bless-hero__focus-video::-webkit-media-controls {
+  display: none;
+}
+
+.bless-hero__focus-video::-webkit-media-controls-panel {
+  display: none;
 }
 
 .bless-hero__heading {
