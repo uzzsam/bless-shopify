@@ -13,7 +13,7 @@
       "type": "bless-hero",
       "settings": {
         "video_background": "shopify://files/videos/stream-medium.mp4",
-        "video_overlay": "shopify://files/videos/thank-you.mp4",
+        "video_overlay": "shopify://files/videos/Sidthahwithaudio.mp4",
         "sound_icon": "shopify://shop_images/sound_white.png",
         "overlay_color": "46, 94, 76",
         "overlay_opacity": 0,
@@ -27,7 +27,6 @@
     },
     "chat": {
       "type": "bless-chat",
-      "disabled": true,
       "settings": {
         "heading": "Talk to Sidthah",
         "widget_src": "",
@@ -40,7 +39,6 @@
     },
     "blessing": {
       "type": "bless-blessing",
-      "disabled": true,
       "settings": {
         "heading": "Your blessing",
         "placeholder_text": "",
