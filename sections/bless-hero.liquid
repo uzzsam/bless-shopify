@@ -55,12 +55,22 @@
             class: 'bless-hero__focus-video'
         }}
         <div class="bless-hero__control-bar" hidden>
-          <button type="button" class="bless-hero__control bless-hero__control--play" data-control="play">
-            <span class="sr-only">Play video</span>
+          <button
+            type="button"
+            class="bless-hero__control bless-hero__control--play"
+            data-control="play"
+            aria-label="Play"
+            title="Play"
+          >
             <span aria-hidden="true">►</span>
           </button>
-          <button type="button" class="bless-hero__control bless-hero__control--mute" data-control="mute">
-            <span class="sr-only">Mute video</span>
+          <button
+            type="button"
+            class="bless-hero__control bless-hero__control--mute"
+            data-control="mute"
+            aria-label="Mute"
+            title="Mute"
+          >
             <span class="bless-hero__sound-icon-wrapper" aria-hidden="true">
               {% if section.settings.sound_icon != blank %}
                 <img class="bless-hero__sound-icon" src="{{ section.settings.sound_icon | image_url: width: 64 }}" alt="" loading="lazy">
@@ -376,24 +386,30 @@ if (heroSection) {
 
   const focusVideo = heroSection.querySelector('.bless-hero__focus-video');
   const controlBar = heroSection.querySelector('.bless-hero__control-bar');
-  if (focusVideo && controlBar) {
+  if (focusVideo instanceof HTMLMediaElement && controlBar) {
     const playButton = controlBar.querySelector('[data-control="play"]');
     const muteButton = controlBar.querySelector('[data-control="mute"]');
     const playIcon = playButton?.querySelector('[aria-hidden="true"]') || null;
     const muteIconWrapper = muteButton?.querySelector('.bless-hero__sound-icon-wrapper') || null;
     const muteGlyph = muteButton?.querySelector('.bless-hero__sound-glyph') || null;
     const muteIconImg = muteButton?.querySelector('.bless-hero__sound-icon') || null;
-    const srPlay = playButton?.querySelector('.sr-only');
-    const srMute = muteButton?.querySelector('.sr-only');
+
+    const enableNativeControls = () => {
+      focusVideo.setAttribute('controls', 'controls');
+      focusVideo.controls = true;
+      controlBar.setAttribute('hidden', 'hidden');
+    };
 
     const syncPlayState = () => {
       if (!playButton || !playIcon) return;
       if (focusVideo.paused) {
         playIcon.textContent = '►';
-        srPlay && srPlay.textContent && (srPlay.textContent = 'Play video');
+        playButton.setAttribute('aria-label', 'Play');
+        playButton.setAttribute('title', 'Play');
       } else {
         playIcon.textContent = '❚❚';
-        srPlay && srPlay.textContent && (srPlay.textContent = 'Pause video');
+        playButton.setAttribute('aria-label', 'Pause');
+        playButton.setAttribute('title', 'Pause');
       }
     };
 
@@ -401,7 +417,8 @@ if (heroSection) {
       if (!muteButton) return;
       const isMuted = focusVideo.muted;
       muteButton.classList.toggle('is-muted', isMuted);
-      if (srMute) srMute.textContent = isMuted ? 'Unmute video' : 'Mute video';
+      muteButton.setAttribute('aria-label', isMuted ? 'Unmute' : 'Mute');
+      muteButton.setAttribute('title', isMuted ? 'Unmute' : 'Mute');
       if (muteGlyph) {
         muteGlyph.textContent = isMuted ? '🔇' : '🔊';
       }
@@ -436,10 +453,13 @@ if (heroSection) {
       if (focusVideo.paused) {
         const playPromise = focusVideo.play();
         if (playPromise && typeof playPromise.then === 'function') {
-          playPromise.then(syncPlayState).catch((error) => {
-            console.warn('Hero video play failed', error);
-            syncPlayState();
-          });
+          playPromise
+            .then(syncPlayState)
+            .catch((error) => {
+              console.warn('Hero video play failed', error);
+              syncPlayState();
+              enableNativeControls();
+            });
         } else {
           syncPlayState();
         }
@@ -460,6 +480,11 @@ if (heroSection) {
       focusVideo.pause();
       focusVideo.currentTime = 0;
       syncPlayState();
+    });
+
+    focusVideo.addEventListener('error', () => {
+      console.warn('Bless hero focus video encountered an error, enabling native controls for fallback.');
+      enableNativeControls();
     });
   }
 }
