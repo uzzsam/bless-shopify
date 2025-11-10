@@ -41,7 +41,48 @@
       {% else %}
         {% assign poster_url = '' %}
       {% endif %}
-      <div class="bless-hero__focus">
+      <deferred-media
+        class="bless-hero__focus"
+        style="--video-aspect-ratio: {{ overlay_video.aspect_ratio }}"
+      >
+        <button
+          class="button deferred-media__poster-button button-unstyled bless-hero__poster-button"
+          ref="deferredMediaPlayButton"
+          aria-label="Play video"
+          type="button"
+          on:click="/showDeferredMedia"
+        >
+          {% if poster_image != blank %}
+            {{
+              poster_image
+              | image_url: width: 3840
+              | image_tag:
+                widths: '240, 352, 832, 1200, 1600, 1920, 2560, 3840',
+                sizes: '(min-width: 750px) 50vw, 100vw',
+                loading: 'lazy',
+                class: 'deferred-media__poster-image'
+            }}
+          {% endif %}
+          <span class="deferred-media__poster-icon icon-play">
+            <span class="visually-hidden">Play video</span>
+          </span>
+        </button>
+
+        <template>
+          {{
+            overlay_video
+            | video_tag:
+              autoplay: false,
+              loop: true,
+              muted: false,
+              playsinline: true,
+              controls: true,
+              preload: 'metadata',
+              poster: poster_url,
+              class: 'bless-hero__focus-video'
+          }}
+        </template>
+
         {{
           overlay_video
           | video_tag:
@@ -49,11 +90,12 @@
             loop: true,
             muted: false,
             playsinline: true,
-            controls: false,
+            controls: true,
             preload: 'metadata',
             poster: poster_url,
             class: 'bless-hero__focus-video'
         }}
+
         <div class="bless-hero__control-bar" hidden>
           <button
             type="button"
@@ -81,7 +123,7 @@
             <span class="bless-hero__mute-slash" aria-hidden="true"></span>
           </button>
         </div>
-      </div>
+      </deferred-media>
     {% endif %}
 
     {% if section.settings.heading != blank %}
@@ -164,6 +206,60 @@
   display: flex;
   justify-content: center;
   position: relative;
+  --video-aspect-ratio: 1;
+}
+
+.bless-hero__focus deferred-media {
+  width: 100%;
+  height: 100%;
+}
+
+.bless-hero__poster-button {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.bless-hero__poster-button .deferred-media__poster-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0 0 32px 32px;
+  box-shadow: 0 32px 60px rgba(0, 0, 0, 0.35);
+  display: block;
+}
+
+.bless-hero__poster-button .deferred-media__poster-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 200ms ease;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.bless-hero__poster-button:hover .deferred-media__poster-icon,
+.bless-hero__poster-button:focus-visible .deferred-media__poster-icon {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%) scale(1.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.deferred-media__poster-icon.icon-play {
+  font-size: 28px;
 }
 
 .bless-hero__focus-video {
@@ -384,108 +480,119 @@ if (heroSection) {
     }
   }
 
-  const focusVideo = heroSection.querySelector('.bless-hero__focus-video');
-  const controlBar = heroSection.querySelector('.bless-hero__control-bar');
-  if (focusVideo instanceof HTMLMediaElement && controlBar) {
-    const playButton = controlBar.querySelector('[data-control="play"]');
-    const muteButton = controlBar.querySelector('[data-control="mute"]');
-    const playIcon = playButton?.querySelector('[aria-hidden="true"]') || null;
-    const muteIconWrapper = muteButton?.querySelector('.bless-hero__sound-icon-wrapper') || null;
-    const muteGlyph = muteButton?.querySelector('.bless-hero__sound-glyph') || null;
-    const muteIconImg = muteButton?.querySelector('.bless-hero__sound-icon') || null;
+  // Handle custom video controls for overlay video
+  const deferredMedia = heroSection.querySelector('deferred-media');
+  if (deferredMedia) {
+    // Wait for deferred-media to process and make video available
+    const initializeVideoControls = () => {
+      const focusVideo = heroSection.querySelector('.bless-hero__focus-video');
+      const controlBar = heroSection.querySelector('.bless-hero__control-bar');
 
-    const enableNativeControls = () => {
-      focusVideo.setAttribute('controls', 'controls');
-      focusVideo.controls = true;
-      controlBar.setAttribute('hidden', 'hidden');
-    };
+      if (focusVideo instanceof HTMLMediaElement && controlBar) {
+        const playButton = controlBar.querySelector('[data-control="play"]');
+        const muteButton = controlBar.querySelector('[data-control="mute"]');
+        const playIcon = playButton?.querySelector('[aria-hidden="true"]') || null;
+        const muteIconWrapper = muteButton?.querySelector('.bless-hero__sound-icon-wrapper') || null;
+        const muteGlyph = muteButton?.querySelector('.bless-hero__sound-glyph') || null;
+        const muteIconImg = muteButton?.querySelector('.bless-hero__sound-icon') || null;
 
-    const syncPlayState = () => {
-      if (!playButton || !playIcon) return;
-      if (focusVideo.paused) {
-        playIcon.textContent = '►';
-        playButton.setAttribute('aria-label', 'Play');
-        playButton.setAttribute('title', 'Play');
-      } else {
-        playIcon.textContent = '❚❚';
-        playButton.setAttribute('aria-label', 'Pause');
-        playButton.setAttribute('title', 'Pause');
-      }
-    };
+        const syncPlayState = () => {
+          if (!playButton || !playIcon) return;
+          if (focusVideo.paused) {
+            playIcon.textContent = '►';
+            playButton.setAttribute('aria-label', 'Play');
+            playButton.setAttribute('title', 'Play');
+          } else {
+            playIcon.textContent = '❚❚';
+            playButton.setAttribute('aria-label', 'Pause');
+            playButton.setAttribute('title', 'Pause');
+          }
+        };
 
-    const syncMuteState = () => {
-      if (!muteButton) return;
-      const isMuted = focusVideo.muted;
-      muteButton.classList.toggle('is-muted', isMuted);
-      muteButton.setAttribute('aria-label', isMuted ? 'Unmute' : 'Mute');
-      muteButton.setAttribute('title', isMuted ? 'Unmute' : 'Mute');
-      if (muteGlyph) {
-        muteGlyph.textContent = isMuted ? '🔇' : '🔊';
-      }
-      if (muteIconImg) {
-        muteIconImg.style.opacity = isMuted ? '0.7' : '1';
-      }
-      if (muteIconWrapper && !muteIconImg && !muteGlyph) {
-        muteButton.textContent = isMuted ? '🔇' : '🔊';
-      }
-    };
+        const syncMuteState = () => {
+          if (!muteButton) return;
+          const isMuted = focusVideo.muted;
+          muteButton.classList.toggle('is-muted', isMuted);
+          muteButton.setAttribute('aria-label', isMuted ? 'Unmute' : 'Mute');
+          muteButton.setAttribute('title', isMuted ? 'Unmute' : 'Mute');
+          if (muteGlyph) {
+            muteGlyph.textContent = isMuted ? '🔇' : '🔊';
+          }
+          if (muteIconImg) {
+            muteIconImg.style.opacity = isMuted ? '0.7' : '1';
+          }
+          if (muteIconWrapper && !muteIconImg && !muteGlyph) {
+            muteButton.textContent = isMuted ? '🔇' : '🔊';
+          }
+        };
 
-    controlBar.hidden = false;
+        controlBar.hidden = false;
 
-    focusVideo.muted = false;
-    focusVideo.defaultMuted = false;
-    focusVideo.removeAttribute('muted');
+        // Ensure video is unmuted for custom controls
+        focusVideo.muted = false;
+        focusVideo.defaultMuted = false;
+        focusVideo.removeAttribute('muted');
 
-    const initialise = () => {
-      focusVideo.pause();
-      focusVideo.currentTime = 0;
-      syncPlayState();
-      syncMuteState();
-    };
-
-    if (focusVideo.readyState >= 2) {
-      initialise();
-    } else {
-      focusVideo.addEventListener('loadeddata', initialise, { once: true });
-    }
-
-    playButton?.addEventListener('click', () => {
-      if (focusVideo.paused) {
-        const playPromise = focusVideo.play();
-        if (playPromise && typeof playPromise.then === 'function') {
-          playPromise
-            .then(syncPlayState)
-            .catch((error) => {
-              console.warn('Hero video play failed', error);
-              syncPlayState();
-              enableNativeControls();
-            });
-        } else {
+        const initialise = () => {
+          focusVideo.pause();
+          focusVideo.currentTime = 0;
           syncPlayState();
+          syncMuteState();
+        };
+
+        // Initialize when video is ready
+        if (focusVideo.readyState >= 2) {
+          initialise();
+        } else {
+          focusVideo.addEventListener('loadedmetadata', initialise, { once: true });
         }
-      } else {
-        focusVideo.pause();
-        syncPlayState();
+
+        playButton?.addEventListener('click', () => {
+          if (focusVideo.paused) {
+            const playPromise = focusVideo.play();
+            if (playPromise && typeof playPromise.then === 'function') {
+              playPromise
+                .then(syncPlayState)
+                .catch((error) => {
+                  console.warn('Hero video play failed', error);
+                  syncPlayState();
+                });
+            } else {
+              syncPlayState();
+            }
+          } else {
+            focusVideo.pause();
+            syncPlayState();
+          }
+        });
+
+        muteButton?.addEventListener('click', () => {
+          focusVideo.muted = !focusVideo.muted;
+          syncMuteState();
+        });
+
+        focusVideo.addEventListener('play', syncPlayState);
+        focusVideo.addEventListener('pause', syncPlayState);
+        focusVideo.addEventListener('ended', () => {
+          focusVideo.pause();
+          focusVideo.currentTime = 0;
+          syncPlayState();
+        });
+
+        focusVideo.addEventListener('error', () => {
+          console.warn('Bless hero focus video encountered an error');
+        });
       }
-    });
+    };
 
-    muteButton?.addEventListener('click', () => {
-      focusVideo.muted = !focusVideo.muted;
-      syncMuteState();
-    });
+    // Try to initialize immediately
+    initializeVideoControls();
 
-    focusVideo.addEventListener('play', syncPlayState);
-    focusVideo.addEventListener('pause', syncPlayState);
-    focusVideo.addEventListener('ended', () => {
-      focusVideo.pause();
-      focusVideo.currentTime = 0;
-      syncPlayState();
-    });
+    // Also try after a short delay to account for deferred-media processing
+    setTimeout(initializeVideoControls, 100);
 
-    focusVideo.addEventListener('error', () => {
-      console.warn('Bless hero focus video encountered an error, enabling native controls for fallback.');
-      enableNativeControls();
-    });
+    // Listen for when deferred-media shows the video
+    deferredMedia.addEventListener('showDeferredMedia', initializeVideoControls, { once: true });
   }
 }
 {% endjavascript %}
