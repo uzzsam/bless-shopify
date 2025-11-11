@@ -13,9 +13,7 @@
   "sections": {
     "header_section": {
       "type": "header",
-      "custom_css": [
-        ".header-logo__img {max-width: 50%; height: auto;}"
-      ],
+      "custom_css": [],
       "settings": {
         "logo_position": "center",
         "menu_position": "left",
