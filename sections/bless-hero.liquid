@@ -147,12 +147,12 @@
   margin: 0 auto;
   text-align: center;
   padding-inline: 1.5rem;
-  padding-top: clamp(32px, 6vw, 80px);
+  padding-top: 0;
   padding-bottom: clamp(32px, 8vw, 96px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 1.25rem;
   height: 100vh;
   box-sizing: border-box;
@@ -160,10 +160,9 @@
 
 .bless-hero__focus {
   margin: 0 auto;
-  width: min(100%, clamp(260px, 20vw + 220px, 520px));
+  width: min(100%, clamp(200px, 18vw, 360px));
   height: auto;
   aspect-ratio: 9 / 16;
-  max-height: 55vh;
   display: flex;
   justify-content: center;
   position: relative;
@@ -195,7 +194,7 @@
 
 .bless-hero__heading {
   font-family: var(--font-heading, 'Cardo', serif);
-  font-size: clamp(2.5rem, 3vw + 1.5rem, 4rem);
+  font-size: clamp(1rem, 1.2vw + 0.6rem, 1.6rem);
   line-height: 1.1;
   margin: 0;
   text-transform: none;
@@ -311,12 +310,12 @@
 @media (max-width: 600px) {
   .bless-hero__content {
     padding-inline: 1rem;
-    padding-top: clamp(24px, 8vw, 64px);
+    padding-top: 0;
     padding-bottom: clamp(24px, 10vw, 80px);
   }
 
   .bless-hero__focus {
-    max-height: 50vh;
+    width: min(100%, clamp(160px, 15vw, 280px));
   }
 
   .bless-hero__focus-video {
