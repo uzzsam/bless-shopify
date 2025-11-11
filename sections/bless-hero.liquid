@@ -152,20 +152,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 1.25rem;
-  min-height: 100vh;
+  height: 100vh;
   box-sizing: border-box;
 }
 
 .bless-hero__focus {
   margin: 0 auto;
   width: min(100%, clamp(260px, 20vw + 220px, 520px));
-  height: min(88vh, 920px);
+  height: auto;
+  aspect-ratio: 9 / 16;
+  max-height: 55vh;
   display: flex;
   justify-content: center;
   position: relative;
-  --video-aspect-ratio: 1;
+  flex-shrink: 0;
 }
 
 .bless-hero__focus-wrapper {
@@ -306,82 +308,15 @@
   opacity: 0.7;
 }
 
-.bless-hero__control-bar {
-  position: absolute;
-  left: 50%;
-  bottom: 1.4rem;
-  transform: translateX(-50%);
-  display: inline-flex;
-  gap: 0.65rem;
-  padding: 0.65rem 1.2rem;
-  border-radius: 999px;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(4px);
-  box-shadow: 0 16px 28px rgba(0,0,0,0.35);
-  align-items: center;
-}
-
-.bless-hero__control {
-  border: none;
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
-  transition: all 160ms ease;
-  padding: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-}
-
-.bless-hero__control:hover,
-.bless-hero__control:focus-visible {
-  background: rgba(255, 255, 255, 0.25);
-  transform: scale(1.12);
-}
-
-.bless-hero__control--play span[aria-hidden="true"] {
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
-.bless-hero__sound-icon-wrapper,
-.bless-hero__sound-glyph {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.bless-hero__sound-icon {
-  width: 22px;
-  height: 22px;
-  display: block;
-}
-
-.bless-hero__control--mute .bless-hero__mute-slash {
-  display: none;
-  position: absolute;
-  width: 22px;
-  height: 2px;
-  background: #fff;
-  transform: rotate(45deg);
-  border-radius: 1px;
-}
-
-.bless-hero__control--mute.is-muted .bless-hero__mute-slash {
-  display: block;
-}
-
 @media (max-width: 600px) {
   .bless-hero__content {
     padding-inline: 1rem;
     padding-top: clamp(24px, 8vw, 64px);
     padding-bottom: clamp(24px, 10vw, 80px);
+  }
+
+  .bless-hero__focus {
+    max-height: 50vh;
   }
 
   .bless-hero__focus-video {
