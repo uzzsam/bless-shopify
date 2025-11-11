@@ -11,8 +11,8 @@
   "current": {
     "logo": "shopify://shop_images/sidthah_logo_white.png",
     "logo_inverse": "shopify://shop_images/sidthah_logo_white.png",
-    "logo_height": 35,
-    "logo_height_mobile": 18,
+    "logo_height": 24,
+    "logo_height_mobile": 14,
     "favicon": "shopify://shop_images/spirals-merged.png",
     "type_body_font": "sans_serif_n4",
     "type_subheading_font": "serif",
