@@ -95,6 +95,8 @@
             {%- form 'product', product, id: form_id, novalidate: 'novalidate', class: 'bless-product__form' -%}
               {% if selected_variant %}
                 <input type="hidden" name="id" value="{{ selected_variant.id }}" data-variant-input>
+                <input type="hidden" name="properties[{{ section.settings.property_key }}]" data-blessing-input>
+
               {% endif %}
               <input type="hidden" name="properties[{{ section.settings.property_key }}]" data-blessing-input>
 
@@ -348,6 +350,27 @@
   const sidthieLabelEl = sectionEl.querySelector('[data-product-sidthie]');
   const dynamicBody = sectionEl.querySelector('[data-dynamic-body]');
 
+
+// --- ADD: pick up ?name= from the URL and prefill the property ---
+const urlParams = new URLSearchParams(window.location.search);
+const urlBlessingRaw = urlParams.get('name');
+if (urlBlessingRaw) {
+  const urlBlessing = urlBlessingRaw.trim().slice(0, 200); // basic guard
+  if (blessingInput) blessingInput.value = urlBlessing;
+
+  // store for the dynamic card to mirror
+  sectionEl.dataset.latestBlessing = urlBlessing;
+
+  // if a blessing is required, enable submit now that we have it
+  if (requireBlessing) {
+    submitButton?.removeAttribute('disabled');
+    sectionEl.querySelectorAll('[data-submit]').forEach((b) => (b.disabled = false));
+  }
+}
+
+
+
+
   // Gate purchase until blessing arrives
   function enableFormWithBlessing(text, detail) {
     if (blessingInput) blessingInput.value = text;
@@ -480,13 +503,31 @@
     const blessing = dynamicBody.querySelector('[data-ajax-blessing]');
 
     // Mirror blessing from event gate
+    /*
     const storedBlessing = sectionEl.dataset.latestBlessing;
     if (blessingInput?.value) blessing.value = blessingInput.value;
-    else if (storedBlessing) blessing.value = storedBlessing;
-
+    else if (storedBlessing) blessing.value = storedBlessing;   
+   
     if (requireBlessing && btn) {
       btn.disabled = !blessing.value;
     }
+      */
+// --- UPDATE: pick blessing in this order: URL -> static input -> stored dataset ---
+const urlParams2 = new URLSearchParams(window.location.search);
+const urlBlessing2 = urlParams2.get('name')?.trim().slice(0, 200) || '';
+
+if (urlBlessing2) {
+  blessing.value = urlBlessing2;
+} else if (blessingInput?.value) {
+  blessing.value = blessingInput.value;
+} else if (sectionEl.dataset.latestBlessing) {
+  blessing.value = sectionEl.dataset.latestBlessing;
+}
+
+// If blessing is required, enable/disable button accordingly
+if (requireBlessing && btn) {
+  btn.disabled = !blessing.value;
+}     
 
     btn?.addEventListener('click', async (e) => {
       e.preventDefault();
