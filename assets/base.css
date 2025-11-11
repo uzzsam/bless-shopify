@@ -4283,3 +4283,10 @@ text-component {
     font-size: max(1rem, 100%);
   }
 }
+
+/* Override h1 styles inside bless-hero */
+.bless-hero__heading {
+  font-size: clamp(0.9rem, 1.1vw + 0.4rem, 1.3rem) !important;
+  line-height: 1.1 !important;
+  margin: 0 !important;
+}
