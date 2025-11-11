@@ -74,7 +74,7 @@
           >
             <span class="bless-hero__sound-icon-wrapper" aria-hidden="true">
               {% if section.settings.sound_icon != blank %}
-                <img class="bless-hero__sound-icon" src="{{ section.settings.sound_icon | image_url: width: 64 }}" alt="" loading="lazy">
+                <img class="bless-hero__sound-icon" src="{{ section.settings.sound_icon | image_url: width: 64 }}" alt="" loading="lazy" width="22" height="22">
               {% else %}
                 <span class="bless-hero__sound-glyph">🔊</span>
               {% endif %}
