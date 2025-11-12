@@ -104,7 +104,7 @@
       "name": "Bless Carousel",
       "settings": {
         "heading": "Carry your Sidthie with you",
-        "collection": "pendants",
+        "collection": "frontpage",
         "max_products": 5,
         "carousel_height": 400,
         "show_arrows": true,
