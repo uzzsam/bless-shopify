@@ -15,7 +15,6 @@
         "heading": {
           "type": "text",
           "name": "Title",
-          "disabled": true,
           "settings": {
             "text": "<h1>{{ closest.page.title }}</h1>",
             "width": "100%",
@@ -59,6 +58,19 @@
         "padding-block-end": 80
       }
     },
+    "bless_chat_Y8zXnR": {
+      "type": "bless-chat",
+      "name": "Bless chat",
+      "settings": {
+        "heading": "Talk to Sidthah",
+        "widget_src": "",
+        "api_url": "",
+        "placeholder": "Talk to Sidthah",
+        "loading_text": "Listening...",
+        "panel_background": "1, 50, 32",
+        "panel_opacity": 45
+      }
+    },
     "bless_hero_VYqKg4": {
       "type": "bless-hero",
       "name": "Bless hero",
@@ -100,6 +112,7 @@
   },
   "order": [
     "main",
+    "bless_chat_Y8zXnR",
     "bless_hero_VYqKg4",
     "bless_product_UBbhCD"
   ]

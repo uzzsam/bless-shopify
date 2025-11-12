@@ -54,16 +54,18 @@
     {% if image %}
       {%- assign logo_width = settings.logo_height | times: image.aspect_ratio | ceil -%}
       {%- assign logo_width_mobile = settings.logo_height_mobile | times: image.aspect_ratio | ceil -%}
-      <img
-        src="{{ image | image_url: width: 3840 }}"
-        srcset="{% for size in '240,352,832,1200,1600,1920,2560,3840' | split: ',' %}{{ image | image_url: width: size }} {{ size }}w{{ unless forloop.last }},{% endunless %}{% endfor %}"
-        alt="{{ shop.name }}"
-        loading="eager"
-        class="header-logo__img"
-        width="{{ logo_width }}"
-        height="{{ settings.logo_height }}"
-        style="--logo-width-desktop: {{ logo_width }}px; --logo-width-mobile: {{ logo_width_mobile }}px; --logo-height-desktop: {{ settings.logo_height }}px; --logo-height-mobile: {{ settings.logo_height_mobile }}px;"
-      />
+      {{-
+        image
+        | image_url: width: 3840
+        | image_tag:
+          width: logo_width,
+          widths: '240,352,832,1200,1600,1920,2560,3840',
+          height: settings.logo_height,
+          alt: shop.name,
+          loading: 'eager',
+          class: 'header-logo__img',
+          style: '--logo-width-desktop: ' | append: logo_width | append: 'px; --logo-width-mobile: ' | append: logo_width_mobile | append: 'px; --logo-height-desktop: ' | append: settings.logo_height | append: 'px; --logo-height-mobile: ' | append: settings.logo_height_mobile | append: 'px;'
+      -}}
     {% else %}
       <span class="header-logo__text">{{ shop.name }}</span>
     {% endif %}
