@@ -1,0 +1,409 @@
+{% liquid
+  assign collection = section.settings.collection
+  assign max_products = section.settings.max_products | default: 6
+  assign carousel_height = section.settings.carousel_height | default: 400
+  assign show_arrows = section.settings.show_arrows | default: true
+  assign show_autoplay = section.settings.show_autoplay | default: false
+  assign autoplay_speed = section.settings.autoplay_speed | default: 5000
+  assign heading = section.settings.heading
+
+  assign products = collection.products | slice: 0, max_products
+%}
+
+<section
+  id="carousel-{{ section.id }}"
+  class="bless-carousel"
+  data-section-id="{{ section.id }}"
+>
+  <div class="bless-carousel__wrapper">
+    {% if heading != blank %}
+      <h2 class="bless-carousel__heading">{{ heading | escape }}</h2>
+    {% endif %}
+
+    {% if products.size > 0 %}
+      {% capture slides %}
+        {% for product in products %}
+          <div class="bless-carousel__slide">
+            <div
+              class="bless-carousel__card"
+              data-product-id="{{ product.id }}"
+              data-product-url="{{ product.url }}"
+            >
+              <!-- Image Container with hover swap -->
+              <div class="bless-carousel__image-container">
+                {% if product.featured_image %}
+                  <!-- Primary Image -->
+                  <img
+                    src="{{ product.featured_image | image_url: width: 600 }}"
+                    alt="{{ product.title | escape }}"
+                    class="bless-carousel__image bless-carousel__image--primary"
+                    data-primary-image
+                    loading="lazy"
+                  >
+                {% endif %}
+
+                <!-- Secondary Image (shown on hover) -->
+                {% if product.images.size > 1 %}
+                  {% assign second_image = product.images[1] %}
+                  <img
+                    src="{{ second_image | image_url: width: 600 }}"
+                    alt="{{ product.title | escape }}"
+                    class="bless-carousel__image bless-carousel__image--secondary"
+                    data-secondary-image
+                    loading="lazy"
+                  >
+                {% endif %}
+              </div>
+
+              <!-- Card Content -->
+              <div class="bless-carousel__content">
+                <h3 class="bless-carousel__product-title">
+                  {{ product.title | escape }}
+                </h3>
+
+                {% if product.description != blank %}
+                  <p class="bless-carousel__product-description">
+                    {{ product.description | strip_html | truncatewords: 20 }}
+                  </p>
+                {% endif %}
+
+                <a href="{{ product.url }}" class="bless-carousel__link">
+                  View Product
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endcapture %}
+
+      {% liquid
+        assign slideshow_style = 'height: ' | append: carousel_height | append: 'px;'
+      %}
+
+      {% render 'slideshow',
+        slides: slides,
+        slide_count: products.size,
+        show_arrows: show_arrows,
+        autoplay: show_autoplay,
+        autoplay_speed: autoplay_speed,
+        infinite: true,
+        class: 'bless-carousel__slideshow',
+        style: slideshow_style
+      %}
+    {% else %}
+      <div class="bless-carousel__empty">
+        <p>No products found in this collection. Please select a collection with products.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .bless-carousel {
+    width: 100%;
+    padding: clamp(2rem, 5vw, 4rem) 0;
+  }
+
+  .bless-carousel__wrapper {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 3vw, 2rem);
+  }
+
+  .bless-carousel__heading {
+    font-family: var(--font-heading, 'Cardo', serif);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 400;
+    color: var(--color-text, #000);
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+
+  .bless-carousel__slideshow {
+    --slideshow-gap: clamp(1rem, 3vw, 2rem);
+  }
+
+  .bless-carousel__slide {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+
+  /* Card styling with glass design */
+  .bless-carousel__card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    overflow: hidden;
+    transition: all 200ms ease-out;
+    cursor: pointer;
+  }
+
+  .bless-carousel__card:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-4px);
+  }
+
+  /* Image Container */
+  .bless-carousel__image-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* 1:1 aspect ratio */
+    overflow: hidden;
+    border-radius: 20px;
+    margin: 10px;
+    flex-shrink: 0;
+  }
+
+  .bless-carousel__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: opacity 200ms ease-out;
+  }
+
+  .bless-carousel__image--primary {
+    opacity: 1;
+  }
+
+  .bless-carousel__image--secondary {
+    opacity: 0;
+  }
+
+  /* Hover effect: swap images on desktop */
+  @media (hover: hover) and (pointer: fine) {
+    .bless-carousel__card:hover .bless-carousel__image--primary {
+      opacity: 0;
+    }
+
+    .bless-carousel__card:hover .bless-carousel__image--secondary {
+      opacity: 1;
+    }
+  }
+
+  /* Card Content */
+  .bless-carousel__content {
+    padding: clamp(1rem, 3vw, 1.5rem);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.5rem, 2vw, 1rem);
+  }
+
+  .bless-carousel__product-title {
+    font-family: var(--font-heading, 'Cardo', serif);
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-weight: 500;
+    color: var(--color-text, #000);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .bless-carousel__product-description {
+    font-family: var(--font-body, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+    color: rgba(0, 0, 0, 0.7);
+    margin: 0;
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .bless-carousel__link {
+    display: inline-block;
+    font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+    color: var(--color-link, #2E5E4C);
+    text-decoration: none;
+    font-weight: 500;
+    padding: clamp(0.5rem, 1vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
+    border: 1px solid currentColor;
+    border-radius: 20px;
+    transition: all 200ms ease-out;
+    align-self: flex-start;
+    margin-top: auto;
+  }
+
+  .bless-carousel__link:hover {
+    background-color: var(--color-link, #2E5E4C);
+    color: white;
+  }
+
+  /* Empty state */
+  .bless-carousel__empty {
+    text-align: center;
+    padding: clamp(3rem, 5vw, 5rem) 1rem;
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 1rem;
+  }
+
+  /* Responsive: Mobile */
+  @media (max-width: 599px) {
+    slideshow-slides {
+      --slide-width: 100%;
+    }
+
+    .bless-carousel__image-container {
+      padding-bottom: 100%;
+    }
+  }
+
+  /* Responsive: Tablet */
+  @media (min-width: 600px) and (max-width: 899px) {
+    slideshow-slides {
+      --slide-width: 50%;
+    }
+  }
+
+  /* Responsive: Desktop */
+  @media (min-width: 900px) {
+    slideshow-slides {
+      --slide-width: calc(33.333% - (var(--slideshow-gap) * 2 / 3));
+    }
+  }
+
+  /* Slideshow component overrides */
+  slideshow-component {
+    --slideshow-gap: clamp(1rem, 3vw, 2rem);
+  }
+
+  slideshow-slides {
+    gap: var(--slideshow-gap);
+  }
+
+{% endstylesheet %}
+
+{% javascript %}
+(function() {
+  const sectionId = '{{ section.id }}';
+  const sectionEl = document.querySelector(`[data-section-id="${sectionId}"]`);
+  if (!sectionEl) return;
+
+  const isTouchDevice = () => {
+    return (('ontouchstart' in window) ||
+            (navigator.maxTouchPoints > 0) ||
+            (navigator.msMaxTouchPoints > 0));
+  };
+
+  // Handle image swapping for touch devices
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = sectionEl.querySelectorAll('.bless-carousel__card');
+
+    cards.forEach(card => {
+      const primaryImg = card.querySelector('[data-primary-image]');
+      const secondaryImg = card.querySelector('[data-secondary-image]');
+
+      if (!secondaryImg) return; // Skip if no secondary image
+
+      // For touch devices: toggle image on tap
+      if (isTouchDevice()) {
+        let imageToggled = false;
+
+        card.addEventListener('click', (e) => {
+          // If the click is on the link, let it through
+          if (e.target.closest('.bless-carousel__link')) {
+            return;
+          }
+
+          e.preventDefault();
+
+          if (!imageToggled) {
+            // Show secondary image
+            primaryImg.style.opacity = '0';
+            secondaryImg.style.opacity = '1';
+            imageToggled = true;
+          } else {
+            // Navigate to product on second tap
+            window.location.href = card.dataset.productUrl;
+          }
+        });
+
+        // Reset toggle when card is no longer focused
+        card.addEventListener('blur', () => {
+          imageToggled = false;
+          primaryImg.style.opacity = '1';
+          secondaryImg.style.opacity = '0';
+        });
+      }
+    });
+  });
+})();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Bless Carousel",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "placeholder": "Featured Products",
+      "default": "Featured Products"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "max_products",
+      "label": "Number of products to display",
+      "default": 6,
+      "min": 3,
+      "max": 20,
+      "step": 1
+    },
+    {
+      "type": "range",
+      "id": "carousel_height",
+      "label": "Carousel height (px)",
+      "default": 400,
+      "min": 300,
+      "max": 800,
+      "step": 50,
+      "unit": "px"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show navigation arrows",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Autoplay Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_autoplay",
+      "label": "Enable autoplay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Autoplay speed (ms)",
+      "default": 5000,
+      "min": 2000,
+      "max": 10000,
+      "step": 500,
+      "unit": "ms"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bless Carousel"
+    }
+  ]
+}
+{% endschema %}
