@@ -16,7 +16,7 @@
         "video_overlay": "shopify://files/videos/Welcome-Sidthah-text-correct.mp4",
         "sound_icon": "shopify://shop_images/sound_white.png",
         "overlay_color": "0, 0, 0",
-        "overlay_opacity": 30,
+        "overlay_opacity": 50,
         "content_padding_top": 0,
         "content_padding_bottom": 124,
         "heading": "Sidthah’s Breath of Care for you",
@@ -63,14 +63,14 @@
     "bless_hero_B7hJWG": {
       "type": "bless-hero",
       "custom_css": [
-        "{background-color: #FFFFFF;}"
+        "{background-color: #ffffff;}"
       ],
       "name": "Bless hero",
       "settings": {
         "video_overlay": "shopify://files/videos/thank-you.mp4",
         "sound_icon": "shopify://shop_images/sound_white.png",
         "overlay_color": "46, 94, 76",
-        "overlay_opacity": 45,
+        "overlay_opacity": 0,
         "content_padding_top": 0,
         "content_padding_bottom": 48,
         "heading": "Blessings for every day",
