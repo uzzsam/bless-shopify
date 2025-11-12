@@ -160,8 +160,8 @@
 
 .bless-hero__focus {
   margin: 0 auto;
-  width: min(100%, clamp(200px, 30vw, 450px));
-  height: auto;
+  width: auto;
+  height: clamp(450px, 75vh, 900px);
   aspect-ratio: 9 / 16;
   display: flex;
   justify-content: center;
@@ -171,8 +171,6 @@
 
 .bless-hero__focus-wrapper {
   position: relative;
-  width: 100%;
-  height: 100%;
 }
 
 .bless-hero__focus-video {
@@ -309,6 +307,10 @@
 }
 
 @media (max-width: 600px) {
+  .bless-hero {
+    height: 100vh;
+  }
+
   .bless-hero__content {
     padding-inline: 1rem;
     padding-top: 0;
@@ -317,11 +319,19 @@
   }
 
   .bless-hero__focus {
-    width: min(100%, clamp(100px, 20vw, 300px));
+    height: clamp(300px, 75vh, 600px);
+    width: auto;
   }
 
   .bless-hero__focus-video {
     border-radius: 0 0 24px 24px;
+  }
+
+  .bless-hero__control {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    padding: 8px;
   }
 }
 {% endstylesheet %}
