@@ -60,6 +60,20 @@
         "auto_scroll": true
       }
     },
+    "bless_hero_B7hJWG": {
+      "type": "bless-hero",
+      "name": "Bless hero",
+      "settings": {
+        "overlay_color": "46, 94, 76",
+        "overlay_opacity": 45,
+        "content_padding_top": 0,
+        "content_padding_bottom": 48,
+        "heading": "Blessings for every day",
+        "subheading": "Discover a personalised blessing crafted just for you, inspired by the spirit of Sidthah.",
+        "cta_label": "Begin your blessing",
+        "cta_target": "#chat-section"
+      }
+    },
     "product": {
       "type": "bless-product",
       "settings": {
@@ -153,169 +167,35 @@
         "padding-block-end": 0
       }
     },
-    "collection_list_c4FmbN": {
-      "type": "collection-list",
-      "blocks": {
-        "group_h9DiCa": {
-          "type": "group",
-          "name": "t:names.header",
-          "settings": {
-            "content_direction": "column",
-            "vertical_on_mobile": true,
-            "horizontal_alignment": "flex-start",
-            "vertical_alignment": "center",
-            "align_baseline": false,
-            "horizontal_alignment_flex_direction_column": "flex-start",
-            "vertical_alignment_flex_direction_column": "center",
-            "gap": 12,
-            "width": "fill",
-            "custom_width": 100,
-            "width_mobile": "fill",
-            "custom_width_mobile": 100,
-            "height": "fit",
-            "custom_height": 100,
-            "inherit_color_scheme": true,
-            "color_scheme": "",
-            "background_media": "none",
-            "video_position": "cover",
-            "background_image_position": "cover",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "toggle_overlay": false,
-            "overlay_color": "#00000026",
-            "overlay_style": "solid",
-            "gradient_direction": "to top",
-            "link": "",
-            "open_in_new_tab": false,
-            "placeholder": "",
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "text_AH7Y9Y": {
-              "type": "text",
-              "name": "t:names.text",
-              "disabled": true,
-              "settings": {
-                "text": "<h3>Shop by collection</h3>",
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 16,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "text_AH7Y9Y"
-          ]
-        },
-        "static-collection-card": {
-          "type": "_collection-card",
-          "name": "t:names.collection_card",
-          "static": true,
-          "settings": {
-            "placement": "below_image",
-            "horizontal_alignment": "center",
-            "vertical_alignment": "center",
-            "collection_card_gap": 8,
-            "inherit_color_scheme": false,
-            "color_scheme": "",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 1
-          },
-          "blocks": {
-            "collection_title_bPKEhf": {
-              "type": "collection-title",
-              "name": "t:names.collection_title",
-              "settings": {
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "collection-card-image": {
-              "type": "_collection-card-image",
-              "name": "t:names.collection_card_image",
-              "static": true,
-              "settings": {
-                "image_ratio": "adapt",
-                "toggle_overlay": false,
-                "overlay_color": "#00000026",
-                "overlay_style": "solid",
-                "gradient_direction": "to top",
-                "border": "solid",
-                "border_width": 11,
-                "border_opacity": 37,
-                "border_radius": 30
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "collection_title_bPKEhf"
-          ]
-        }
-      },
-      "block_order": [
-        "group_h9DiCa"
-      ],
-      "disabled": true,
-      "name": "t:names.collections_carousel",
+    "blocks_Mz4HMN": {
+      "type": "_blocks",
+      "name": "Product carousel",
       "settings": {
-        "collection_list": [],
-        "layout_type": "carousel",
-        "carousel_on_mobile": false,
-        "columns": 3,
-        "mobile_columns": "2",
-        "mobile_card_size": "60cqw",
-        "columns_gap": 8,
-        "bento_gap": 8,
-        "rows_gap": 8,
-        "max_collections": 4,
-        "icons_style": "arrow",
-        "icons_shape": "circle",
-        "section_width": "page-width",
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
         "gap": 12,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
         "color_scheme": "",
-        "padding-block-start": 48,
-        "padding-block-end": 48
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
       }
     }
   },
@@ -323,8 +203,9 @@
     "hero",
     "chat",
     "blessing",
+    "bless_hero_B7hJWG",
     "product",
     "17629303023d2fe21e",
-    "collection_list_c4FmbN"
+    "blocks_Mz4HMN"
   ]
 }
