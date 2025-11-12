@@ -98,6 +98,19 @@
         "button_label": "Add blessing to cart",
         "cart_note": "We will include this blessing with your order."
       }
+    },
+    "bless_carousel_Ped9qL": {
+      "type": "bless-carousel",
+      "name": "Bless Carousel",
+      "settings": {
+        "heading": "Carry your Sidthie with you",
+        "collection": "pendants",
+        "max_products": 5,
+        "carousel_height": 400,
+        "show_arrows": true,
+        "show_autoplay": true,
+        "autoplay_speed": 5000
+      }
     }
   },
   "order": [
@@ -105,6 +118,7 @@
     "chat",
     "blessing",
     "bless_hero_B7hJWG",
-    "product"
+    "product",
+    "bless_carousel_Ped9qL"
   ]
 }
