@@ -54,9 +54,11 @@
     {% if image %}
       {%- assign logo_width = settings.logo_height | times: image.aspect_ratio | ceil -%}
       {%- assign logo_width_mobile = settings.logo_height_mobile | times: image.aspect_ratio | ceil -%}
+      {%- assign image_sizes = '240,352,832,1200,1600,1920,2560,3840' | split: ',' -%}
+      {%- capture srcset_attr -%}{% for size in image_sizes %}{{ image | image_url: width: size }} {{ size }}w{% unless forloop.last %},{% endunless %}{% endfor %}{%- endcapture -%}
       <img
         src="{{ image | image_url: width: 3840 }}"
-        srcset="{% for size in '240,352,832,1200,1600,1920,2560,3840' | split: ',' %}{{ image | image_url: width: size }} {{ size }}w{{ unless forloop.last }},{% endunless %}{% endfor %}"
+        srcset="{{ srcset_attr }}"
         alt="{{ shop.name }}"
         loading="eager"
         class="header-logo__img"
