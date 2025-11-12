@@ -111,7 +111,7 @@
 {% stylesheet %}
 .bless-hero {
   position: relative;
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -246,17 +246,17 @@
   border: none;
   background: rgba(255, 255, 255, 0.15);
   color: #ffffff;
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 2vw, 1.5rem);
   line-height: 1;
   cursor: pointer;
   transition: all 160ms ease;
-  padding: 12px;
+  padding: clamp(8px, 1.5vw, 12px);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  width: 48px;
-  height: 48px;
+  width: clamp(40px, 8vw, 48px);
+  height: clamp(40px, 8vw, 48px);
   border-radius: 50%;
 }
 
@@ -307,10 +307,6 @@
 }
 
 @media (max-width: 600px) {
-  .bless-hero {
-    height: 100vh;
-  }
-
   .bless-hero__content {
     padding-inline: 1rem;
     padding-top: 0;
@@ -325,13 +321,6 @@
 
   .bless-hero__focus-video {
     border-radius: 0 0 24px 24px;
-  }
-
-  .bless-hero__control {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
-    padding: 8px;
   }
 }
 {% endstylesheet %}
