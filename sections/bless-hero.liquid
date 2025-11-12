@@ -7,7 +7,7 @@
   assign content_padding_bottom = section.settings.content_padding_bottom | default: 48
 %}
 
-<section id="BlessHero-{{ section.id }}" class="bless-hero">
+<section id="BlessHero-{{ section.id }}" class="bless-hero" data-bless-hero-section>
   <div class="bless-hero__media-wrap">
     {% if background_video != blank %}
       <div class="bless-hero__background">
@@ -327,7 +327,7 @@
 
 {% javascript %}
 // CTA scroll functionality
-const heroSection = document.getElementById('BlessHero-{{ section.id }}');
+const heroSection = document.currentScript.closest('[data-bless-hero-section]');
 if (heroSection) {
   const cta = heroSection.querySelector('.bless-hero__cta');
   if (cta) {
