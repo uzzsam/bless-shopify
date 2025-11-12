@@ -63,8 +63,8 @@
       "name": "Bless chat",
       "settings": {
         "heading": "Talk to Sidthah",
-        "widget_src": "",
-        "api_url": "",
+        "widget_src": "https://bless-chat-rick.vercel.app/bless-chat-widget.js",
+        "api_url": "https://bless-chat-rick.vercel.app/api/chat",
         "placeholder": "Talk to Sidthah",
         "loading_text": "Listening...",
         "panel_background": "1, 50, 32",
