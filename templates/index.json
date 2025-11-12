@@ -60,6 +60,25 @@
         "auto_scroll": true
       }
     },
+    "bless_hero_B7hJWG": {
+      "type": "bless-hero",
+      "custom_css": [
+        "{background-color: #FFFFFF;}"
+      ],
+      "name": "Bless hero",
+      "settings": {
+        "video_overlay": "shopify://files/videos/thank-you.mp4",
+        "sound_icon": "shopify://shop_images/sound_white.png",
+        "overlay_color": "46, 94, 76",
+        "overlay_opacity": 45,
+        "content_padding_top": 0,
+        "content_padding_bottom": 48,
+        "heading": "Blessings for every day",
+        "subheading": "Discover a personalised blessing crafted just for you, inspired by the spirit of Sidthah.",
+        "cta_label": "Begin your blessing",
+        "cta_target": "#chat-section"
+      }
+    },
     "product": {
       "type": "bless-product",
       "settings": {
@@ -79,12 +98,119 @@
         "button_label": "Add blessing to cart",
         "cart_note": "We will include this blessing with your order."
       }
+    },
+    "17629303023d2fe21e": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_dd7ad9e_LrYLUh": {
+          "type": "ai_gen_block_dd7ad9e",
+          "settings": {
+            "heading": "Featured Products",
+            "subtitle": "Discover our curated selection",
+            "products": [
+              "lumasara",
+              "morasara",
+              "nalamera",
+              "niraluma",
+              "olanwela",
+              "rakawela",
+              "welamora"
+            ],
+            "button_label": "View Product",
+            "card_corner_radius": 30,
+            "card_opacity": 65,
+            "background_color": "#414141",
+            "heading_color": "#ffffff",
+            "text_color": "#ece3d6",
+            "price_color": "#a8ccc1",
+            "card_background": "#0000000f",
+            "button_background": "#ece3d66e",
+            "button_text_color": "#ffffff",
+            "button_border": "#a8ccc1",
+            "button_hover_background": "#2e5e4c",
+            "button_hover_text_color": "#ffffff",
+            "button_hover_border": "#000000",
+            "nav_background": "#ffffff",
+            "nav_color": "#414141",
+            "nav_border": "#ece3d6",
+            "nav_hover_background": "#2e5e4c",
+            "nav_hover_color": "#ffffff",
+            "heading_font": "cardo_n4",
+            "heading_size": 32
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_dd7ad9e_LrYLUh"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 12,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "blocks_Mz4HMN": {
+      "type": "_blocks",
+      "name": "Product carousel",
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 12,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
     }
   },
   "order": [
     "hero",
     "chat",
     "blessing",
-    "product"
+    "bless_hero_B7hJWG",
+    "product",
+    "17629303023d2fe21e",
+    "blocks_Mz4HMN"
   ]
 }
