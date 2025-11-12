@@ -10,7 +10,7 @@
   if collection
     assign products = collection.products | slice: 0, max_products
   else
-    assign products = empty_array
+    assign products = nil
   endif
 %}
 
@@ -40,6 +40,8 @@
                   <img
                     src="{{ product.featured_image | image_url: width: 600 }}"
                     alt="{{ product.title | escape }}"
+                    width="600"
+                    height="600"
                     class="bless-carousel__image bless-carousel__image--primary"
                     data-primary-image
                     loading="lazy"
@@ -52,6 +54,8 @@
                   <img
                     src="{{ second_image | image_url: width: 600 }}"
                     alt="{{ product.title | escape }}"
+                    width="600"
+                    height="600"
                     class="bless-carousel__image bless-carousel__image--secondary"
                     data-secondary-image
                     loading="lazy"
@@ -285,10 +289,6 @@
 
 {% javascript %}
 (function() {
-  const sectionId = '{{ section.id }}';
-  const sectionEl = document.querySelector(`[data-section-id="${sectionId}"]`);
-  if (!sectionEl) return;
-
   const isTouchDevice = () => {
     return (('ontouchstart' in window) ||
             (navigator.maxTouchPoints > 0) ||
@@ -297,20 +297,18 @@
 
   // Handle image swapping for touch devices
   document.addEventListener('DOMContentLoaded', () => {
-    const cards = sectionEl.querySelectorAll('.bless-carousel__card');
+    const cards = document.querySelectorAll('.bless-carousel__card');
 
     cards.forEach(card => {
       const primaryImg = card.querySelector('[data-primary-image]');
       const secondaryImg = card.querySelector('[data-secondary-image]');
 
-      if (!secondaryImg) return; // Skip if no secondary image
+      if (!secondaryImg) return;
 
-      // For touch devices: toggle image on tap
       if (isTouchDevice()) {
         let imageToggled = false;
 
         card.addEventListener('click', (e) => {
-          // If the click is on the link, let it through
           if (e.target.closest('.bless-carousel__link')) {
             return;
           }
@@ -318,17 +316,14 @@
           e.preventDefault();
 
           if (!imageToggled) {
-            // Show secondary image
             primaryImg.style.opacity = '0';
             secondaryImg.style.opacity = '1';
             imageToggled = true;
           } else {
-            // Navigate to product on second tap
             window.location.href = card.dataset.productUrl;
           }
         });
 
-        // Reset toggle when card is no longer focused
         card.addEventListener('blur', () => {
           imageToggled = false;
           primaryImg.style.opacity = '1';
