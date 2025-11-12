@@ -62,8 +62,13 @@
     },
     "bless_hero_B7hJWG": {
       "type": "bless-hero",
+      "custom_css": [
+        "{background-color: #FFFFFF;}"
+      ],
       "name": "Bless hero",
       "settings": {
+        "video_overlay": "shopify://files/videos/thank-you.mp4",
+        "sound_icon": "shopify://shop_images/sound_white.png",
         "overlay_color": "46, 94, 76",
         "overlay_opacity": 45,
         "content_padding_top": 0,
