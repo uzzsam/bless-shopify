@@ -7,7 +7,11 @@
   assign autoplay_speed = section.settings.autoplay_speed | default: 5000
   assign heading = section.settings.heading
 
-  assign products = collection.products | slice: 0, max_products
+  if collection
+    assign products = collection.products | slice: 0, max_products
+  else
+    assign products = empty_array
+  endif
 %}
 
 <section
@@ -76,9 +80,7 @@
         {% endfor %}
       {% endcapture %}
 
-      {% liquid
-        assign slideshow_style = 'height: ' | append: carousel_height | append: 'px;'
-      %}
+      {% capture slideshow_style %}height: {{ carousel_height }}px;{% endcapture %}
 
       {% render 'slideshow',
         slides: slides,
