@@ -4,36 +4,34 @@
   assign show_autoplay = section.settings.show_autoplay | default: false
   assign autoplay_speed = section.settings.autoplay_speed | default: 5000
   assign heading = section.settings.heading
-
-  assign products = ''
-
-  if section.settings.product_1 != blank
-    assign products = products | append: section.settings.product_1 | append: '|'
-  endif
-  if section.settings.product_2 != blank
-    assign products = products | append: section.settings.product_2 | append: '|'
-  endif
-  if section.settings.product_3 != blank
-    assign products = products | append: section.settings.product_3 | append: '|'
-  endif
-  if section.settings.product_4 != blank
-    assign products = products | append: section.settings.product_4 | append: '|'
-  endif
-  if section.settings.product_5 != blank
-    assign products = products | append: section.settings.product_5 | append: '|'
-  endif
-  if section.settings.product_6 != blank
-    assign products = products | append: section.settings.product_6 | append: '|'
-  endif
-  if section.settings.product_7 != blank
-    assign products = products | append: section.settings.product_7 | append: '|'
-  endif
-  if section.settings.product_8 != blank
-    assign products = products | append: section.settings.product_8 | append: '|'
-  endif
-
-  assign products = products | split: '|' | compact
 %}
+
+{% assign products = "" | split: "" %}
+
+{% if section.settings.product_1 %}
+  {% assign products = products | push: section.settings.product_1 %}
+{% endif %}
+{% if section.settings.product_2 %}
+  {% assign products = products | push: section.settings.product_2 %}
+{% endif %}
+{% if section.settings.product_3 %}
+  {% assign products = products | push: section.settings.product_3 %}
+{% endif %}
+{% if section.settings.product_4 %}
+  {% assign products = products | push: section.settings.product_4 %}
+{% endif %}
+{% if section.settings.product_5 %}
+  {% assign products = products | push: section.settings.product_5 %}
+{% endif %}
+{% if section.settings.product_6 %}
+  {% assign products = products | push: section.settings.product_6 %}
+{% endif %}
+{% if section.settings.product_7 %}
+  {% assign products = products | push: section.settings.product_7 %}
+{% endif %}
+{% if section.settings.product_8 %}
+  {% assign products = products | push: section.settings.product_8 %}
+{% endif %}
 
 <section
   id="carousel-{{ section.id }}"
