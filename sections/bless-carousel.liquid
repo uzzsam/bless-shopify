@@ -1,17 +1,38 @@
 {% liquid
-  assign collection = section.settings.collection
-  assign max_products = section.settings.max_products | default: 6
   assign carousel_height = section.settings.carousel_height | default: 400
   assign show_arrows = section.settings.show_arrows | default: true
   assign show_autoplay = section.settings.show_autoplay | default: false
   assign autoplay_speed = section.settings.autoplay_speed | default: 5000
   assign heading = section.settings.heading
 
-  if collection
-    assign products = collection.products | slice: 0, max_products
-  else
-    assign products = nil
+  assign products = ''
+
+  if section.settings.product_1 != blank
+    assign products = products | append: section.settings.product_1 | append: '|'
   endif
+  if section.settings.product_2 != blank
+    assign products = products | append: section.settings.product_2 | append: '|'
+  endif
+  if section.settings.product_3 != blank
+    assign products = products | append: section.settings.product_3 | append: '|'
+  endif
+  if section.settings.product_4 != blank
+    assign products = products | append: section.settings.product_4 | append: '|'
+  endif
+  if section.settings.product_5 != blank
+    assign products = products | append: section.settings.product_5 | append: '|'
+  endif
+  if section.settings.product_6 != blank
+    assign products = products | append: section.settings.product_6 | append: '|'
+  endif
+  if section.settings.product_7 != blank
+    assign products = products | append: section.settings.product_7 | append: '|'
+  endif
+  if section.settings.product_8 != blank
+    assign products = products | append: section.settings.product_8 | append: '|'
+  endif
+
+  assign products = products | split: '|' | compact
 %}
 
 <section
@@ -354,18 +375,52 @@
       "default": "Explore Our Collection"
     },
     {
-      "type": "collection",
-      "id": "collection",
-      "label": "Collection"
+      "type": "header",
+      "content": "Products"
     },
     {
-      "type": "range",
-      "id": "max_products",
-      "label": "Number of products to display",
-      "default": 6,
-      "min": 3,
-      "max": 20,
-      "step": 1
+      "type": "product",
+      "id": "product_1",
+      "label": "Product 1"
+    },
+    {
+      "type": "product",
+      "id": "product_2",
+      "label": "Product 2"
+    },
+    {
+      "type": "product",
+      "id": "product_3",
+      "label": "Product 3"
+    },
+    {
+      "type": "product",
+      "id": "product_4",
+      "label": "Product 4"
+    },
+    {
+      "type": "product",
+      "id": "product_5",
+      "label": "Product 5"
+    },
+    {
+      "type": "product",
+      "id": "product_6",
+      "label": "Product 6"
+    },
+    {
+      "type": "product",
+      "id": "product_7",
+      "label": "Product 7"
+    },
+    {
+      "type": "product",
+      "id": "product_8",
+      "label": "Product 8"
+    },
+    {
+      "type": "header",
+      "content": "Display Settings"
     },
     {
       "type": "range",
