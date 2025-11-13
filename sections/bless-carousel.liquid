@@ -4,9 +4,14 @@
   assign show_autoplay = section.settings.show_autoplay | default: false
   assign autoplay_speed_ms = section.settings.autoplay_speed | default: 5000
   assign autoplay_speed = autoplay_speed_ms | divided_by: 1000
+  assign carousel_behavior = section.settings.carousel_behavior | default: 'infinite'
   assign heading = section.settings.heading
   assign product_count = 0
   assign slide_index = 0
+  assign use_infinite = true
+  if carousel_behavior == 'one-way'
+    assign use_infinite = false
+  endif
 %}
 
 <section
@@ -66,7 +71,7 @@
         show_arrows: show_arrows,
         autoplay: show_autoplay,
         autoplay_speed: autoplay_speed,
-        infinite: true,
+        infinite: use_infinite,
         class: 'bless-carousel__slideshow',
         style: slideshow_style
       %}
@@ -107,6 +112,7 @@
   .bless-carousel__slideshow {
     --slideshow-gap: clamp(1rem, 3vw, 2rem);
     width: 100%;
+    position: relative;
   }
 
   slideshow-component {
@@ -115,6 +121,13 @@
     touch-action: pan-y;
     user-select: none;
     -webkit-user-select: none;
+    position: relative;
+    overflow: visible;
+  }
+
+  slideshow-container {
+    position: relative;
+    overflow: visible;
   }
 
   slideshow-component[dragging] {
@@ -468,6 +481,23 @@
       "max": 20000,
       "step": 500,
       "unit": "ms"
+    },
+    {
+      "type": "select",
+      "id": "carousel_behavior",
+      "label": "Carousel behavior",
+      "options": [
+        {
+          "value": "infinite",
+          "label": "Infinite loop (smooth)"
+        },
+        {
+          "value": "one-way",
+          "label": "One-way scroll (slides right, then stops)"
+        }
+      ],
+      "default": "infinite",
+      "info": "Choose how the carousel advances through products."
     }
   ],
   "presets": [

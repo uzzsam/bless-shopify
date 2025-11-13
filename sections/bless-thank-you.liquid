@@ -300,8 +300,110 @@ if (thankYouSection) {
       });
     }
   }
+
+  // Video controls functionality
+  const focusWrapper = thankYouSection.querySelector('.bless-thank-you__focus-wrapper');
+  if (focusWrapper) {
+    const focusVideo = focusWrapper.querySelector('.bless-thank-you__focus-video');
+    const controlBar = focusWrapper.querySelector('.bless-thank-you__control-bar');
+
+    if (focusVideo && controlBar) {
+      const playButton = controlBar.querySelector('[data-control="play"]');
+      const muteButton = controlBar.querySelector('[data-control="mute"]');
+
+      if (playButton && muteButton) {
+        const playIcon = playButton.querySelector('[aria-hidden="true"]');
+        const muteGlyph = muteButton.querySelector('.bless-thank-you__sound-glyph');
+        const muteIconImg = muteButton.querySelector('.bless-thank-you__sound-icon');
+
+        const syncPlayState = () => {
+          if (!playIcon) return;
+          if (focusVideo.paused) {
+            playIcon.textContent = '►';
+            playButton.setAttribute('aria-label', 'Play');
+            playButton.setAttribute('title', 'Play');
+          } else {
+            playIcon.textContent = '❚❚';
+            playButton.setAttribute('aria-label', 'Pause');
+            playButton.setAttribute('title', 'Pause');
+          }
+        };
+
+        const syncMuteState = () => {
+          const isMuted = focusVideo.muted;
+          muteButton.classList.toggle('is-muted', isMuted);
+          muteButton.setAttribute('aria-label', isMuted ? 'Unmute' : 'Mute');
+          muteButton.setAttribute('title', isMuted ? 'Unmute' : 'Mute');
+          if (muteGlyph) {
+            muteGlyph.textContent = isMuted ? '🔇' : '🔊';
+          }
+          if (muteIconImg) {
+            muteIconImg.style.opacity = isMuted ? '0.7' : '1';
+          }
+        };
+
+        // Ensure video is unmuted and not muted attribute
+        focusVideo.muted = false;
+        focusVideo.defaultMuted = false;
+        focusVideo.removeAttribute('muted');
+
+        const initializeControls = () => {
+          focusVideo.pause();
+          focusVideo.currentTime = 0;
+          syncPlayState();
+          syncMuteState();
+        };
+
+        // Initialize when video is ready
+        if (focusVideo.readyState >= 2) {
+          initializeControls();
+        } else {
+          focusVideo.addEventListener('loadedmetadata', initializeControls, { once: true });
+        }
+
+        // Play button click handler
+        playButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          if (focusVideo.paused) {
+            const playPromise = focusVideo.play();
+            if (playPromise && typeof playPromise.then === 'function') {
+              playPromise
+                .then(() => {
+                  syncPlayState();
+                })
+                .catch((error) => {
+                  console.error('Video play failed:', error.message);
+                  syncPlayState();
+                });
+            } else {
+              syncPlayState();
+            }
+          } else {
+            focusVideo.pause();
+            syncPlayState();
+          }
+        });
+
+        // Mute button click handler
+        muteButton.addEventListener('click', () => {
+          focusVideo.muted = !focusVideo.muted;
+          syncMuteState();
+        });
+
+        // Video event listeners
+        focusVideo.addEventListener('play', syncPlayState);
+        focusVideo.addEventListener('pause', syncPlayState);
+        focusVideo.addEventListener('ended', () => {
+          focusVideo.pause();
+          focusVideo.currentTime = 0;
+          syncPlayState();
+        });
+      }
+    }
+  }
 }
-// Video controls are handled by hero-video-controls.js global script
 {% endjavascript %}
 
 {% schema %}
