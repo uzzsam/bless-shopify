@@ -60,23 +60,18 @@
         "auto_scroll": true
       }
     },
-    "bless_hero_B7hJWG": {
-      "type": "bless-hero",
-      "custom_css": [
-        "{background: transparent;}"
-      ],
-      "name": "Bless hero",
+    "bless_thank_you_8ERPqR": {
+      "type": "bless-thank-you",
+      "name": "Bless thank you",
       "settings": {
         "video_overlay": "shopify://files/videos/thank-you.mp4",
         "sound_icon": "shopify://shop_images/sound_white.png",
-        "overlay_color": "46, 94, 76",
-        "overlay_opacity": 0,
         "content_padding_top": 0,
         "content_padding_bottom": 48,
-        "heading": "Blessings for every day",
-        "subheading": "Discover a personalised blessing crafted just for you, inspired by the spirit of Sidthah.",
-        "cta_label": "Begin your blessing",
-        "cta_target": "#bless-products"
+        "heading": "Thank You",
+        "subheading": "Sidthies",
+        "cta_label": "Carry your Sidthie",
+        "cta_target": "#carousel-section"
       }
     },
     "product": {
@@ -116,21 +111,7 @@
         "carousel_height": 750,
         "show_arrows": true,
         "show_autoplay": true,
-        "autoplay_speed": 2500
-      }
-    },
-    "bless_thank_you_8ERPqR": {
-      "type": "bless-thank-you",
-      "name": "Bless thank you",
-      "settings": {
-        "video_overlay": "shopify://files/videos/thank-you.mp4",
-        "sound_icon": "shopify://shop_images/sound_white.png",
-        "content_padding_top": 0,
-        "content_padding_bottom": 48,
-        "heading": "Thank You",
-        "subheading": "Sidthies",
-        "cta_label": "Carry your Sidthie",
-        "cta_target": "#carousel-section"
+        "autoplay_speed": 3500
       }
     }
   },
@@ -138,9 +119,8 @@
     "hero",
     "chat",
     "blessing",
-    "bless_hero_B7hJWG",
+    "bless_thank_you_8ERPqR",
     "product",
-    "bless_carousel_Ped9qL",
-    "bless_thank_you_8ERPqR"
+    "bless_carousel_Ped9qL"
   ]
 }
