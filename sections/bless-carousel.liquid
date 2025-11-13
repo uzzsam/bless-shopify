@@ -299,10 +299,24 @@
   /* Slideshow Arrows - Glass Circle Style */
   slideshow-arrows {
     opacity: 1 !important;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10;
+    width: 100%;
+    padding: 0 clamp(1rem, 3vw, 2rem);
+    box-sizing: border-box;
   }
 
   slideshow-arrow {
     opacity: 1 !important;
+    pointer-events: auto;
   }
 
   slideshow-arrow button {
@@ -319,12 +333,18 @@
     justify-content: center;
     transition: all 200ms ease-out;
     cursor: pointer;
+    flex-shrink: 0;
   }
 
   slideshow-arrow button:hover {
     background: rgba(255, 255, 255, 0.3) !important;
     border-color: rgba(255, 255, 255, 0.5);
     transform: scale(1.1);
+  }
+
+  slideshow-arrow button:active {
+    background: rgba(255, 255, 255, 0.25) !important;
+    transform: scale(0.95);
   }
 
   slideshow-arrow button svg {
