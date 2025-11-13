@@ -20,42 +20,42 @@
 
     {% capture slides %}
       {% if section.settings.product_1 %}
-        {% include 'carousel-product-slide', product: section.settings.product_1, index: slide_index %}
+        {% render 'carousel-product-slide', product: section.settings.product_1, index: slide_index %}
         {% assign product_count = product_count | plus: 1 %}
         {% assign slide_index = slide_index | plus: 1 %}
       {% endif %}
       {% if section.settings.product_2 %}
-        {% include 'carousel-product-slide', product: section.settings.product_2, index: slide_index %}
+        {% render 'carousel-product-slide', product: section.settings.product_2, index: slide_index %}
         {% assign product_count = product_count | plus: 1 %}
         {% assign slide_index = slide_index | plus: 1 %}
       {% endif %}
       {% if section.settings.product_3 %}
-        {% include 'carousel-product-slide', product: section.settings.product_3, index: slide_index %}
+        {% render 'carousel-product-slide', product: section.settings.product_3, index: slide_index %}
         {% assign product_count = product_count | plus: 1 %}
         {% assign slide_index = slide_index | plus: 1 %}
       {% endif %}
       {% if section.settings.product_4 %}
-        {% include 'carousel-product-slide', product: section.settings.product_4, index: slide_index %}
+        {% render 'carousel-product-slide', product: section.settings.product_4, index: slide_index %}
         {% assign product_count = product_count | plus: 1 %}
         {% assign slide_index = slide_index | plus: 1 %}
       {% endif %}
       {% if section.settings.product_5 %}
-        {% include 'carousel-product-slide', product: section.settings.product_5, index: slide_index %}
+        {% render 'carousel-product-slide', product: section.settings.product_5, index: slide_index %}
         {% assign product_count = product_count | plus: 1 %}
         {% assign slide_index = slide_index | plus: 1 %}
       {% endif %}
       {% if section.settings.product_6 %}
-        {% include 'carousel-product-slide', product: section.settings.product_6, index: slide_index %}
+        {% render 'carousel-product-slide', product: section.settings.product_6, index: slide_index %}
         {% assign product_count = product_count | plus: 1 %}
         {% assign slide_index = slide_index | plus: 1 %}
       {% endif %}
       {% if section.settings.product_7 %}
-        {% include 'carousel-product-slide', product: section.settings.product_7, index: slide_index %}
+        {% render 'carousel-product-slide', product: section.settings.product_7, index: slide_index %}
         {% assign product_count = product_count | plus: 1 %}
         {% assign slide_index = slide_index | plus: 1 %}
       {% endif %}
       {% if section.settings.product_8 %}
-        {% include 'carousel-product-slide', product: section.settings.product_8, index: slide_index %}
+        {% render 'carousel-product-slide', product: section.settings.product_8, index: slide_index %}
         {% assign product_count = product_count | plus: 1 %}
         {% assign slide_index = slide_index | plus: 1 %}
       {% endif %}
