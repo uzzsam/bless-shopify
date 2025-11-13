@@ -118,6 +118,20 @@
         "show_autoplay": true,
         "autoplay_speed": 2500
       }
+    },
+    "bless_thank_you_8ERPqR": {
+      "type": "bless-thank-you",
+      "name": "Bless thank you",
+      "settings": {
+        "video_overlay": "shopify://files/videos/thank-you.mp4",
+        "sound_icon": "shopify://shop_images/sound_white.png",
+        "content_padding_top": 0,
+        "content_padding_bottom": 48,
+        "heading": "Thank You",
+        "subheading": "Sidthies",
+        "cta_label": "Carry your Sidthie",
+        "cta_target": "#carousel-section"
+      }
     }
   },
   "order": [
@@ -126,6 +140,7 @@
     "blessing",
     "bless_hero_B7hJWG",
     "product",
-    "bless_carousel_Ped9qL"
+    "bless_carousel_Ped9qL",
+    "bless_thank_you_8ERPqR"
   ]
 }
