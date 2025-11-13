@@ -81,6 +81,7 @@
     },
     "product": {
       "type": "bless-product",
+      "disabled": true,
       "settings": {
         "product": "",
         "heading": "Carry your blessing with you",
