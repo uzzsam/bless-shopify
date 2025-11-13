@@ -1,0 +1,372 @@
+{% liquid
+  assign overlay_video = section.settings.video_overlay
+  assign content_padding_top = section.settings.content_padding_top | default: 0
+  assign content_padding_bottom = section.settings.content_padding_bottom | default: 48
+%}
+
+<section id="BlessThankYou-{{ section.id }}" class="bless-thank-you bless-overlay-30" data-bless-thank-you-section>
+  <div
+    class="bless-thank-you__content"
+    style="padding-top: {{ content_padding_top }}px; padding-bottom: {{ content_padding_bottom }}px;"
+  >
+    {% if overlay_video != blank %}
+      {% assign poster_image = overlay_video.preview_image %}
+      {% if poster_image != blank %}
+        {% assign poster_url = poster_image | image_url: width: 1600 %}
+      {% else %}
+        {% assign poster_url = '' %}
+      {% endif %}
+      <div class="bless-thank-you__focus bless-thank-you__focus-wrapper">
+        {{
+          overlay_video
+          | video_tag:
+            autoplay: false,
+            loop: true,
+            muted: false,
+            playsinline: true,
+            controls: false,
+            preload: 'metadata',
+            poster: poster_url,
+            class: 'bless-thank-you__focus-video'
+        }}
+
+        <div class="bless-thank-you__control-bar">
+          <button
+            type="button"
+            class="bless-thank-you__control bless-thank-you__control--play"
+            data-control="play"
+            aria-label="Play"
+            title="Play"
+          >
+            <span aria-hidden="true">►</span>
+          </button>
+          <button
+            type="button"
+            class="bless-thank-you__control bless-thank-you__control--mute"
+            data-control="mute"
+            aria-label="Mute"
+            title="Mute"
+          >
+            <span class="bless-thank-you__sound-icon-wrapper" aria-hidden="true">
+              {% if section.settings.sound_icon != blank %}
+                <img class="bless-thank-you__sound-icon" src="{{ section.settings.sound_icon | image_url: width: 64 }}" alt="" loading="lazy" width="22" height="22">
+              {% else %}
+                <span class="bless-thank-you__sound-glyph">🔊</span>
+              {% endif %}
+            </span>
+            <span class="bless-thank-you__mute-slash" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if section.settings.heading != blank %}
+      <h1 class="bless-thank-you__heading">
+        {{ section.settings.heading | escape }}
+      </h1>
+    {% endif %}
+
+    {% if section.settings.subheading != blank %}
+      <p class="bless-thank-you__subheading">
+        {{ section.settings.subheading | escape }}
+      </p>
+    {% endif %}
+
+    {% if section.settings.cta_label != blank %}
+      <a
+        class="bless-thank-you__cta link"
+        href="{{ section.settings.cta_target | default: '#chat-section' }}"
+      >
+        {{ section.settings.cta_label | escape }}
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+.bless-thank-you {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: #184135;
+  overflow: hidden;
+  color: rgb(var(--color-light-flesh, 236, 227, 214));
+  padding-top: 0;
+}
+
+.bless-thank-you__content {
+  position: relative;
+  z-index: 1;
+  max-width: min(620px, 92vw);
+  margin: 0 auto;
+  text-align: center;
+  padding-inline: 1.5rem;
+  padding-top: 0;
+  padding-bottom: clamp(16px, 4vw, 48px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.bless-thank-you__focus {
+  margin: 0 auto;
+  width: auto;
+  height: clamp(450px, 75vh, 900px);
+  aspect-ratio: 9 / 16;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.bless-thank-you__focus-wrapper {
+  position: relative;
+}
+
+.bless-thank-you__focus-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0 0 32px 32px;
+  box-shadow: 0 32px 60px rgba(0, 0, 0, 0.35);
+  display: block;
+}
+
+.bless-thank-you__focus-video::-webkit-media-controls {
+  display: none;
+}
+
+.bless-thank-you__focus-video::-webkit-media-controls-panel {
+  display: none;
+}
+
+.bless-thank-you__heading {
+  font-family: var(--font-heading, 'Cardo', serif);
+  font-size: clamp(0.9rem, 1.1vw + 0.4rem, 1.3rem) !important;
+  line-height: 1.1;
+  margin: 0;
+  text-transform: none;
+}
+
+.bless-thank-you__subheading {
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+  color: rgba(var(--color-light-flesh, 236, 227, 214), 0.85);
+}
+
+.bless-thank-you__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.8rem;
+  border-radius: 999px;
+  background: rgba(var(--color-avocado, 227, 216, 154), 0.92);
+  color: rgb(var(--color-dark-green, 46, 94, 76));
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: transform 200ms ease, background-color 200ms ease;
+}
+
+.bless-thank-you__cta:hover,
+.bless-thank-you__cta:focus {
+  transform: translateY(-2px);
+  background: rgba(var(--color-avocado, 227, 216, 154), 1);
+}
+
+.bless-thank-you__control-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 1.4rem;
+  transform: translateX(-50%);
+  display: inline-flex;
+  gap: 0.65rem;
+  padding: 0.65rem 1.2rem;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 16px 28px rgba(0,0,0,0.35);
+  align-items: center;
+}
+
+.bless-thank-you__control {
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-size: clamp(0.875rem, 1.5vw, 1.5rem);
+  line-height: 1;
+  cursor: pointer;
+  transition: all 160ms ease;
+  padding: clamp(6px, 1vw, 12px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: clamp(32px, 7vw, 48px);
+  height: clamp(32px, 7vw, 48px);
+  border-radius: 50%;
+}
+
+.bless-thank-you__control:hover,
+.bless-thank-you__control:focus-visible {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.12);
+}
+
+.bless-thank-you__control--play span[aria-hidden="true"] {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.bless-thank-you__sound-icon-wrapper,
+.bless-thank-you__sound-glyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bless-thank-you__sound-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.bless-thank-you__control--mute {
+  color: transparent;
+}
+
+.bless-thank-you__mute-slash {
+  display: none;
+  position: absolute;
+  width: 24px;
+  height: 2px;
+  background: #fff;
+  transform: rotate(45deg);
+  border-radius: 1px;
+}
+
+.bless-thank-you__control--mute.is-muted .bless-thank-you__mute-slash {
+  display: block;
+}
+
+.bless-thank-you__control--mute.is-muted .bless-thank-you__sound-icon {
+  opacity: 0.7;
+}
+
+@media (max-width: 600px) {
+  .bless-thank-you__content {
+    padding-inline: 1rem;
+    padding-top: 0;
+    padding-bottom: clamp(16px, 4vw, 48px);
+    gap: 0.4rem;
+  }
+
+  .bless-thank-you__focus {
+    height: clamp(300px, 75vh, 600px);
+    width: auto;
+  }
+
+  .bless-thank-you__focus-video {
+    border-radius: 0 0 24px 24px;
+  }
+}
+{% endstylesheet %}
+
+{% javascript %}
+// CTA scroll functionality
+const thankYouSection = document.currentScript.closest('[data-bless-thank-you-section]');
+if (thankYouSection) {
+  const cta = thankYouSection.querySelector('.bless-thank-you__cta');
+  if (cta) {
+    const targetSelector = cta.getAttribute('href');
+    if (targetSelector && targetSelector.startsWith('#')) {
+      cta.addEventListener('click', (event) => {
+        const targetElement = document.querySelector(targetSelector);
+        if (targetElement) {
+          event.preventDefault();
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+  }
+}
+// Video controls are handled by hero-video-controls.js global script
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Bless thank you",
+  "settings": [
+    {
+      "type": "video",
+      "id": "video_overlay",
+      "label": "Overlay focus video"
+    },
+    {
+      "type": "image_picker",
+      "id": "sound_icon",
+      "label": "Sound icon",
+      "info": "Upload a white sound icon to use for the mute toggle."
+    },
+    {
+      "type": "range",
+      "id": "content_padding_top",
+      "label": "Content top padding",
+      "default": 0,
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "content_padding_bottom",
+      "label": "Content bottom padding",
+      "default": 48,
+      "min": 16,
+      "max": 200,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Thank You"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Your blessing has been sent to you."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Continue"
+    },
+    {
+      "type": "text",
+      "id": "cta_target",
+      "label": "CTA anchor target",
+      "default": "#carousel-section",
+      "info": "Provide an anchor (for example: #carousel-section) to scroll to when the CTA is clicked."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bless thank you"
+    }
+  ]
+}
+{% endschema %}
