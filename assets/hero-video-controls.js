@@ -1,16 +1,24 @@
 console.log('hero-video-controls.js: Loaded');
 
 function initHeroVideoControls() {
-  console.log('hero-video-controls: Initializing all hero sections...');
+  console.log('hero-video-controls: Initializing all hero/thank-you sections...');
 
-  // Find all hero sections with videos
-  const heroSections = document.querySelectorAll('[id^="BlessHero-"]');
-  console.log('hero-video-controls: Found', heroSections.length, 'hero sections');
+  // Find all hero and thank-you sections with videos
+  const videoSections = document.querySelectorAll('[id^="BlessHero-"], [id^="BlessThankYou-"]');
+  console.log('hero-video-controls: Found', videoSections.length, 'video sections');
 
-  heroSections.forEach((heroSection) => {
-    console.log('hero-video-controls: Processing section:', heroSection.id);
+  videoSections.forEach((section) => {
+    console.log('hero-video-controls: Processing section:', section.id);
 
-    const focusWrapper = heroSection.querySelector('.bless-hero__focus-wrapper');
+    // Support both bless-hero and bless-thank-you classes
+    const isThankYouSection = section.id.startsWith('BlessThankYou-');
+    const focusWrapperClass = isThankYouSection ? '.bless-thank-you__focus-wrapper' : '.bless-hero__focus-wrapper';
+    const focusVideoClass = isThankYouSection ? '.bless-thank-you__focus-video' : '.bless-hero__focus-video';
+    const controlBarClass = isThankYouSection ? '.bless-thank-you__control-bar' : '.bless-hero__control-bar';
+    const soundGlyphClass = isThankYouSection ? '.bless-thank-you__sound-glyph' : '.bless-hero__sound-glyph';
+    const soundIconClass = isThankYouSection ? '.bless-thank-you__sound-icon' : '.bless-hero__sound-icon';
+
+    const focusWrapper = section.querySelector(focusWrapperClass);
     console.log('  - Focus wrapper found?', !!focusWrapper);
 
     if (!focusWrapper) {
@@ -18,8 +26,8 @@ function initHeroVideoControls() {
       return;
     }
 
-    const focusVideo = focusWrapper.querySelector('.bless-hero__focus-video');
-    const controlBar = focusWrapper.querySelector('.bless-hero__control-bar');
+    const focusVideo = focusWrapper.querySelector(focusVideoClass);
+    const controlBar = focusWrapper.querySelector(controlBarClass);
 
     console.log('  - Video element found?', focusVideo instanceof HTMLMediaElement);
     console.log('  - Control bar found?', !!controlBar);
@@ -42,8 +50,8 @@ function initHeroVideoControls() {
     }
 
     const playIcon = playButton.querySelector('[aria-hidden="true"]');
-    const muteGlyph = muteButton.querySelector('.bless-hero__sound-glyph');
-    const muteIconImg = muteButton.querySelector('.bless-hero__sound-icon');
+    const muteGlyph = muteButton.querySelector(soundGlyphClass);
+    const muteIconImg = muteButton.querySelector(soundIconClass);
 
     const syncPlayState = () => {
       if (!playIcon) return;
