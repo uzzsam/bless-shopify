@@ -76,7 +76,7 @@
         "heading": "Blessings for every day",
         "subheading": "Discover a personalised blessing crafted just for you, inspired by the spirit of Sidthah.",
         "cta_label": "Begin your blessing",
-        "cta_target": "#bless-carousel-section"
+        "cta_target": "#bless-products"
       }
     },
     "product": {
@@ -105,7 +105,7 @@
       "name": "Bless Carousel",
       "settings": {
         "heading": "Carry your Sidthie with you",
-        "section_anchor": "bless-product",
+        "section_anchor": "bless-products",
         "product_1": "lumasara",
         "product_2": "morasara",
         "product_3": "nalamera",
