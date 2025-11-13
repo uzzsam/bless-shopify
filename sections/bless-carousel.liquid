@@ -2,7 +2,8 @@
   assign carousel_height = section.settings.carousel_height | default: 400
   assign show_arrows = section.settings.show_arrows | default: true
   assign show_autoplay = section.settings.show_autoplay | default: false
-  assign autoplay_speed = section.settings.autoplay_speed | default: 5000
+  assign autoplay_speed_ms = section.settings.autoplay_speed | default: 5000
+  assign autoplay_speed = autoplay_speed_ms | divided_by: 1000
   assign heading = section.settings.heading
   assign product_count = 0
   assign slide_index = 0
@@ -279,6 +280,44 @@
   /* Slideshow component overrides */
   slideshow-component {
     --slideshow-gap: clamp(1rem, 3vw, 2rem);
+  }
+
+  /* Slideshow Arrows - Glass Circle Style */
+  slideshow-arrows {
+    opacity: 1 !important;
+  }
+
+  slideshow-arrow {
+    opacity: 1 !important;
+  }
+
+  slideshow-arrow button {
+    width: clamp(48px, 8vw, 64px);
+    height: clamp(48px, 8vw, 64px);
+    min-width: 48px;
+    min-height: 48px;
+    background: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 200ms ease-out;
+    cursor: pointer;
+  }
+
+  slideshow-arrow button:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+  }
+
+  slideshow-arrow button svg {
+    width: clamp(20px, 3vw, 28px);
+    height: clamp(20px, 3vw, 28px);
+    stroke: white;
+    stroke-width: 2;
   }
 
 
