@@ -9,7 +9,7 @@
 %}
 
 <section
-  id="carousel-{{ section.id }}"
+  id="{% if section.settings.section_anchor != blank %}{{ section.settings.section_anchor }}{% else %}carousel-{{ section.id }}{% endif %}"
   class="bless-carousel bless-overlay-30"
   data-section-id="{{ section.id }}"
 >
@@ -329,6 +329,13 @@
       "label": "Section Heading",
       "placeholder": "Featured Products",
       "default": "Explore Our Collection"
+    },
+    {
+      "type": "text",
+      "id": "section_anchor",
+      "label": "Section anchor ID (optional)",
+      "placeholder": "e.g., carousel-section",
+      "info": "Use this to create a linkable anchor. Leave blank to use default ID."
     },
     {
       "type": "header",
