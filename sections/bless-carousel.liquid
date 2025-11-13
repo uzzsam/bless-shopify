@@ -54,11 +54,6 @@
         {% assign product_count = product_count | plus: 1 %}
         {% assign slide_index = slide_index | plus: 1 %}
       {% endif %}
-      {% if section.settings.product_8 %}
-        {% render 'carousel-product-slide', product: section.settings.product_8, index: slide_index %}
-        {% assign product_count = product_count | plus: 1 %}
-        {% assign slide_index = slide_index | plus: 1 %}
-      {% endif %}
     {% endcapture %}
 
     {% if product_count > 0 %}
@@ -115,6 +110,24 @@
   slideshow-component {
     display: block;
     width: 100%;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  slideshow-component[dragging] {
+    cursor: grabbing;
+  }
+
+  slideshow-component:not([dragging]) {
+    cursor: grab;
+  }
+
+  slideshow-slides {
+    display: flex;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
   }
 
   .bless-carousel__slide {
@@ -375,11 +388,6 @@
       "type": "product",
       "id": "product_7",
       "label": "Product 7"
-    },
-    {
-      "type": "product",
-      "id": "product_8",
-      "label": "Product 8"
     },
     {
       "type": "header",
