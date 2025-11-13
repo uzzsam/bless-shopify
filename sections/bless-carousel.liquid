@@ -82,6 +82,7 @@
   .bless-carousel {
     width: 100%;
     padding: clamp(2rem, 5vw, 4rem) 0;
+    backdrop-filter: blur(15px);
   }
 
   .bless-carousel__wrapper {
@@ -462,9 +463,9 @@
       "type": "range",
       "id": "autoplay_speed",
       "label": "Autoplay speed (ms)",
-      "default": 5000,
-      "min": 2000,
-      "max": 9500,
+      "default": 8000,
+      "min": 3000,
+      "max": 20000,
       "step": 500,
       "unit": "ms"
     }
