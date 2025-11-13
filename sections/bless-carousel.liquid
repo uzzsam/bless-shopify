@@ -128,6 +128,7 @@
   slideshow-container {
     position: relative;
     overflow: visible;
+    width: 100%;
   }
 
   slideshow-component[dragging] {
@@ -140,16 +141,14 @@
 
   slideshow-slides {
     display: flex;
-    scroll-snap-type: none;
-    scroll-behavior: auto;
+    scroll-snap-type: x proximity;
+    scroll-behavior: smooth;
     overscroll-behavior: contain;
-    transform: translateX(0);
-    will-change: transform;
   }
 
   .bless-carousel__slide {
     flex-shrink: 0;
-    scroll-snap-align: none;
+    scroll-snap-align: start;
     width: 100%;
     min-height: 100%;
     height: 100%;
@@ -403,57 +402,6 @@
       }
     });
 
-    // Smooth infinite scroll implementation
-    const slideshowComponent = document.querySelector('.bless-carousel__slideshow');
-    const slideshowSlides = slideshowComponent?.querySelector('slideshow-slides');
-
-    if (slideshowSlides) {
-      const originalSlides = Array.from(slideshowSlides.querySelectorAll('slideshow-slide'));
-
-      if (originalSlides.length > 0) {
-        // Clone slides to create seamless infinite loop
-        originalSlides.forEach(slide => {
-          const clone = slide.cloneNode(true);
-          slideshowSlides.appendChild(clone);
-        });
-
-        // Initialize smooth scrolling
-        let scrollPos = 0;
-        let isScrolling = true;
-        const scrollSpeed = 0.3; // pixels per frame (adjust for speed)
-        const slideWidth = originalSlides[0].offsetWidth;
-        const gap = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--slideshow-gap')) || 16;
-        const itemWidth = slideWidth + gap;
-        const resetPoint = itemWidth * originalSlides.length;
-
-        function animate() {
-          if (isScrolling) {
-            scrollPos -= scrollSpeed;
-
-            // Reset to start when we've scrolled past all original items
-            if (scrollPos <= -resetPoint) {
-              scrollPos = 0;
-            }
-
-            slideshowSlides.style.transform = `translateX(${scrollPos}px)`;
-          }
-
-          requestAnimationFrame(animate);
-        }
-
-        // Pause on hover
-        slideshowComponent.addEventListener('mouseenter', () => {
-          isScrolling = false;
-        });
-
-        slideshowComponent.addEventListener('mouseleave', () => {
-          isScrolling = true;
-        });
-
-        // Start animation
-        animate();
-      }
-    }
   });
 })();
 {% endjavascript %}
