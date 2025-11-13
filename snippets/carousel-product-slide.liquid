@@ -1,0 +1,54 @@
+<div class="bless-carousel__slide">
+  <div
+    class="bless-carousel__card"
+    data-product-id="{{ product.id }}"
+    data-product-url="{{ product.url }}"
+  >
+    <!-- Image Container with hover swap -->
+    <div class="bless-carousel__image-container">
+      {% if product.featured_image %}
+        <!-- Primary Image -->
+        <img
+          src="{{ product.featured_image | image_url: width: 600 }}"
+          alt="{{ product.title | escape }}"
+          width="600"
+          height="600"
+          class="bless-carousel__image bless-carousel__image--primary"
+          data-primary-image
+          loading="lazy"
+        >
+      {% endif %}
+
+      <!-- Secondary Image (shown on hover) -->
+      {% if product.images.size > 1 %}
+        {% assign second_image = product.images[1] %}
+        <img
+          src="{{ second_image | image_url: width: 600 }}"
+          alt="{{ product.title | escape }}"
+          width="600"
+          height="600"
+          class="bless-carousel__image bless-carousel__image--secondary"
+          data-secondary-image
+          loading="lazy"
+        >
+      {% endif %}
+    </div>
+
+    <!-- Card Content -->
+    <div class="bless-carousel__content">
+      <h3 class="bless-carousel__product-title">
+        {{ product.title | escape }}
+      </h3>
+
+      {% if product.description != blank %}
+        <p class="bless-carousel__product-description">
+          {{ product.description | strip_html | truncatewords: 20 }}
+        </p>
+      {% endif %}
+
+      <a href="{{ product.url }}" class="bless-carousel__link">
+        View Product
+      </a>
+    </div>
+  </div>
+</div>

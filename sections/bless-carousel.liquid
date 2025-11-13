@@ -4,34 +4,8 @@
   assign show_autoplay = section.settings.show_autoplay | default: false
   assign autoplay_speed = section.settings.autoplay_speed | default: 5000
   assign heading = section.settings.heading
+  assign product_count = 0
 %}
-
-{% assign products = "" | split: "" %}
-
-{% if section.settings.product_1 %}
-  {% assign products = products | push: section.settings.product_1 %}
-{% endif %}
-{% if section.settings.product_2 %}
-  {% assign products = products | push: section.settings.product_2 %}
-{% endif %}
-{% if section.settings.product_3 %}
-  {% assign products = products | push: section.settings.product_3 %}
-{% endif %}
-{% if section.settings.product_4 %}
-  {% assign products = products | push: section.settings.product_4 %}
-{% endif %}
-{% if section.settings.product_5 %}
-  {% assign products = products | push: section.settings.product_5 %}
-{% endif %}
-{% if section.settings.product_6 %}
-  {% assign products = products | push: section.settings.product_6 %}
-{% endif %}
-{% if section.settings.product_7 %}
-  {% assign products = products | push: section.settings.product_7 %}
-{% endif %}
-{% if section.settings.product_8 %}
-  {% assign products = products | push: section.settings.product_8 %}
-{% endif %}
 
 <section
   id="carousel-{{ section.id }}"
@@ -43,71 +17,47 @@
       <h2 class="bless-carousel__heading">{{ heading | escape }}</h2>
     {% endif %}
 
-    {% if products.size > 0 %}
-      {% capture slides %}
-        {% for product in products %}
-          <div class="bless-carousel__slide">
-            <div
-              class="bless-carousel__card"
-              data-product-id="{{ product.id }}"
-              data-product-url="{{ product.url }}"
-            >
-              <!-- Image Container with hover swap -->
-              <div class="bless-carousel__image-container">
-                {% if product.featured_image %}
-                  <!-- Primary Image -->
-                  <img
-                    src="{{ product.featured_image | image_url: width: 600 }}"
-                    alt="{{ product.title | escape }}"
-                    width="600"
-                    height="600"
-                    class="bless-carousel__image bless-carousel__image--primary"
-                    data-primary-image
-                    loading="lazy"
-                  >
-                {% endif %}
+    {% capture slides %}
+      {% if section.settings.product_1 %}
+        {% include 'carousel-product-slide', product: section.settings.product_1 %}
+        {% assign product_count = product_count | plus: 1 %}
+      {% endif %}
+      {% if section.settings.product_2 %}
+        {% include 'carousel-product-slide', product: section.settings.product_2 %}
+        {% assign product_count = product_count | plus: 1 %}
+      {% endif %}
+      {% if section.settings.product_3 %}
+        {% include 'carousel-product-slide', product: section.settings.product_3 %}
+        {% assign product_count = product_count | plus: 1 %}
+      {% endif %}
+      {% if section.settings.product_4 %}
+        {% include 'carousel-product-slide', product: section.settings.product_4 %}
+        {% assign product_count = product_count | plus: 1 %}
+      {% endif %}
+      {% if section.settings.product_5 %}
+        {% include 'carousel-product-slide', product: section.settings.product_5 %}
+        {% assign product_count = product_count | plus: 1 %}
+      {% endif %}
+      {% if section.settings.product_6 %}
+        {% include 'carousel-product-slide', product: section.settings.product_6 %}
+        {% assign product_count = product_count | plus: 1 %}
+      {% endif %}
+      {% if section.settings.product_7 %}
+        {% include 'carousel-product-slide', product: section.settings.product_7 %}
+        {% assign product_count = product_count | plus: 1 %}
+      {% endif %}
+      {% if section.settings.product_8 %}
+        {% include 'carousel-product-slide', product: section.settings.product_8 %}
+        {% assign product_count = product_count | plus: 1 %}
+      {% endif %}
+    {% endcapture %}
 
-                <!-- Secondary Image (shown on hover) -->
-                {% if product.images.size > 1 %}
-                  {% assign second_image = product.images[1] %}
-                  <img
-                    src="{{ second_image | image_url: width: 600 }}"
-                    alt="{{ product.title | escape }}"
-                    width="600"
-                    height="600"
-                    class="bless-carousel__image bless-carousel__image--secondary"
-                    data-secondary-image
-                    loading="lazy"
-                  >
-                {% endif %}
-              </div>
-
-              <!-- Card Content -->
-              <div class="bless-carousel__content">
-                <h3 class="bless-carousel__product-title">
-                  {{ product.title | escape }}
-                </h3>
-
-                {% if product.description != blank %}
-                  <p class="bless-carousel__product-description">
-                    {{ product.description | strip_html | truncatewords: 20 }}
-                  </p>
-                {% endif %}
-
-                <a href="{{ product.url }}" class="bless-carousel__link">
-                  View Product
-                </a>
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-      {% endcapture %}
-
+    {% if product_count > 0 %}
       {% capture slideshow_style %}height: {{ carousel_height }}px;{% endcapture %}
 
       {% render 'slideshow',
         slides: slides,
-        slide_count: products.size,
+        slide_count: product_count,
         show_arrows: show_arrows,
         autoplay: show_autoplay,
         autoplay_speed: autoplay_speed,
@@ -117,7 +67,7 @@
       %}
     {% else %}
       <div class="bless-carousel__empty">
-        <p>No products found in this collection. Please select a collection with products.</p>
+        <p>No products selected. Please select products in the section settings.</p>
       </div>
     {% endif %}
   </div>
