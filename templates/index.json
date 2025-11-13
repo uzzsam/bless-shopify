@@ -105,6 +105,7 @@
       "name": "Bless Carousel",
       "settings": {
         "heading": "Carry your Sidthie with you",
+        "section_anchor": "bless-product",
         "product_1": "lumasara",
         "product_2": "morasara",
         "product_3": "nalamera",
@@ -112,11 +113,10 @@
         "product_5": "olanwela",
         "product_6": "rakawela",
         "product_7": "welamora",
-        "product_8": "",
         "carousel_height": 750,
         "show_arrows": true,
         "show_autoplay": true,
-        "autoplay_speed": 5000
+        "autoplay_speed": 2500
       }
     }
   },
