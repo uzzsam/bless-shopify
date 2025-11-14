@@ -89,7 +89,6 @@
   .bless-carousel {
     width: 100%;
     padding: clamp(2rem, 5vw, 4rem) 0;
-    backdrop-filter: blur(15px);
   }
 
   .bless-carousel__wrapper {
@@ -134,11 +133,12 @@
     position: absolute;
     left: 0;
     top: 0;
+    transition: transform 0.6s ease-out;
   }
 
-  /* One-way behavior - smooth transitions */
-  [data-carousel-behavior="one-way"] .bless-carousel__track {
-    transition: transform 0.5s ease-out;
+  /* Remove transition during auto-scroll */
+  .bless-carousel__track.no-transition {
+    transition: none !important;
   }
 
   .bless-carousel__slide {
@@ -397,6 +397,13 @@
       currentIndex = index;
     }
 
+    // Determine how many slides are visible at once
+    function getVisibleSlides() {
+      var viewportWidth = carousel.querySelector('.bless-carousel__viewport').offsetWidth;
+      var slideWidth = getSlideWidth();
+      return Math.round(viewportWidth / slideWidth);
+    }
+
     function nextSlide() {
       console.log('Next slide clicked, current index:', currentIndex);
       
@@ -409,24 +416,34 @@
           animationId = null;
         }
         
+        // Remove no-transition class to enable smooth animation
+        track.classList.remove('no-transition');
+        
+        // Calculate max index to avoid showing clones
+        var visibleSlides = getVisibleSlides();
+        var maxIndex = totalOriginalSlides - visibleSlides;
+        
         currentIndex++;
         
-        // Wrap around if we've gone past all slides
-        if (currentIndex >= totalOriginalSlides) {
+        // Wrap around if we've gone past the max index
+        if (currentIndex > maxIndex) {
           currentIndex = 0;
         }
         
         slideToIndex(currentIndex);
         
-        // Resume auto-scroll after a short delay
+        // Resume auto-scroll after transition completes
         if (wasScrolling) {
           setTimeout(function() {
+            track.classList.add('no-transition');
             isScrolling = true;
             scroll();
-          }, 100);
+          }, 700);
         }
       } else {
-        if (currentIndex < totalOriginalSlides - 1) {
+        var visibleSlides = getVisibleSlides();
+        var maxIndex = totalOriginalSlides - visibleSlides;
+        if (currentIndex < maxIndex) {
           currentIndex++;
           slideToIndex(currentIndex);
         }
@@ -445,21 +462,29 @@
           animationId = null;
         }
         
+        // Remove no-transition class to enable smooth animation
+        track.classList.remove('no-transition');
+        
+        // Calculate max index to avoid showing clones
+        var visibleSlides = getVisibleSlides();
+        var maxIndex = totalOriginalSlides - visibleSlides;
+        
         currentIndex--;
         
         // Wrap around if we've gone before first slide
         if (currentIndex < 0) {
-          currentIndex = totalOriginalSlides - 1;
+          currentIndex = maxIndex;
         }
         
         slideToIndex(currentIndex);
         
-        // Resume auto-scroll after a short delay
+        // Resume auto-scroll after transition completes
         if (wasScrolling) {
           setTimeout(function() {
+            track.classList.add('no-transition');
             isScrolling = true;
             scroll();
-          }, 100);
+          }, 700);
         }
       } else {
         if (currentIndex > 0) {
@@ -471,6 +496,9 @@
 
     // Pause on hover for infinite scroll
     if (behavior === 'infinite') {
+      // Add no-transition class for auto-scroll
+      track.classList.add('no-transition');
+      
       carousel.addEventListener('mouseenter', function() {
         isScrolling = false;
         if (animationId) {
@@ -480,6 +508,7 @@
       });
 
       carousel.addEventListener('mouseleave', function() {
+        track.classList.add('no-transition');
         isScrolling = true;
         if (!animationId) {
           scroll();
@@ -701,7 +730,7 @@
       "type": "range",
       "id": "scroll_speed",
       "label": "Scroll speed (infinite loop only)",
-      "default": 0.5,
+      "default": 0.3,
       "min": 0.1,
       "max": 2,
       "step": 0.1,
