@@ -319,33 +319,225 @@
   }
 {% endstylesheet %}
 
-{% javascript %}
-(function() {
-  const isTouchDevice = () => {
-    return (('ontouchstart' in window) ||
-            (navigator.maxTouchPoints > 0) ||
-            (navigator.msMaxTouchPoints > 0));
-  };
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize carousel for section {{ section.id }}
+    var carousel = document.querySelector('[data-section-id="{{ section.id }}"]');
+    if (!carousel) return;
 
-  document.addEventListener('DOMContentLoaded', () => {
-    // Handle image swapping for touch devices
-    const cards = document.querySelectorAll('.bless-carousel__card');
-    cards.forEach(card => {
-      const primaryImg = card.querySelector('[data-primary-image]');
-      const secondaryImg = card.querySelector('[data-secondary-image]');
+    var track = carousel.querySelector('.bless-carousel__track');
+    var slides = Array.prototype.slice.call(carousel.querySelectorAll('.bless-carousel__slide'));
+    var prevButton = carousel.querySelector('.bless-carousel__arrow--prev');
+    var nextButton = carousel.querySelector('.bless-carousel__arrow--next');
+    var behavior = carousel.getAttribute('data-carousel-behavior') || 'infinite';
+    var scrollSpeed = parseFloat(carousel.getAttribute('data-scroll-speed')) || 0.5;
+    
+    if (!track || slides.length === 0) {
+      console.log('Carousel: No track or slides found');
+      return;
+    }
 
-      if (!secondaryImg) return;
+    console.log('Carousel initialized with ' + slides.length + ' slides, behavior: ' + behavior);
 
-      if (isTouchDevice()) {
-        let imageToggled = false;
+    var position = 0;
+    var animationId = null;
+    var isScrolling = (behavior === 'infinite');
+    var currentIndex = 0;
 
-        card.addEventListener('click', (e) => {
-          if (e.target.closest('.bless-carousel__link')) {
-            return;
+    // Clone slides for infinite loop
+    if (behavior === 'infinite') {
+      slides.forEach(function(slide) {
+        var clone = slide.cloneNode(true);
+        clone.setAttribute('aria-hidden', 'true');
+        track.appendChild(clone);
+      });
+      console.log('Cloned slides for infinite loop');
+    }
+
+    function getSlideWidth() {
+      if (!slides[0]) return 0;
+      var slideWidth = slides[0].offsetWidth;
+      var trackStyle = window.getComputedStyle(track);
+      var gap = parseFloat(trackStyle.gap) || parseFloat(trackStyle.columnGap) || 0;
+      return slideWidth + gap;
+    }
+
+    function scroll() {
+      if (!isScrolling) return;
+
+      position -= scrollSpeed;
+      var slideWidth = getSlideWidth();
+      var resetPoint = -slideWidth * slides.length;
+
+      if (position <= resetPoint) {
+        position = 0;
+      }
+
+      track.style.transform = 'translateX(' + position + 'px)';
+      animationId = requestAnimationFrame(scroll);
+    }
+
+    function slideToIndex(index) {
+      var slideWidth = getSlideWidth();
+      position = -slideWidth * index;
+      track.style.transform = 'translateX(' + position + 'px)';
+      currentIndex = index;
+    }
+
+    function nextSlide() {
+      console.log('Next slide clicked');
+      var slideWidth = getSlideWidth();
+      
+      if (behavior === 'infinite') {
+        position -= slideWidth;
+        var resetPoint = -slideWidth * slides.length;
+        if (position <= resetPoint) {
+          position = 0;
+        }
+        track.style.transform = 'translateX(' + position + 'px)';
+      } else {
+        if (currentIndex < slides.length - 1) {
+          currentIndex++;
+          slideToIndex(currentIndex);
+        }
+      }
+    }
+
+    function prevSlide() {
+      console.log('Prev slide clicked');
+      var slideWidth = getSlideWidth();
+      
+      if (behavior === 'infinite') {
+        position += slideWidth;
+        if (position > 0) {
+          position = -slideWidth * (slides.length - 1);
+        }
+        track.style.transform = 'translateX(' + position + 'px)';
+      } else {
+        if (currentIndex > 0) {
+          currentIndex--;
+          slideToIndex(currentIndex);
+        }
+      }
+    }
+
+    // Pause on hover for infinite scroll
+    if (behavior === 'infinite') {
+      carousel.addEventListener('mouseenter', function() {
+        isScrolling = false;
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+          animationId = null;
+        }
+      });
+
+      carousel.addEventListener('mouseleave', function() {
+        isScrolling = true;
+        if (!animationId) {
+          scroll();
+        }
+      });
+
+      // Start infinite scroll
+      console.log('Starting infinite scroll');
+      scroll();
+    }
+
+    // Arrow buttons
+    if (prevButton) {
+      prevButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        prevSlide();
+      });
+      console.log('Prev button event attached');
+    }
+
+    if (nextButton) {
+      nextButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        nextSlide();
+      });
+      console.log('Next button event attached');
+    }
+
+    // Touch/drag support
+    var isDragging = false;
+    var startX = 0;
+    var currentTranslate = 0;
+    var prevTranslate = 0;
+
+    function dragStart(e) {
+      if (behavior === 'infinite') {
+        isScrolling = false;
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+          animationId = null;
+        }
+      }
+      isDragging = true;
+      startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+      prevTranslate = position;
+      track.style.cursor = 'grabbing';
+    }
+
+    function drag(e) {
+      if (!isDragging) return;
+      if (e.cancelable) e.preventDefault();
+      var currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+      var diff = currentX - startX;
+      currentTranslate = prevTranslate + diff;
+      track.style.transform = 'translateX(' + currentTranslate + 'px)';
+    }
+
+    function dragEnd() {
+      if (!isDragging) return;
+      isDragging = false;
+      track.style.cursor = 'grab';
+      
+      var movedBy = currentTranslate - prevTranslate;
+      
+      if (behavior === 'infinite') {
+        position = currentTranslate;
+        isScrolling = true;
+        if (!animationId) {
+          scroll();
+        }
+      } else {
+        if (Math.abs(movedBy) > 50) {
+          if (movedBy > 0 && currentIndex > 0) {
+            currentIndex--;
+          } else if (movedBy < 0 && currentIndex < slides.length - 1) {
+            currentIndex++;
           }
+        }
+        slideToIndex(currentIndex);
+      }
+    }
 
+    track.addEventListener('mousedown', dragStart);
+    track.addEventListener('touchstart', dragStart, { passive: true });
+    track.addEventListener('mousemove', drag);
+    track.addEventListener('touchmove', drag, { passive: false });
+    track.addEventListener('mouseup', dragEnd);
+    track.addEventListener('touchend', dragEnd);
+    track.addEventListener('mouseleave', dragEnd);
+
+    // Image swapping for touch devices
+    var isTouchDevice = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+    
+    if (isTouchDevice) {
+      var cards = carousel.querySelectorAll('.bless-carousel__card');
+      cards.forEach(function(card) {
+        var primaryImg = card.querySelector('[data-primary-image]');
+        var secondaryImg = card.querySelector('[data-secondary-image]');
+        if (!secondaryImg) return;
+
+        var imageToggled = false;
+        card.addEventListener('click', function(e) {
+          if (e.target.closest('.bless-carousel__link')) return;
           e.preventDefault();
-
           if (!imageToggled) {
             primaryImg.style.opacity = '0';
             secondaryImg.style.opacity = '1';
@@ -354,221 +546,10 @@
             window.location.href = card.dataset.productUrl;
           }
         });
-
-        card.addEventListener('blur', () => {
-          imageToggled = false;
-          primaryImg.style.opacity = '1';
-          secondaryImg.style.opacity = '0';
-        });
-      }
-    });
-
-    // Initialize carousel
-    const carousels = document.querySelectorAll('.bless-carousel');
-    
-    carousels.forEach(carousel => {
-      const track = carousel.querySelector('.bless-carousel__track');
-      const slides = Array.from(carousel.querySelectorAll('.bless-carousel__slide'));
-      const prevButton = carousel.querySelector('.bless-carousel__arrow--prev');
-      const nextButton = carousel.querySelector('.bless-carousel__arrow--next');
-      const behavior = carousel.dataset.carouselBehavior || 'infinite';
-      const scrollSpeed = parseFloat(carousel.dataset.scrollSpeed) || 0.5;
-      
-      if (!track || slides.length === 0) {
-        console.log('Carousel: No track or slides found');
-        return;
-      }
-
-      console.log('Carousel initialized with', slides.length, 'slides');
-
-      let position = 0;
-      let animationId = null;
-      let isScrolling = behavior === 'infinite';
-      let currentIndex = 0;
-
-      // Clone slides for infinite loop
-      if (behavior === 'infinite') {
-        slides.forEach(slide => {
-          const clone = slide.cloneNode(true);
-          clone.setAttribute('aria-hidden', 'true');
-          track.appendChild(clone);
-        });
-        console.log('Cloned slides for infinite loop');
-      }
-
-      function getSlideWidth() {
-        if (!slides[0]) return 0;
-        const slideWidth = slides[0].offsetWidth;
-        const gap = parseFloat(getComputedStyle(track).gap) || 0;
-        return slideWidth + gap;
-      }
-
-      function scroll() {
-        if (!isScrolling) return;
-
-        position -= scrollSpeed;
-        const slideWidth = getSlideWidth();
-        const resetPoint = -slideWidth * slides.length;
-
-        if (position <= resetPoint) {
-          position = 0;
-        }
-
-        track.style.transform = `translateX(${position}px)`;
-        animationId = requestAnimationFrame(scroll);
-      }
-
-      function slideToIndex(index) {
-        const slideWidth = getSlideWidth();
-        position = -slideWidth * index;
-        track.style.transform = `translateX(${position}px)`;
-        currentIndex = index;
-      }
-
-      function nextSlide() {
-        console.log('Next slide clicked');
-        if (behavior === 'infinite') {
-          const slideWidth = getSlideWidth();
-          position -= slideWidth;
-          
-          const resetPoint = -slideWidth * slides.length;
-          if (position <= resetPoint) {
-            position = 0;
-          }
-          
-          track.style.transform = `translateX(${position}px)`;
-        } else {
-          if (currentIndex < slides.length - 1) {
-            currentIndex++;
-            slideToIndex(currentIndex);
-          }
-        }
-      }
-
-      function prevSlide() {
-        console.log('Prev slide clicked');
-        if (behavior === 'infinite') {
-          const slideWidth = getSlideWidth();
-          position += slideWidth;
-          
-          if (position > 0) {
-            position = -slideWidth * (slides.length - 1);
-          }
-          
-          track.style.transform = `translateX(${position}px)`;
-        } else {
-          if (currentIndex > 0) {
-            currentIndex--;
-            slideToIndex(currentIndex);
-          }
-        }
-      }
-
-      // Pause on hover for infinite scroll
-      if (behavior === 'infinite') {
-        carousel.addEventListener('mouseenter', () => {
-          isScrolling = false;
-          if (animationId) {
-            cancelAnimationFrame(animationId);
-            animationId = null;
-          }
-        });
-
-        carousel.addEventListener('mouseleave', () => {
-          isScrolling = true;
-          if (!animationId) {
-            scroll();
-          }
-        });
-
-        // Start infinite scroll
-        scroll();
-      }
-
-      // Arrow buttons
-      if (prevButton) {
-        prevButton.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          prevSlide();
-        });
-        console.log('Prev button event attached');
-      }
-
-      if (nextButton) {
-        nextButton.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          nextSlide();
-        });
-        console.log('Next button event attached');
-      }
-
-      // Touch/drag support
-      let isDragging = false;
-      let startX = 0;
-      let currentTranslate = 0;
-      let prevTranslate = 0;
-
-      track.addEventListener('mousedown', dragStart);
-      track.addEventListener('touchstart', dragStart, { passive: true });
-      track.addEventListener('mousemove', drag);
-      track.addEventListener('touchmove', drag, { passive: false });
-      track.addEventListener('mouseup', dragEnd);
-      track.addEventListener('touchend', dragEnd);
-      track.addEventListener('mouseleave', dragEnd);
-
-      function dragStart(e) {
-        if (behavior === 'infinite') {
-          isScrolling = false;
-          if (animationId) {
-            cancelAnimationFrame(animationId);
-            animationId = null;
-          }
-        }
-        isDragging = true;
-        startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
-        prevTranslate = position;
-        track.style.cursor = 'grabbing';
-      }
-
-      function drag(e) {
-        if (!isDragging) return;
-        if (e.cancelable) e.preventDefault();
-        const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
-        const diff = currentX - startX;
-        currentTranslate = prevTranslate + diff;
-        track.style.transform = `translateX(${currentTranslate}px)`;
-      }
-
-      function dragEnd() {
-        if (!isDragging) return;
-        isDragging = false;
-        track.style.cursor = 'grab';
-        
-        const movedBy = currentTranslate - prevTranslate;
-        
-        if (behavior === 'infinite') {
-          position = currentTranslate;
-          isScrolling = true;
-          if (!animationId) {
-            scroll();
-          }
-        } else {
-          if (Math.abs(movedBy) > 50) {
-            if (movedBy > 0 && currentIndex > 0) {
-              currentIndex--;
-            } else if (movedBy < 0 && currentIndex < slides.length - 1) {
-              currentIndex++;
-            }
-          }
-          slideToIndex(currentIndex);
-        }
-      }
-    });
+      });
+    }
   });
-})();
-{% endjavascript %}
+</script>
 
 {% schema %}
 {
