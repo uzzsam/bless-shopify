@@ -354,12 +354,14 @@
     var animationId = null;
     var isScrolling = (behavior === 'infinite');
     var currentIndex = 0;
+    var totalOriginalSlides = slides.length;
 
     // Clone slides for infinite loop
     if (behavior === 'infinite') {
       slides.forEach(function(slide) {
         var clone = slide.cloneNode(true);
         clone.setAttribute('aria-hidden', 'true');
+        clone.classList.add('bless-carousel__slide--clone');
         track.appendChild(clone);
       });
       console.log('Cloned slides for infinite loop');
@@ -378,7 +380,7 @@
 
       position -= scrollSpeed;
       var slideWidth = getSlideWidth();
-      var resetPoint = -slideWidth * slides.length;
+      var resetPoint = -slideWidth * totalOriginalSlides;
 
       if (position <= resetPoint) {
         position = 0;
@@ -396,18 +398,35 @@
     }
 
     function nextSlide() {
-      console.log('Next slide clicked');
-      var slideWidth = getSlideWidth();
+      console.log('Next slide clicked, current index:', currentIndex);
       
       if (behavior === 'infinite') {
-        position -= slideWidth;
-        var resetPoint = -slideWidth * slides.length;
-        if (position <= resetPoint) {
-          position = 0;
+        // Stop auto-scroll temporarily
+        var wasScrolling = isScrolling;
+        isScrolling = false;
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+          animationId = null;
         }
-        track.style.transform = 'translateX(' + position + 'px)';
+        
+        currentIndex++;
+        
+        // Wrap around if we've gone past all slides
+        if (currentIndex >= totalOriginalSlides) {
+          currentIndex = 0;
+        }
+        
+        slideToIndex(currentIndex);
+        
+        // Resume auto-scroll after a short delay
+        if (wasScrolling) {
+          setTimeout(function() {
+            isScrolling = true;
+            scroll();
+          }, 100);
+        }
       } else {
-        if (currentIndex < slides.length - 1) {
+        if (currentIndex < totalOriginalSlides - 1) {
           currentIndex++;
           slideToIndex(currentIndex);
         }
@@ -415,15 +434,33 @@
     }
 
     function prevSlide() {
-      console.log('Prev slide clicked');
-      var slideWidth = getSlideWidth();
+      console.log('Prev slide clicked, current index:', currentIndex);
       
       if (behavior === 'infinite') {
-        position += slideWidth;
-        if (position > 0) {
-          position = -slideWidth * (slides.length - 1);
+        // Stop auto-scroll temporarily
+        var wasScrolling = isScrolling;
+        isScrolling = false;
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+          animationId = null;
         }
-        track.style.transform = 'translateX(' + position + 'px)';
+        
+        currentIndex--;
+        
+        // Wrap around if we've gone before first slide
+        if (currentIndex < 0) {
+          currentIndex = totalOriginalSlides - 1;
+        }
+        
+        slideToIndex(currentIndex);
+        
+        // Resume auto-scroll after a short delay
+        if (wasScrolling) {
+          setTimeout(function() {
+            isScrolling = true;
+            scroll();
+          }, 100);
+        }
       } else {
         if (currentIndex > 0) {
           currentIndex--;
