@@ -66,7 +66,7 @@
       "settings": {
         "video_overlay": "shopify://files/videos/thank-you.mp4",
         "sound_icon": "shopify://shop_images/sound_white.png",
-        "content_padding_top": 40,
+        "content_padding_top": 0,
         "content_padding_bottom": 48,
         "heading": "Thank You",
         "subheading": "Sidthies",
