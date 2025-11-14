@@ -5,76 +5,65 @@
   assign autoplay_speed_ms = section.settings.autoplay_speed | default: 5000
   assign autoplay_speed = autoplay_speed_ms | divided_by: 1000
   assign carousel_behavior = section.settings.carousel_behavior | default: 'infinite'
+  assign scroll_speed = section.settings.scroll_speed | default: 0.5
   assign heading = section.settings.heading
   assign product_count = 0
   assign slide_index = 0
-  assign use_infinite = true
-  if carousel_behavior == 'one-way'
-    assign use_infinite = false
-  endif
 %}
 
 <section
   id="{% if section.settings.section_anchor != blank %}{{ section.settings.section_anchor }}{% else %}carousel-{{ section.id }}{% endif %}"
   class="bless-carousel bless-overlay-30"
   data-section-id="{{ section.id }}"
+  data-carousel-behavior="{{ carousel_behavior }}"
+  data-scroll-speed="{{ scroll_speed }}"
 >
   <div class="bless-carousel__wrapper">
     {% if heading != blank %}
       <h2 class="bless-carousel__heading">{{ heading | escape }}</h2>
     {% endif %}
 
-    {% capture slides %}
-      {% if section.settings.product_1 %}
-        {% render 'carousel-product-slide', product: section.settings.product_1, index: slide_index %}
-        {% assign product_count = product_count | plus: 1 %}
-        {% assign slide_index = slide_index | plus: 1 %}
-      {% endif %}
-      {% if section.settings.product_2 %}
-        {% render 'carousel-product-slide', product: section.settings.product_2, index: slide_index %}
-        {% assign product_count = product_count | plus: 1 %}
-        {% assign slide_index = slide_index | plus: 1 %}
-      {% endif %}
-      {% if section.settings.product_3 %}
-        {% render 'carousel-product-slide', product: section.settings.product_3, index: slide_index %}
-        {% assign product_count = product_count | plus: 1 %}
-        {% assign slide_index = slide_index | plus: 1 %}
-      {% endif %}
-      {% if section.settings.product_4 %}
-        {% render 'carousel-product-slide', product: section.settings.product_4, index: slide_index %}
-        {% assign product_count = product_count | plus: 1 %}
-        {% assign slide_index = slide_index | plus: 1 %}
-      {% endif %}
-      {% if section.settings.product_5 %}
-        {% render 'carousel-product-slide', product: section.settings.product_5, index: slide_index %}
-        {% assign product_count = product_count | plus: 1 %}
-        {% assign slide_index = slide_index | plus: 1 %}
-      {% endif %}
-      {% if section.settings.product_6 %}
-        {% render 'carousel-product-slide', product: section.settings.product_6, index: slide_index %}
-        {% assign product_count = product_count | plus: 1 %}
-        {% assign slide_index = slide_index | plus: 1 %}
-      {% endif %}
-      {% if section.settings.product_7 %}
-        {% render 'carousel-product-slide', product: section.settings.product_7, index: slide_index %}
-        {% assign product_count = product_count | plus: 1 %}
-        {% assign slide_index = slide_index | plus: 1 %}
-      {% endif %}
-    {% endcapture %}
+    {% if product_count > 0 or section.settings.product_1 or section.settings.product_2 or section.settings.product_3 or section.settings.product_4 or section.settings.product_5 or section.settings.product_6 or section.settings.product_7 %}
+      <div class="bless-carousel__container" style="height: {{ carousel_height }}px;">
+        <div class="bless-carousel__track">
+          {% if section.settings.product_1 %}
+            {% render 'carousel-product-slide', product: section.settings.product_1, index: 0 %}
+          {% endif %}
+          {% if section.settings.product_2 %}
+            {% render 'carousel-product-slide', product: section.settings.product_2, index: 1 %}
+          {% endif %}
+          {% if section.settings.product_3 %}
+            {% render 'carousel-product-slide', product: section.settings.product_3, index: 2 %}
+          {% endif %}
+          {% if section.settings.product_4 %}
+            {% render 'carousel-product-slide', product: section.settings.product_4, index: 3 %}
+          {% endif %}
+          {% if section.settings.product_5 %}
+            {% render 'carousel-product-slide', product: section.settings.product_5, index: 4 %}
+          {% endif %}
+          {% if section.settings.product_6 %}
+            {% render 'carousel-product-slide', product: section.settings.product_6, index: 5 %}
+          {% endif %}
+          {% if section.settings.product_7 %}
+            {% render 'carousel-product-slide', product: section.settings.product_7, index: 6 %}
+          {% endif %}
+        </div>
 
-    {% if product_count > 0 %}
-      {% capture slideshow_style %}height: {{ carousel_height }}px;{% endcapture %}
-
-      {% render 'slideshow',
-        slides: slides,
-        slide_count: product_count,
-        show_arrows: show_arrows,
-        autoplay: show_autoplay,
-        autoplay_speed: autoplay_speed,
-        infinite: use_infinite,
-        class: 'bless-carousel__slideshow',
-        style: slideshow_style
-      %}
+        {% if show_arrows %}
+        <div class="bless-carousel__arrows">
+          <button class="bless-carousel__arrow bless-carousel__arrow--prev" aria-label="Previous slide">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="bless-carousel__arrow bless-carousel__arrow--next" aria-label="Next slide">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        {% endif %}
+      </div>
     {% else %}
       <div class="bless-carousel__empty">
         <p>No products selected. Please select products in the section settings.</p>
@@ -109,46 +98,26 @@
     z-index: 1;
   }
 
-  .bless-carousel__slideshow {
-    --slideshow-gap: clamp(1rem, 3vw, 2rem);
-    width: 100%;
+  .bless-carousel__container {
     position: relative;
-  }
-
-  slideshow-component {
-    display: block;
-    width: 100%;
-    touch-action: pan-y;
-    user-select: none;
-    -webkit-user-select: none;
-    position: relative;
-    overflow: visible;
-  }
-
-  slideshow-container {
-    position: relative;
-    overflow: visible;
+    overflow: hidden;
     width: 100%;
   }
 
-  slideshow-component[dragging] {
-    cursor: grabbing;
-  }
-
-  slideshow-component:not([dragging]) {
-    cursor: grab;
-  }
-
-  slideshow-slides {
+  .bless-carousel__track {
     display: flex;
-    scroll-snap-type: x proximity;
-    scroll-behavior: smooth;
-    overscroll-behavior: contain;
+    gap: clamp(1rem, 3vw, 2rem);
+    will-change: transform;
+    transition: none;
+  }
+
+  /* One-way behavior - smooth transitions */
+  [data-carousel-behavior="one-way"] .bless-carousel__track {
+    transition: transform 0.5s ease-out;
   }
 
   .bless-carousel__slide {
     flex-shrink: 0;
-    scroll-snap-align: start;
     width: 100%;
     min-height: 100%;
     height: 100%;
@@ -267,8 +236,59 @@
   .bless-carousel__empty {
     text-align: center;
     padding: clamp(3rem, 5vw, 5rem) 1rem;
-    color: rgba(0, 0, 0, 0.5);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 1rem;
+  }
+
+  /* Navigation Arrows - Always Visible */
+  .bless-carousel__arrows {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10;
+    padding: 0 clamp(1rem, 3vw, 2rem);
+  }
+
+  .bless-carousel__arrow {
+    width: clamp(48px, 8vw, 64px);
+    height: clamp(48px, 8vw, 64px);
+    min-width: 48px;
+    min-height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 200ms ease-out;
+    cursor: pointer;
+    pointer-events: auto;
+    color: white;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .bless-carousel__arrow:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+  }
+
+  .bless-carousel__arrow:active {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(0.95);
+  }
+
+  .bless-carousel__arrow svg {
+    width: clamp(20px, 3vw, 28px);
+    height: clamp(20px, 3vw, 28px);
   }
 
   /* Responsive: Mobile */
@@ -281,81 +301,16 @@
   /* Responsive: Tablet */
   @media (min-width: 600px) and (max-width: 899px) {
     .bless-carousel__slide {
-      width: 50%;
+      width: calc(50% - 0.5rem);
     }
   }
 
   /* Responsive: Desktop */
   @media (min-width: 900px) {
     .bless-carousel__slide {
-      width: calc(33.333% - var(--slideshow-gap));
+      width: calc(33.333% - 1.33rem);
     }
   }
-
-  /* Slideshow component overrides */
-  slideshow-component {
-    --slideshow-gap: clamp(1rem, 3vw, 2rem);
-  }
-
-  /* Slideshow Arrows - Glass Circle Style */
-  slideshow-arrows {
-    opacity: 1 !important;
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    transform: translateY(-50%);
-    display: flex !important;
-    justify-content: space-between;
-    align-items: center;
-    pointer-events: none;
-    z-index: 10;
-    width: 100%;
-    padding: 0 clamp(1rem, 3vw, 2rem);
-    box-sizing: border-box;
-  }
-
-  slideshow-arrow {
-    opacity: 1 !important;
-    pointer-events: auto;
-  }
-
-  slideshow-arrow button {
-    width: clamp(48px, 8vw, 64px);
-    height: clamp(48px, 8vw, 64px);
-    min-width: 48px;
-    min-height: 48px;
-    background: rgba(255, 255, 255, 0.2) !important;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 200ms ease-out;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-
-  slideshow-arrow button:hover {
-    background: rgba(255, 255, 255, 0.3) !important;
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: scale(1.1);
-  }
-
-  slideshow-arrow button:active {
-    background: rgba(255, 255, 255, 0.25) !important;
-    transform: scale(0.95);
-  }
-
-  slideshow-arrow button svg {
-    width: clamp(20px, 3vw, 28px);
-    height: clamp(20px, 3vw, 28px);
-    stroke: white;
-    stroke-width: 2;
-  }
-
-
 {% endstylesheet %}
 
 {% javascript %}
@@ -402,6 +357,173 @@
       }
     });
 
+    // Initialize carousel
+    const carousels = document.querySelectorAll('.bless-carousel');
+    
+    carousels.forEach(carousel => {
+      const track = carousel.querySelector('.bless-carousel__track');
+      const slides = Array.from(carousel.querySelectorAll('.bless-carousel__slide'));
+      const prevButton = carousel.querySelector('.bless-carousel__arrow--prev');
+      const nextButton = carousel.querySelector('.bless-carousel__arrow--next');
+      const behavior = carousel.dataset.carouselBehavior;
+      const scrollSpeed = parseFloat(carousel.dataset.scrollSpeed) || 0.5;
+      
+      if (!track || slides.length === 0) return;
+
+      let position = 0;
+      let animationId = null;
+      let isScrolling = behavior === 'infinite';
+      let currentIndex = 0;
+
+      // Clone slides for infinite loop
+      if (behavior === 'infinite') {
+        slides.forEach(slide => {
+          const clone = slide.cloneNode(true);
+          track.appendChild(clone);
+        });
+      }
+
+      function getSlideWidth() {
+        return slides[0].offsetWidth + parseFloat(getComputedStyle(track).gap) || 0;
+      }
+
+      function scroll() {
+        if (!isScrolling) return;
+
+        position -= scrollSpeed;
+        const slideWidth = getSlideWidth();
+        const resetPoint = -slideWidth * slides.length;
+
+        if (position <= resetPoint) {
+          position = 0;
+        }
+
+        track.style.transform = `translateX(${position}px)`;
+        animationId = requestAnimationFrame(scroll);
+      }
+
+      function slideToIndex(index) {
+        const slideWidth = getSlideWidth();
+        position = -slideWidth * index;
+        track.style.transform = `translateX(${position}px)`;
+        currentIndex = index;
+      }
+
+      function nextSlide() {
+        if (behavior === 'infinite') {
+          // For infinite, just let it continue scrolling
+          return;
+        } else {
+          // For one-way, move to next slide
+          if (currentIndex < slides.length - 1) {
+            currentIndex++;
+            slideToIndex(currentIndex);
+          }
+        }
+      }
+
+      function prevSlide() {
+        if (behavior === 'infinite') {
+          // For infinite, reverse direction temporarily
+          const slideWidth = getSlideWidth();
+          position += slideWidth;
+          track.style.transform = `translateX(${position}px)`;
+        } else {
+          // For one-way, move to previous slide
+          if (currentIndex > 0) {
+            currentIndex--;
+            slideToIndex(currentIndex);
+          }
+        }
+      }
+
+      // Pause on hover for infinite scroll
+      if (behavior === 'infinite') {
+        carousel.addEventListener('mouseenter', () => {
+          isScrolling = false;
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+          }
+        });
+
+        carousel.addEventListener('mouseleave', () => {
+          isScrolling = true;
+          scroll();
+        });
+
+        // Start infinite scroll
+        scroll();
+      }
+
+      // Arrow buttons
+      if (prevButton) {
+        prevButton.addEventListener('click', prevSlide);
+      }
+
+      if (nextButton) {
+        nextButton.addEventListener('click', nextSlide);
+      }
+
+      // Touch/drag support
+      let isDragging = false;
+      let startX = 0;
+      let currentTranslate = 0;
+      let prevTranslate = 0;
+
+      track.addEventListener('mousedown', dragStart);
+      track.addEventListener('touchstart', dragStart);
+      track.addEventListener('mousemove', drag);
+      track.addEventListener('touchmove', drag);
+      track.addEventListener('mouseup', dragEnd);
+      track.addEventListener('touchend', dragEnd);
+      track.addEventListener('mouseleave', dragEnd);
+
+      function dragStart(e) {
+        if (behavior === 'infinite') {
+          isScrolling = false;
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+          }
+        }
+        isDragging = true;
+        startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+        prevTranslate = position;
+        track.style.cursor = 'grabbing';
+      }
+
+      function drag(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+        const diff = currentX - startX;
+        currentTranslate = prevTranslate + diff;
+        track.style.transform = `translateX(${currentTranslate}px)`;
+      }
+
+      function dragEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        track.style.cursor = 'grab';
+        
+        const movedBy = currentTranslate - prevTranslate;
+        
+        if (behavior === 'infinite') {
+          position = currentTranslate;
+          isScrolling = true;
+          scroll();
+        } else {
+          // Snap to nearest slide
+          if (Math.abs(movedBy) > 50) {
+            if (movedBy > 0 && currentIndex > 0) {
+              currentIndex--;
+            } else if (movedBy < 0 && currentIndex < slides.length - 1) {
+              currentIndex++;
+            }
+          }
+          slideToIndex(currentIndex);
+        }
+      }
+    });
   });
 })();
 {% endjavascript %}
@@ -485,23 +607,7 @@
     },
     {
       "type": "header",
-      "content": "Autoplay Settings"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_autoplay",
-      "label": "Enable autoplay",
-      "default": false
-    },
-    {
-      "type": "range",
-      "id": "autoplay_speed",
-      "label": "Autoplay speed (ms)",
-      "default": 8000,
-      "min": 3000,
-      "max": 9500,
-      "step": 500,
-      "unit": "ms"
+      "content": "Carousel Behavior"
     },
     {
       "type": "select",
@@ -510,15 +616,25 @@
       "options": [
         {
           "value": "infinite",
-          "label": "Infinite loop (smooth)"
+          "label": "Infinite loop (continuous scroll)"
         },
         {
           "value": "one-way",
-          "label": "One-way scroll (slides right, then stops)"
+          "label": "One-way scroll (manual navigation)"
         }
       ],
       "default": "infinite",
       "info": "Choose how the carousel advances through products."
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "label": "Scroll speed (infinite loop only)",
+      "default": 0.5,
+      "min": 0.1,
+      "max": 2,
+      "step": 0.1,
+      "info": "Higher = faster scrolling. Only applies to infinite loop mode."
     }
   ],
   "presets": [
