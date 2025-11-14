@@ -110,8 +110,8 @@
         "product_7": "welamora",
         "carousel_height": 750,
         "show_arrows": true,
-        "show_autoplay": true,
-        "autoplay_speed": 3500
+        "carousel_behavior": "infinite",
+        "scroll_speed": 0.9
       }
     }
   },
