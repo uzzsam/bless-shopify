@@ -123,6 +123,7 @@
     flex: 1;
     overflow: hidden;
     height: 100%;
+    position: relative;
   }
 
   .bless-carousel__track {
@@ -130,6 +131,9 @@
     gap: clamp(1rem, 3vw, 2rem);
     will-change: transform;
     height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
   }
 
   /* One-way behavior - smooth transitions */
@@ -142,7 +146,35 @@
     height: 100%;
   }
 
-  /* Card styling with glass design */
+  /* Responsive: Mobile - 1 slide visible */
+  @media (max-width: 599px) {
+    .bless-carousel__slide {
+      width: calc(100vw - 10rem);
+    }
+  }
+
+  /* Responsive: Tablet - 2 slides visible */
+  @media (min-width: 600px) and (max-width: 899px) {
+    .bless-carousel__slide {
+      width: calc((100vw - 12rem) / 2 - 1rem);
+    }
+  }
+
+  /* Responsive: Desktop - 3 slides visible */
+  @media (min-width: 900px) {
+    .bless-carousel__slide {
+      width: calc((100vw - 16rem) / 3 - 1.5rem);
+    }
+    
+    /* Constrained width for max-width container */
+    .bless-carousel__wrapper {
+      max-width: 1400px;
+    }
+    
+    .bless-carousel__slide {
+      width: calc((min(100vw, 1400px) - 16rem) / 3 - 1.5rem);
+    }
+  }
   .bless-carousel__card {
     display: flex;
     flex-direction: column;
@@ -295,27 +327,6 @@
   .bless-carousel__arrow svg {
     width: clamp(20px, 3vw, 28px);
     height: clamp(20px, 3vw, 28px);
-  }
-
-  /* Responsive: Mobile */
-  @media (max-width: 599px) {
-    .bless-carousel__slide {
-      width: calc(100vw - 6rem);
-    }
-  }
-
-  /* Responsive: Tablet */
-  @media (min-width: 600px) and (max-width: 899px) {
-    .bless-carousel__slide {
-      width: calc(50% - 1rem);
-    }
-  }
-
-  /* Responsive: Desktop */
-  @media (min-width: 900px) {
-    .bless-carousel__slide {
-      width: calc(33.333% - 1.33rem);
-    }
   }
 {% endstylesheet %}
 
