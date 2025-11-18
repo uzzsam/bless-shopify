@@ -81,6 +81,8 @@
   assign bless_layout_active = false
   if template contains 'page.bless'
     assign bless_layout_active = true
+  elsif template contains 'page.thanks'
+    assign bless_layout_active = true
   elsif template contains 'index.bless'
     assign bless_layout_active = true
   elsif template == 'index'
