@@ -590,6 +590,8 @@ if (urlBlessingRaw) {
     const price = firstAvailable ? money(firstAvailable.price) : '';
     const hasSecondaryImage = p?.images && p.images.length > 1;
     const description = p.body_html ? p.body_html.replace(/<[^>]*>/g, '').substring(0, 150).trim() : '';
+    const showVariantPrices = {{ section.settings.show_variant_prices | json }};
+    const cartNoteText = {{ section.settings.cart_note | json }};
 
     dynamicBody.innerHTML = `
       <div class="bless-product__details">
@@ -614,7 +616,7 @@ if (urlBlessingRaw) {
               <select class="bless-product__select" data-ajax-variant>
                 ${p.variants.map(v => `
                   <option value="${v.id}" ${v.id===firstAvailable?.id?'selected':''} ${v.available?'':'disabled'}>
-                    ${v.title}${{{ section.settings.show_variant_prices | json }} && v.price ? ` — ${money(v.price)}` : ''}
+                    ${v.title}${showVariantPrices && v.price ? ` — ${money(v.price)}` : ''}
                   </option>
                 `).join('')}
               </select>
@@ -630,7 +632,7 @@ if (urlBlessingRaw) {
               {{ section.settings.button_label | escape }}
             </button>
 
-            ${{{ section.settings.cart_note | json }} ? `<p class="bless-product__note">{{ section.settings.cart_note | escape }}</p>` : ``}
+            ${cartNoteText ? `<p class="bless-product__note">${cartNoteText}</p>` : ``}
           </div>
         </div>
       </div>
