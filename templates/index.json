@@ -62,6 +62,7 @@
     },
     "bless_thank_you_8ERPqR": {
       "type": "bless-thank-you",
+      "disabled": true,
       "name": "Bless thank you",
       "settings": {
         "video_overlay": "shopify://files/videos/thank-you.mp4",
@@ -97,6 +98,7 @@
     },
     "bless_carousel_Ped9qL": {
       "type": "bless-carousel",
+      "disabled": true,
       "name": "Bless Carousel",
       "settings": {
         "heading": "Carry your Sidthie with you",
