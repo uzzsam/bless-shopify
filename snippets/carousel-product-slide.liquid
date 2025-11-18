@@ -46,11 +46,37 @@
         </p>
       {% endif %}
 
-      <a href="{{ product.url }}" class="bless-carousel__link" style="color: white; border-color: white;">
-        View Product
+      <!-- View product link -->
+      <a
+        href="{{ product.url }}"
+        class="bless-carousel__link"
+        style="color: white; border-color: white; margin-bottom: 0.5rem;"
+      >
+        View product
       </a>
+
+      <!-- Add to cart button -->
+      {%- form 'product', product, class: 'bless-carousel__form', novalidate: 'novalidate' -%}
+        <input
+          type="hidden"
+          name="id"
+          value="{{ product.selected_or_first_available_variant.id }}"
+        >
+        <button
+          type="submit"
+          class="bless-carousel__link"
+          style="color: white; border-color: white; margin-top: 0.25rem;"
+        >
+          {{ 'products.product.add_to_cart' | t: default: 'Add to cart' }}
+        </button>
+      {%- endform -%}
     </div>
   </div>
 {% endcapture %}
 
-{% render 'slideshow-slide', index: index, slide_id: product.id, class: 'bless-carousel__slide', children: card_content %}
+{% render 'slideshow-slide',
+  index: index,
+  slide_id: product.id,
+  class: 'bless-carousel__slide',
+  children: card_content
+%}
