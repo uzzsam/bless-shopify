@@ -39,15 +39,33 @@
               {% assign featured_media = product.featured_media %}
               {% case featured_media.media_type %}
                 {% when 'image' %}
-                  {{
-                    featured_media
-                    | image_url: width: 960
-                    | image_tag:
-                      widths: '400, 600, 760, 900',
-                      sizes: '(min-width: 768px) 360px, 80vw',
-                      alt: featured_media.alt | default: product.title,
-                      class: 'bless-product__image'
-                  }}
+                  <div class="bless-product__image-container">
+                    {{
+                      featured_media
+                      | image_url: width: 960
+                      | image_tag:
+                        widths: '400, 600, 760, 900',
+                        sizes: '(min-width: 768px) 360px, 80vw',
+                        alt: featured_media.alt | default: product.title,
+                        class: 'bless-product__image bless-product__image--primary',
+                        data-primary: true
+                    }}
+                    {% if product.media.size > 1 %}
+                      {% assign secondary_media = product.media[1] %}
+                      {% if secondary_media.media_type == 'image' %}
+                        {{
+                          secondary_media
+                          | image_url: width: 960
+                          | image_tag:
+                            widths: '400, 600, 760, 900',
+                            sizes: '(min-width: 768px) 360px, 80vw',
+                            alt: secondary_media.alt | default: product.title,
+                            class: 'bless-product__image bless-product__image--secondary',
+                            data-secondary: true
+                        }}
+                      {% endif %}
+                    {% endif %}
+                  </div>
                 {% when 'video' %}
                   {{
                     featured_media
@@ -72,7 +90,9 @@
                   }}
                 {% else %}
                   <!-- Guard unknown type; avoid media_tag on strings -->
-                  <img class="bless-product__image" src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | escape }}">
+                  <div class="bless-product__image-container">
+                    <img class="bless-product__image bless-product__image--primary" src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | escape }}">
+                  </div>
               {% endcase %}
             </div>
           {% endif %}
@@ -155,9 +175,18 @@
         data-dynamic-card
       >
         <div class="bless-product__dynamic" data-dynamic-body>
-          <p class="bless-product__empty">
-            Choose a Sidthie in the chat above to load its pendant here.
-          </p>
+          <div class="bless-product__empty-state">
+            <div class="bless-product__empty-image">
+              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+                <rect x="10" y="10" width="80" height="80" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" rx="8"/>
+                <path d="M35 45 L50 30 L65 45 M50 30 V55 M35 55 H65" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3 class="bless-product__empty-title">No product selected</h3>
+            <p class="bless-product__empty-message">
+              Select a product from the chat above or choose one using the category picker to see it here.
+            </p>
+          </div>
         </div>
       </div>
     {% endif %}
@@ -222,12 +251,48 @@
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
+  position: relative;
+}
+
+.bless-product__image-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; /* 1:1 aspect ratio */
+  overflow: hidden;
+  border-radius: 24px;
 }
 
 .bless-product__image {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   display: block;
+  transition: opacity 300ms ease-out;
+}
+
+.bless-product__image--primary {
+  opacity: 1;
+  z-index: 1;
+}
+
+.bless-product__image--secondary {
+  opacity: 0;
+  z-index: 0;
+}
+
+/* Hover effect: swap images on desktop */
+@media (hover: hover) and (pointer: fine) {
+  .bless-product__media:hover .bless-product__image--primary {
+    opacity: 0;
+  }
+
+  .bless-product__media:hover .bless-product__image--secondary {
+    opacity: 1;
+  }
 }
 
 .bless-product__video,
@@ -322,6 +387,48 @@
 .bless-product__dynamic {
   text-align: left;
   color: #fff;
+}
+
+.bless-product__empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  min-height: 300px;
+}
+
+.bless-product__empty-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  opacity: 0.5;
+}
+
+.bless-product__empty-image svg {
+  width: 100%;
+  height: 100%;
+}
+
+.bless-product__empty-title {
+  font-family: var(--font-heading, 'Cardo', serif);
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.bless-product__empty-message {
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  font-size: 0.95rem;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 280px;
+  line-height: 1.5;
 }
 
 @media (min-width: 900px) {
@@ -426,10 +533,30 @@ if (urlBlessingRaw) {
     });
   }
 
-  // Prevent submit without blessing (static mode)
-  if (formEl && requireBlessing) {
+  // Handle form submission (static mode)
+  if (formEl) {
     formEl.addEventListener('submit', (event) => {
-      if (!blessingInput?.value) event.preventDefault();
+      // Prevent submit without blessing if required
+      if (requireBlessing && !blessingInput?.value) {
+        event.preventDefault();
+        console.warn('Form submission blocked: blessing required but not provided');
+        return false;
+      }
+
+      // Ensure variant ID is set
+      const variantId = variantInput?.value || variantSelect?.value;
+      if (!variantId) {
+        event.preventDefault();
+        console.error('Form submission blocked: no variant selected');
+        return false;
+      }
+
+      // Update button state for visual feedback
+      const btn = formEl.querySelector('[data-submit]');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Adding to cart...';
+      }
     });
   }
 
@@ -460,27 +587,39 @@ if (urlBlessingRaw) {
   function renderDynamicCard(p) {
     const firstAvailable = p.variants.find(v => v.available) || p.variants[0];
     const price = firstAvailable ? money(firstAvailable.price) : '';
+    const hasSecondaryImage = p?.images && p.images.length > 1;
+    const description = p.body_html ? p.body_html.replace(/<[^>]*>/g, '').substring(0, 150).trim() : '';
 
     dynamicBody.innerHTML = `
       <div class="bless-product__details">
         <div class="bless-product__media">
-          ${p?.images?.[0]?.src
-            ? `<img class="bless-product__image" src="${p.images[0].src}" alt="${p.title}">`
-            : ``}
+          <div class="bless-product__image-container">
+            ${p?.images?.[0]?.src
+              ? `<img class="bless-product__image bless-product__image--primary" src="${p.images[0].src}" alt="${p.title}" data-primary>`
+              : ``}
+            ${hasSecondaryImage && p.images[1]?.src
+              ? `<img class="bless-product__image bless-product__image--secondary" src="${p.images[1].src}" alt="${p.title}" data-secondary>`
+              : ``}
+          </div>
         </div>
         <div class="bless-product__content">
           <h3 class="bless-product__title">${p.title}</h3>
           ${price ? `<p class="bless-product__price">${price}</p>` : ``}
+          ${description ? `<div class="bless-product__description">${description}...</div>` : ``}
 
           <div class="bless-product__form" data-ajax-form>
-            <select class="bless-product__select" data-ajax-variant>
-              ${p.variants.map(v => `
-                <option value="${v.id}" ${v.id===firstAvailable?.id?'selected':''} ${v.available?'':'disabled'}>
-                  ${v.title}${v.compare_at_price ? ` — ${money(v.price)}` : ''}
-                </option>
-              `).join('')}
-            </select>
+            ${p.variants.length > 1 ? `
+              <label class="bless-product__label">{{ section.settings.variant_label | escape }}</label>
+              <select class="bless-product__select" data-ajax-variant>
+                ${p.variants.map(v => `
+                  <option value="${v.id}" ${v.id===firstAvailable?.id?'selected':''} ${v.available?'':'disabled'}>
+                    ${v.title}${{{ section.settings.show_variant_prices | json }} && v.price ? ` — ${money(v.price)}` : ''}
+                  </option>
+                `).join('')}
+              </select>
+            ` : ``}
 
+            <label class="bless-product__label">{{ 'products.product.quantity' | t }}</label>
             <input type="number" class="bless-product__quantity" min="1" value="1" data-ajax-qty>
 
             <!-- blessing captured as cart line property -->
@@ -490,7 +629,7 @@ if (urlBlessingRaw) {
               {{ section.settings.button_label | escape }}
             </button>
 
-            <p class="bless-product__note">{{ section.settings.cart_note | escape }}</p>
+            ${{{ section.settings.cart_note | json }} ? `<p class="bless-product__note">{{ section.settings.cart_note | escape }}</p>` : ``}
           </div>
         </div>
       </div>
@@ -531,27 +670,55 @@ if (requireBlessing && btn) {
 
     btn?.addEventListener('click', async (e) => {
       e.preventDefault();
-      if (requireBlessing && !blessing.value) return;
+      if (requireBlessing && !blessing.value) {
+        console.warn('Blessing required but not provided');
+        return;
+      }
+
       btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = 'Adding to cart...';
+
       try {
-        const payload = new URLSearchParams();
-        payload.set('id', select.value);
-        payload.set('quantity', qty.value || '1');
-        if (blessing.value) payload.set(`properties[{{ section.settings.property_key | escape }}]`, blessing.value);
+        // Use FormData for more robust handling
+        const formData = new FormData();
+        formData.set('id', select?.value || firstAvailable?.id);
+        formData.set('quantity', qty?.value || '1');
+
+        // Add blessing property if present
+        if (blessing.value) {
+          formData.set('properties[{{ section.settings.property_key | escape }}]', blessing.value);
+        }
 
         const res = await fetch('/cart/add.js', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-          body: payload.toString(),
+          body: formData,
           credentials: 'same-origin'
         });
-        if (!res.ok) throw new Error('Add to cart failed');
-        // Optional: open cart drawer if your theme supports it
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Failed to add product to cart');
+        }
+
+        // Success - refresh cart and dispatch event
         window.dispatchEvent(new CustomEvent('cart:refresh'));
+
+        // Show success feedback
+        btn.textContent = 'Added to cart!';
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }, 1500);
+
       } catch (err) {
-        console.error(err);
-      } finally {
-        btn.disabled = false;
+        console.error('Add to cart error:', err);
+        btn.textContent = 'Error adding to cart';
+
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }, 2000);
       }
     });
   }

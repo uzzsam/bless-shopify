@@ -342,7 +342,7 @@
     var nextButton = carousel.querySelector('.bless-carousel__arrow--next');
     var behavior = carousel.getAttribute('data-carousel-behavior') || 'infinite';
     var scrollSpeed = parseFloat(carousel.getAttribute('data-scroll-speed')) || 0.5;
-    
+
     if (!track || slides.length === 0) {
       console.log('Carousel: No track or slides found');
       return;
@@ -355,17 +355,9 @@
     var isScrolling = (behavior === 'infinite');
     var currentIndex = 0;
     var totalOriginalSlides = slides.length;
+    var isTransitioning = false;
 
-    // Clone slides for infinite loop
-    if (behavior === 'infinite') {
-      slides.forEach(function(slide) {
-        var clone = slide.cloneNode(true);
-        clone.setAttribute('aria-hidden', 'true');
-        clone.classList.add('bless-carousel__slide--clone');
-        track.appendChild(clone);
-      });
-      console.log('Cloned slides for infinite loop');
-    }
+    // NO CLONING - use logical infinite loop with modulo arithmetic
 
     function getSlideWidth() {
       if (!slides[0]) return 0;
@@ -380,9 +372,10 @@
 
       position -= scrollSpeed;
       var slideWidth = getSlideWidth();
-      var resetPoint = -slideWidth * totalOriginalSlides;
 
-      if (position <= resetPoint) {
+      // Use modulo to create seamless infinite loop without DOM cloning
+      var maxScroll = slideWidth * totalOriginalSlides;
+      if (Math.abs(position) >= maxScroll) {
         position = 0;
       }
 
@@ -393,8 +386,8 @@
     function slideToIndex(index) {
       var slideWidth = getSlideWidth();
       position = -slideWidth * index;
+      currentIndex = index % totalOriginalSlides;
       track.style.transform = 'translateX(' + position + 'px)';
-      currentIndex = index;
     }
 
     // Determine how many slides are visible at once
@@ -404,92 +397,90 @@
       return Math.round(viewportWidth / slideWidth);
     }
 
+    function scrollBySteps(steps) {
+      var visibleSlides = getVisibleSlides();
+      var newIndex = currentIndex + steps;
+
+      // Wrap around for infinite behavior
+      if (newIndex >= totalOriginalSlides) {
+        newIndex = newIndex % totalOriginalSlides;
+      } else if (newIndex < 0) {
+        newIndex = totalOriginalSlides + (newIndex % totalOriginalSlides);
+      }
+
+      // Enable smooth transition
+      track.classList.remove('no-transition');
+      isTransitioning = true;
+
+      slideToIndex(newIndex);
+
+      // After transition, continue auto-scroll if needed
+      setTimeout(function() {
+        isTransitioning = false;
+        if (behavior === 'infinite' && isScrolling) {
+          track.classList.add('no-transition');
+        }
+      }, 600);
+    }
+
     function nextSlide() {
+      if (isTransitioning) return;
       console.log('Next slide clicked, current index:', currentIndex);
-      
+
       if (behavior === 'infinite') {
-        // Stop auto-scroll temporarily
+        // Pause auto-scroll during transition
         var wasScrolling = isScrolling;
         isScrolling = false;
         if (animationId) {
           cancelAnimationFrame(animationId);
           animationId = null;
         }
-        
-        // Remove no-transition class to enable smooth animation
-        track.classList.remove('no-transition');
-        
-        // Calculate max index to avoid showing clones
-        var visibleSlides = getVisibleSlides();
-        var maxIndex = totalOriginalSlides - visibleSlides;
-        
-        currentIndex++;
-        
-        // Wrap around if we've gone past the max index
-        if (currentIndex > maxIndex) {
-          currentIndex = 0;
-        }
-        
-        slideToIndex(currentIndex);
-        
-        // Resume auto-scroll after transition completes
+
+        scrollBySteps(1);
+
+        // Resume auto-scroll
         if (wasScrolling) {
           setTimeout(function() {
             track.classList.add('no-transition');
             isScrolling = true;
             scroll();
-          }, 700);
+          }, 600);
         }
       } else {
         var visibleSlides = getVisibleSlides();
-        var maxIndex = totalOriginalSlides - visibleSlides;
+        var maxIndex = Math.max(0, totalOriginalSlides - visibleSlides);
         if (currentIndex < maxIndex) {
-          currentIndex++;
-          slideToIndex(currentIndex);
+          scrollBySteps(1);
         }
       }
     }
 
     function prevSlide() {
+      if (isTransitioning) return;
       console.log('Prev slide clicked, current index:', currentIndex);
-      
+
       if (behavior === 'infinite') {
-        // Stop auto-scroll temporarily
+        // Pause auto-scroll during transition
         var wasScrolling = isScrolling;
         isScrolling = false;
         if (animationId) {
           cancelAnimationFrame(animationId);
           animationId = null;
         }
-        
-        // Remove no-transition class to enable smooth animation
-        track.classList.remove('no-transition');
-        
-        // Calculate max index to avoid showing clones
-        var visibleSlides = getVisibleSlides();
-        var maxIndex = totalOriginalSlides - visibleSlides;
-        
-        currentIndex--;
-        
-        // Wrap around if we've gone before first slide
-        if (currentIndex < 0) {
-          currentIndex = maxIndex;
-        }
-        
-        slideToIndex(currentIndex);
-        
-        // Resume auto-scroll after transition completes
+
+        scrollBySteps(-1);
+
+        // Resume auto-scroll
         if (wasScrolling) {
           setTimeout(function() {
             track.classList.add('no-transition');
             isScrolling = true;
             scroll();
-          }, 700);
+          }, 600);
         }
       } else {
         if (currentIndex > 0) {
-          currentIndex--;
-          slideToIndex(currentIndex);
+          scrollBySteps(-1);
         }
       }
     }
@@ -498,7 +489,7 @@
     if (behavior === 'infinite') {
       // Add no-transition class for auto-scroll
       track.classList.add('no-transition');
-      
+
       carousel.addEventListener('mouseenter', function() {
         isScrolling = false;
         if (animationId) {
@@ -508,10 +499,12 @@
       });
 
       carousel.addEventListener('mouseleave', function() {
-        track.classList.add('no-transition');
-        isScrolling = true;
-        if (!animationId) {
-          scroll();
+        if (!isTransitioning) {
+          track.classList.add('no-transition');
+          isScrolling = true;
+          if (!animationId) {
+            scroll();
+          }
         }
       });
 
@@ -546,6 +539,7 @@
     var prevTranslate = 0;
 
     function dragStart(e) {
+      if (isTransitioning) return;
       if (behavior === 'infinite') {
         isScrolling = false;
         if (animationId) {
@@ -557,6 +551,7 @@
       startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
       prevTranslate = position;
       track.style.cursor = 'grabbing';
+      track.classList.remove('no-transition');
     }
 
     function drag(e) {
@@ -572,24 +567,35 @@
       if (!isDragging) return;
       isDragging = false;
       track.style.cursor = 'grab';
-      
+
+      var slideWidth = getSlideWidth();
       var movedBy = currentTranslate - prevTranslate;
-      
+
       if (behavior === 'infinite') {
         position = currentTranslate;
-        isScrolling = true;
-        if (!animationId) {
+
+        // Snap to nearest slide after drag
+        var nearestIndex = Math.round(-position / slideWidth);
+        slideToIndex(nearestIndex);
+
+        setTimeout(function() {
+          track.classList.add('no-transition');
+          isScrolling = true;
           scroll();
-        }
+        }, 600);
       } else {
         if (Math.abs(movedBy) > 50) {
           if (movedBy > 0 && currentIndex > 0) {
             currentIndex--;
-          } else if (movedBy < 0 && currentIndex < slides.length - 1) {
+          } else if (movedBy < 0 && currentIndex < totalOriginalSlides - 1) {
             currentIndex++;
           }
         }
+        track.classList.remove('no-transition');
         slideToIndex(currentIndex);
+        setTimeout(function() {
+          track.classList.add('no-transition');
+        }, 600);
       }
     }
 
@@ -603,7 +609,7 @@
 
     // Image swapping for touch devices
     var isTouchDevice = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
-    
+
     if (isTouchDevice) {
       var cards = carousel.querySelectorAll('.bless-carousel__card');
       cards.forEach(function(card) {
