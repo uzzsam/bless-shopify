@@ -56,8 +56,7 @@
         "product_7": "morasara",
         "carousel_height": 400,
         "show_arrows": true,
-        "carousel_behavior": "infinite",
-        "scroll_speed": 1
+        "scroll_speed": 0.3
       }
     }
   },
