@@ -97,6 +97,7 @@
                 "menu_zGVbCp": {
                   "type": "menu",
                   "name": "t:names.menu",
+                  "disabled": true,
                   "settings": {
                     "menu": "footer",
                     "heading": "Shop",
@@ -170,7 +171,7 @@
               "settings": {
                 "width": "custom",
                 "custom_width": 46,
-                "inherit_color_scheme": false,
+                "inherit_color_scheme": true,
                 "heading": "Hear from Sidthah",
                 "heading_preset": "h4",
                 "color_scheme": "scheme-1",

@@ -58,19 +58,6 @@
         "padding-block-end": 80
       }
     },
-    "bless_chat_Y8zXnR": {
-      "type": "bless-chat",
-      "name": "Bless chat",
-      "settings": {
-        "heading": "Talk to Sidthah",
-        "widget_src": "https://bless-chat-rick.vercel.app/bless-chat-widget.js",
-        "api_url": "https://bless-chat-rick.vercel.app/api/chat",
-        "placeholder": "Talk to Sidthah",
-        "loading_text": "Listening...",
-        "panel_background": "1, 50, 32",
-        "panel_opacity": 45
-      }
-    },
     "bless_hero_VYqKg4": {
       "type": "bless-hero",
       "name": "Bless hero",
@@ -108,12 +95,31 @@
         "button_label": "Add blessing to cart",
         "cart_note": "We will include this blessing with your order."
       }
+    },
+    "bless_carousel_KMdpJ6": {
+      "type": "bless-carousel",
+      "name": "Bless Carousel",
+      "settings": {
+        "heading": "Carry your Sidthie with you",
+        "section_anchor": "sidthie_products",
+        "product_1": "",
+        "product_2": "",
+        "product_3": "",
+        "product_4": "",
+        "product_5": "",
+        "product_6": "",
+        "product_7": "",
+        "carousel_height": 400,
+        "show_arrows": true,
+        "carousel_behavior": "infinite",
+        "scroll_speed": 0.3
+      }
     }
   },
   "order": [
     "main",
-    "bless_chat_Y8zXnR",
     "bless_hero_VYqKg4",
-    "bless_product_UBbhCD"
+    "bless_product_UBbhCD",
+    "bless_carousel_KMdpJ6"
   ]
 }
