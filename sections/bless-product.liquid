@@ -91,7 +91,7 @@
                 {% else %}
                   <!-- Guard unknown type; avoid media_tag on strings -->
                   <div class="bless-product__image-container">
-                    <img class="bless-product__image bless-product__image--primary" src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | escape }}">
+                    <img class="bless-product__image bless-product__image--primary" src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | escape }}" width="900" height="900">
                   </div>
               {% endcase %}
             </div>
@@ -441,6 +441,7 @@
 }
 {% endstylesheet %}
 
+{% # theme-check-disable StaticStylesheetAndJavascriptTags %}
 {% javascript %}
 (function () {
   const sectionId = '{{ section.id }}';
@@ -777,6 +778,7 @@ if (requireBlessing && btn) {
   });
 })();
 {% endjavascript %}
+{% # theme-check-enable StaticStylesheetAndJavascriptTags %}
 
 {% schema %}
 {

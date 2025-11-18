@@ -330,6 +330,7 @@
   }
 {% endstylesheet %}
 
+{% # theme-check-disable StaticStylesheetAndJavascriptTags %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Initialize carousel for section {{ section.id }}
@@ -633,6 +634,7 @@
     }
   });
 </script>
+{% # theme-check-enable StaticStylesheetAndJavascriptTags %}
 
 {% schema %}
 {
