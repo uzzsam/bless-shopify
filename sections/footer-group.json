@@ -253,6 +253,7 @@
         },
         "block_bda2581182a1": {
           "type": "social-links",
+          "disabled": true,
           "settings": {
             "facebook_url": "http://facebook.com/",
             "instagram_url": "http://instagram.com/",

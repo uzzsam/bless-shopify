@@ -60,45 +60,8 @@
         "auto_scroll": true
       }
     },
-    "bless_thank_you_8ERPqR": {
-      "type": "bless-thank-you",
-      "disabled": true,
-      "name": "Bless thank you",
-      "settings": {
-        "video_overlay": "shopify://files/videos/thank-you.mp4",
-        "sound_icon": "shopify://shop_images/sound_white.png",
-        "content_padding_top": 0,
-        "content_padding_bottom": 48,
-        "heading": "Thank You",
-        "subheading": "Sidthies",
-        "cta_label": "Carry your Sidthie",
-        "cta_target": "#bless-products"
-      }
-    },
-    "product": {
-      "type": "bless-product",
-      "disabled": true,
-      "settings": {
-        "product": "",
-        "heading": "Carry your blessing with you",
-        "panel_background": "65, 65, 65",
-        "panel_opacity": 40,
-        "show_media": true,
-        "show_description": true,
-        "show_price": true,
-        "show_variant_picker": true,
-        "show_variant_prices": true,
-        "show_quantity_selector": true,
-        "require_blessing": true,
-        "variant_label": "Choose your option",
-        "property_key": "Blessing",
-        "button_label": "Add blessing to cart",
-        "cart_note": "We will include this blessing with your order."
-      }
-    },
     "bless_carousel_Ped9qL": {
       "type": "bless-carousel",
-      "disabled": true,
       "name": "Bless Carousel",
       "settings": {
         "heading": "Carry your Sidthie with you",
@@ -121,8 +84,6 @@
     "hero",
     "chat",
     "blessing",
-    "bless_thank_you_8ERPqR",
-    "product",
     "bless_carousel_Ped9qL"
   ]
 }
