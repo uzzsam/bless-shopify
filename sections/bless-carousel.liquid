@@ -1,7 +1,6 @@
 {% liquid
   assign carousel_height = section.settings.carousel_height | default: 400
   assign show_arrows = section.settings.show_arrows | default: true
-  assign carousel_behavior = section.settings.carousel_behavior | default: 'infinite'
   assign scroll_speed = section.settings.scroll_speed | default: 0.5
   assign heading = section.settings.heading
 %}
@@ -10,8 +9,8 @@
   id="{% if section.settings.section_anchor != blank %}{{ section.settings.section_anchor }}{% else %}carousel-{{ section.id }}{% endif %}"
   class="bless-carousel bless-overlay-30"
   data-section-id="{{ section.id }}"
-  data-carousel-behavior="{{ carousel_behavior }}"
   data-scroll-speed="{{ scroll_speed }}"
+  style="--carousel-height: {{ carousel_height }}px"
 >
   <div class="bless-carousel__wrapper">
     {% if heading != blank %}
@@ -19,18 +18,18 @@
     {% endif %}
 
     {% if section.settings.product_1 or section.settings.product_2 or section.settings.product_3 or section.settings.product_4 or section.settings.product_5 or section.settings.product_6 or section.settings.product_7 %}
-      <div class="bless-carousel__container" style="height: {{ carousel_height }}px;">
-        
+      <div class="bless-carousel__container">
+
         {% if show_arrows %}
-        <button class="bless-carousel__arrow bless-carousel__arrow--prev" aria-label="Previous slide">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
+          <button class="bless-carousel__arrow bless-carousel__arrow--prev" aria-label="Previous products">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         {% endif %}
 
         <div class="bless-carousel__viewport">
-          <div class="bless-carousel__track">
+          <div class="bless-carousel__track" data-carousel-track>
             {% if section.settings.product_1 %}
               <div class="bless-carousel__slide">
                 {% render 'carousel-product-slide', product: section.settings.product_1, index: 0 %}
@@ -70,11 +69,11 @@
         </div>
 
         {% if show_arrows %}
-        <button class="bless-carousel__arrow bless-carousel__arrow--next" aria-label="Next slide">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
+          <button class="bless-carousel__arrow bless-carousel__arrow--next" aria-label="Next products">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         {% endif %}
       </div>
     {% else %}
@@ -116,6 +115,7 @@
     display: flex;
     align-items: center;
     gap: clamp(0.5rem, 2vw, 1rem);
+    height: var(--carousel-height, 400px);
   }
 
   .bless-carousel__viewport {
@@ -128,16 +128,12 @@
   .bless-carousel__track {
     display: flex;
     gap: clamp(1rem, 3vw, 2rem);
-    will-change: transform;
     height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-    transition: transform 0.6s ease-out;
+    will-change: transform;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
-  /* Remove transition during auto-scroll */
-  .bless-carousel__track.no-transition {
+  .bless-carousel__track.instant {
     transition: none !important;
   }
 
@@ -146,35 +142,27 @@
     height: 100%;
   }
 
-  /* Responsive: Mobile - 1 slide visible */
+  /* Responsive: Mobile - 2 slides visible */
   @media (max-width: 599px) {
     .bless-carousel__slide {
-      width: calc(100vw - 10rem);
+      width: calc((100vw - 10rem - 1rem) / 2);
     }
   }
 
-  /* Responsive: Tablet - 2 slides visible */
+  /* Responsive: Tablet - 3 slides visible */
   @media (min-width: 600px) and (max-width: 899px) {
     .bless-carousel__slide {
-      width: calc((100vw - 12rem) / 2 - 1rem);
+      width: calc((100vw - 12rem - 2rem) / 3);
     }
   }
 
-  /* Responsive: Desktop - 3 slides visible */
+  /* Responsive: Desktop - 4-5 slides visible */
   @media (min-width: 900px) {
     .bless-carousel__slide {
-      width: calc((100vw - 16rem) / 3 - 1.5rem);
-    }
-    
-    /* Constrained width for max-width container */
-    .bless-carousel__wrapper {
-      max-width: 1400px;
-    }
-    
-    .bless-carousel__slide {
-      width: calc((min(100vw, 1400px) - 16rem) / 3 - 1.5rem);
+      width: calc((min(100vw, 1400px) - 16rem - 3rem) / 4);
     }
   }
+
   .bless-carousel__card {
     display: flex;
     flex-direction: column;
@@ -196,11 +184,10 @@
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
   }
 
-  /* Image Container */
   .bless-carousel__image-container {
     position: relative;
     width: 100%;
-    padding-bottom: 100%; /* 1:1 aspect ratio */
+    padding-bottom: 100%;
     overflow: hidden;
     border-radius: 20px;
     margin: 10px;
@@ -220,10 +207,12 @@
 
   .bless-carousel__image--primary {
     opacity: 1;
+    z-index: 1;
   }
 
   .bless-carousel__image--secondary {
     opacity: 0;
+    z-index: 0;
   }
 
   /* Hover effect: swap images on desktop */
@@ -237,7 +226,6 @@
     }
   }
 
-  /* Card Content */
   .bless-carousel__content {
     padding: clamp(1rem, 3vw, 1.5rem);
     flex: 1;
@@ -283,7 +271,6 @@
     color: white;
   }
 
-  /* Empty state */
   .bless-carousel__empty {
     text-align: center;
     padding: clamp(3rem, 5vw, 5rem) 1rem;
@@ -291,7 +278,7 @@
     font-size: 1rem;
   }
 
-  /* Navigation Arrows - Always Visible, at edges */
+  /* Navigation Arrows */
   .bless-carousel__arrow {
     flex-shrink: 0;
     width: clamp(48px, 8vw, 64px);
@@ -308,8 +295,6 @@
     transition: all 200ms ease-out;
     cursor: pointer;
     color: white;
-    opacity: 1;
-    visibility: visible;
     z-index: 10;
   }
 
@@ -333,305 +318,163 @@
 {% # theme-check-disable StaticStylesheetAndJavascriptTags %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialize carousel for section {{ section.id }}
-    var carousel = document.querySelector('[data-section-id="{{ section.id }}"]');
-    if (!carousel) return;
+    const sectionId = '{{ section.id }}';
+    const section = document.querySelector(`[data-section-id="${sectionId}"]`);
+    if (!section) return;
 
-    var track = carousel.querySelector('.bless-carousel__track');
-    var slides = Array.prototype.slice.call(carousel.querySelectorAll('.bless-carousel__slide'));
-    var prevButton = carousel.querySelector('.bless-carousel__arrow--prev');
-    var nextButton = carousel.querySelector('.bless-carousel__arrow--next');
-    var behavior = carousel.getAttribute('data-carousel-behavior') || 'infinite';
-    var scrollSpeed = parseFloat(carousel.getAttribute('data-scroll-speed')) || 0.5;
+    const track = section.querySelector('[data-carousel-track]');
+    const prevBtn = section.querySelector('.bless-carousel__arrow--prev');
+    const nextBtn = section.querySelector('.bless-carousel__arrow--next');
+    const scrollSpeed = parseFloat(section.getAttribute('data-scroll-speed')) || 0.5;
 
-    if (!track || slides.length === 0) {
-      console.log('Carousel: No track or slides found');
-      return;
+    if (!track) return;
+
+    const slides = Array.from(track.querySelectorAll('.bless-carousel__slide'));
+    const totalSlides = slides.length;
+
+    if (totalSlides === 0) return;
+
+    // Get number of visible items based on screen size
+    function getVisibleItems() {
+      const width = window.innerWidth;
+      if (width < 600) return 2;
+      if (width < 900) return 3;
+      return 4;
     }
 
-    console.log('Carousel initialized with ' + slides.length + ' slides, behavior: ' + behavior);
+    let visibleItems = getVisibleItems();
+    let currentPosition = 0; // Position in slide units (not pixels)
+    let isAutoScrolling = true;
+    let autoScrollInterval;
+    let lastArrowClickTime = 0;
 
-    var position = 0;
-    var animationId = null;
-    var isScrolling = (behavior === 'infinite');
-    var currentIndex = 0;
-    var totalOriginalSlides = slides.length;
-    var isTransitioning = false;
+    // Clone slides for seamless looping
+    function setupClones() {
+      // Clear existing clones
+      track.querySelectorAll('[data-clone]').forEach(clone => clone.remove());
 
-    // NO CLONING - use logical infinite loop with modulo arithmetic
+      // Add clones at end
+      for (let i = 0; i < totalSlides; i++) {
+        const clone = slides[i].cloneNode(true);
+        clone.setAttribute('data-clone', 'true');
+        clone.setAttribute('aria-hidden', 'true');
+        track.appendChild(clone);
+      }
 
+      // Add clones at beginning
+      for (let i = totalSlides - 1; i >= 0; i--) {
+        const clone = slides[i].cloneNode(true);
+        clone.setAttribute('data-clone', 'true');
+        clone.setAttribute('aria-hidden', 'true');
+        track.insertBefore(clone, track.firstChild);
+      }
+    }
+
+    setupClones();
+
+    // Get slide width including gap
     function getSlideWidth() {
-      if (!slides[0]) return 0;
-      var slideWidth = slides[0].offsetWidth;
-      var trackStyle = window.getComputedStyle(track);
-      var gap = parseFloat(trackStyle.gap) || parseFloat(trackStyle.columnGap) || 0;
-      return slideWidth + gap;
+      if (slides.length === 0) return 0;
+      const rect = slides[0].getBoundingClientRect();
+      const gap = parseFloat(window.getComputedStyle(track).gap) || 0;
+      return rect.width + gap;
     }
 
-    function scroll() {
-      if (!isScrolling) return;
+    // Update position visually
+    function updatePosition(animate = true) {
+      const slideWidth = getSlideWidth();
+      // Offset by totalSlides to account for clones at beginning
+      const offset = -(currentPosition + totalSlides) * slideWidth;
 
-      position -= scrollSpeed;
-      var slideWidth = getSlideWidth();
-
-      // Use modulo to create seamless infinite loop without DOM cloning
-      var maxScroll = slideWidth * totalOriginalSlides;
-      if (Math.abs(position) >= maxScroll) {
-        position = 0;
+      if (animate) {
+        track.classList.remove('instant');
+      } else {
+        track.classList.add('instant');
       }
 
-      track.style.transform = 'translateX(' + position + 'px)';
-      animationId = requestAnimationFrame(scroll);
+      track.style.transform = `translateX(${offset}px)`;
     }
 
-    function slideToIndex(index) {
-      var slideWidth = getSlideWidth();
-      position = -slideWidth * index;
-      currentIndex = index % totalOriginalSlides;
-      track.style.transform = 'translateX(' + position + 'px)';
+    // Auto-scroll function
+    function autoScroll() {
+      if (!isAutoScrolling) return;
+
+      // Advance by 0.02 slides per frame (~0.5px per frame)
+      const increment = scrollSpeed * 0.02;
+      currentPosition += increment;
+
+      const slideWidth = getSlideWidth();
+      const maxPosition = totalSlides;
+
+      // Seamless loop: jump to start when reaching end
+      if (currentPosition >= maxPosition) {
+        currentPosition = 0;
+        updatePosition(false);
+      } else {
+        updatePosition(true);
+      }
     }
 
-    // Determine how many slides are visible at once
-    function getVisibleSlides() {
-      var viewportWidth = carousel.querySelector('.bless-carousel__viewport').offsetWidth;
-      var slideWidth = getSlideWidth();
-      return Math.round(viewportWidth / slideWidth);
-    }
+    // Arrow click handler
+    function handleArrowClick(direction) {
+      lastArrowClickTime = Date.now();
 
-    function scrollBySteps(steps) {
-      var visibleSlides = getVisibleSlides();
-      var newIndex = currentIndex + steps;
+      // Pause auto-scroll briefly
+      isAutoScrolling = false;
+      clearInterval(autoScrollInterval);
 
-      // Wrap around for infinite behavior
-      if (newIndex >= totalOriginalSlides) {
-        newIndex = newIndex % totalOriginalSlides;
-      } else if (newIndex < 0) {
-        newIndex = totalOriginalSlides + (newIndex % totalOriginalSlides);
+      // Advance by exactly one slide
+      currentPosition += direction;
+
+      // Handle wraparound
+      if (currentPosition >= totalSlides) {
+        currentPosition = 0;
+      } else if (currentPosition < 0) {
+        currentPosition = totalSlides - 1;
       }
 
-      // Enable smooth transition
-      track.classList.remove('no-transition');
-      isTransitioning = true;
+      updatePosition(true);
 
-      slideToIndex(newIndex);
-
-      // After transition, continue auto-scroll if needed
-      setTimeout(function() {
-        isTransitioning = false;
-        if (behavior === 'infinite' && isScrolling) {
-          track.classList.add('no-transition');
-        }
+      // Resume auto-scroll after transition
+      setTimeout(() => {
+        isAutoScrolling = true;
+        startAutoScroll();
       }, 600);
     }
 
-    function nextSlide() {
-      if (isTransitioning) return;
-      console.log('Next slide clicked, current index:', currentIndex);
+    // Start auto-scroll loop
+    function startAutoScroll() {
+      clearInterval(autoScrollInterval);
+      autoScrollInterval = setInterval(autoScroll, 16); // ~60fps
+    }
 
-      if (behavior === 'infinite') {
-        // Pause auto-scroll during transition
-        var wasScrolling = isScrolling;
-        isScrolling = false;
-        if (animationId) {
-          cancelAnimationFrame(animationId);
-          animationId = null;
-        }
-
-        scrollBySteps(1);
-
-        // Resume auto-scroll
-        if (wasScrolling) {
-          setTimeout(function() {
-            track.classList.add('no-transition');
-            isScrolling = true;
-            scroll();
-          }, 600);
-        }
-      } else {
-        var visibleSlides = getVisibleSlides();
-        var maxIndex = Math.max(0, totalOriginalSlides - visibleSlides);
-        if (currentIndex < maxIndex) {
-          scrollBySteps(1);
-        }
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      const newVisibleItems = getVisibleItems();
+      if (newVisibleItems !== visibleItems) {
+        visibleItems = newVisibleItems;
+        updatePosition(false);
       }
+    });
+
+    // Arrow button listeners
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => handleArrowClick(-1));
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => handleArrowClick(1));
     }
 
-    function prevSlide() {
-      if (isTransitioning) return;
-      console.log('Prev slide clicked, current index:', currentIndex);
+    // Initialize
+    updatePosition(false);
+    startAutoScroll();
 
-      if (behavior === 'infinite') {
-        // Pause auto-scroll during transition
-        var wasScrolling = isScrolling;
-        isScrolling = false;
-        if (animationId) {
-          cancelAnimationFrame(animationId);
-          animationId = null;
-        }
-
-        scrollBySteps(-1);
-
-        // Resume auto-scroll
-        if (wasScrolling) {
-          setTimeout(function() {
-            track.classList.add('no-transition');
-            isScrolling = true;
-            scroll();
-          }, 600);
-        }
-      } else {
-        if (currentIndex > 0) {
-          scrollBySteps(-1);
-        }
+    // Cleanup on section unload
+    document.addEventListener('shopify:section:unload', (event) => {
+      if (event.detail?.sectionId === sectionId) {
+        clearInterval(autoScrollInterval);
       }
-    }
-
-    // Pause on hover for infinite scroll
-    if (behavior === 'infinite') {
-      // Add no-transition class for auto-scroll
-      track.classList.add('no-transition');
-
-      carousel.addEventListener('mouseenter', function() {
-        isScrolling = false;
-        if (animationId) {
-          cancelAnimationFrame(animationId);
-          animationId = null;
-        }
-      });
-
-      carousel.addEventListener('mouseleave', function() {
-        if (!isTransitioning) {
-          track.classList.add('no-transition');
-          isScrolling = true;
-          if (!animationId) {
-            scroll();
-          }
-        }
-      });
-
-      // Start infinite scroll
-      console.log('Starting infinite scroll');
-      scroll();
-    }
-
-    // Arrow buttons
-    if (prevButton) {
-      prevButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        prevSlide();
-      });
-      console.log('Prev button event attached');
-    }
-
-    if (nextButton) {
-      nextButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        nextSlide();
-      });
-      console.log('Next button event attached');
-    }
-
-    // Touch/drag support
-    var isDragging = false;
-    var startX = 0;
-    var currentTranslate = 0;
-    var prevTranslate = 0;
-
-    function dragStart(e) {
-      if (isTransitioning) return;
-      if (behavior === 'infinite') {
-        isScrolling = false;
-        if (animationId) {
-          cancelAnimationFrame(animationId);
-          animationId = null;
-        }
-      }
-      isDragging = true;
-      startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
-      prevTranslate = position;
-      track.style.cursor = 'grabbing';
-      track.classList.remove('no-transition');
-    }
-
-    function drag(e) {
-      if (!isDragging) return;
-      if (e.cancelable) e.preventDefault();
-      var currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
-      var diff = currentX - startX;
-      currentTranslate = prevTranslate + diff;
-      track.style.transform = 'translateX(' + currentTranslate + 'px)';
-    }
-
-    function dragEnd() {
-      if (!isDragging) return;
-      isDragging = false;
-      track.style.cursor = 'grab';
-
-      var slideWidth = getSlideWidth();
-      var movedBy = currentTranslate - prevTranslate;
-
-      if (behavior === 'infinite') {
-        position = currentTranslate;
-
-        // Snap to nearest slide after drag
-        var nearestIndex = Math.round(-position / slideWidth);
-        slideToIndex(nearestIndex);
-
-        setTimeout(function() {
-          track.classList.add('no-transition');
-          isScrolling = true;
-          scroll();
-        }, 600);
-      } else {
-        if (Math.abs(movedBy) > 50) {
-          if (movedBy > 0 && currentIndex > 0) {
-            currentIndex--;
-          } else if (movedBy < 0 && currentIndex < totalOriginalSlides - 1) {
-            currentIndex++;
-          }
-        }
-        track.classList.remove('no-transition');
-        slideToIndex(currentIndex);
-        setTimeout(function() {
-          track.classList.add('no-transition');
-        }, 600);
-      }
-    }
-
-    track.addEventListener('mousedown', dragStart);
-    track.addEventListener('touchstart', dragStart, { passive: true });
-    track.addEventListener('mousemove', drag);
-    track.addEventListener('touchmove', drag, { passive: false });
-    track.addEventListener('mouseup', dragEnd);
-    track.addEventListener('touchend', dragEnd);
-    track.addEventListener('mouseleave', dragEnd);
-
-    // Image swapping for touch devices
-    var isTouchDevice = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
-
-    if (isTouchDevice) {
-      var cards = carousel.querySelectorAll('.bless-carousel__card');
-      cards.forEach(function(card) {
-        var primaryImg = card.querySelector('[data-primary-image]');
-        var secondaryImg = card.querySelector('[data-secondary-image]');
-        if (!secondaryImg) return;
-
-        var imageToggled = false;
-        card.addEventListener('click', function(e) {
-          if (e.target.closest('.bless-carousel__link')) return;
-          e.preventDefault();
-          if (!imageToggled) {
-            primaryImg.style.opacity = '0';
-            secondaryImg.style.opacity = '1';
-            imageToggled = true;
-          } else {
-            window.location.href = card.dataset.productUrl;
-          }
-        });
-      });
-    }
+    });
   });
 </script>
 {% # theme-check-enable StaticStylesheetAndJavascriptTags %}
@@ -715,34 +558,17 @@
     },
     {
       "type": "header",
-      "content": "Carousel Behavior"
-    },
-    {
-      "type": "select",
-      "id": "carousel_behavior",
-      "label": "Carousel behavior",
-      "options": [
-        {
-          "value": "infinite",
-          "label": "Infinite loop (continuous scroll)"
-        },
-        {
-          "value": "one-way",
-          "label": "One-way scroll (manual navigation)"
-        }
-      ],
-      "default": "infinite",
-      "info": "Choose how the carousel advances through products."
+      "content": "Auto-Scroll Settings"
     },
     {
       "type": "range",
       "id": "scroll_speed",
-      "label": "Scroll speed (infinite loop only)",
-      "default": 0.3,
+      "label": "Auto-scroll speed",
+      "default": 0.5,
       "min": 0.1,
       "max": 2,
       "step": 0.1,
-      "info": "Higher = faster scrolling. Only applies to infinite loop mode."
+      "info": "Higher = faster scrolling. Recommended: 0.3-0.8 for smooth infinite loop."
     }
   ],
   "presets": [
