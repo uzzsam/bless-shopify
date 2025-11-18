@@ -18,7 +18,7 @@
         "content_padding_bottom": 16,
         "heading": "Thank You",
         "subheading": "Your order has been received. We'll send you an email confirmation shortly.",
-        "cta_label": "Explore related products",
+        "cta_label": "Your Sidthie",
         "cta_target": "#carousel-section"
       }
     },
@@ -45,7 +45,8 @@
     "carousel": {
       "type": "bless-carousel",
       "settings": {
-        "heading": "Related Products",
+        "heading": "more Sidthies",
+        "section_anchor": "carousel-section",
         "product_1": "nalamera",
         "product_2": "lumasara",
         "product_3": "welamora",
@@ -56,8 +57,7 @@
         "carousel_height": 400,
         "show_arrows": true,
         "carousel_behavior": "infinite",
-        "scroll_speed": 1,
-        "section_anchor": "carousel-section"
+        "scroll_speed": 1
       }
     }
   },
