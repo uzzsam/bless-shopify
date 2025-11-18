@@ -87,7 +87,7 @@
         "show_description": false,
         "show_price": true,
         "show_variant_picker": true,
-        "show_variant_prices": false,
+        "show_variant_prices": true,
         "show_quantity_selector": true,
         "require_blessing": true,
         "variant_label": "Choose your option",
@@ -112,7 +112,7 @@
         "carousel_height": 400,
         "show_arrows": true,
         "carousel_behavior": "infinite",
-        "scroll_speed": 0.3
+        "scroll_speed": 0.1
       }
     }
   },
