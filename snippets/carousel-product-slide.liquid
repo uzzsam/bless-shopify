@@ -1,82 +1,73 @@
-{% capture card_content %}
-  <div
-    class="bless-carousel__card"
-    data-product-id="{{ product.id }}"
-    data-product-url="{{ product.url }}"
-  >
-    <!-- Image Container with hover swap -->
-    <div class="bless-carousel__image-container">
-      {% if product.featured_image %}
-        <!-- Primary Image -->
-        <img
-          src="{{ product.featured_image | image_url: width: 600 }}"
-          alt="{{ product.title | escape }}"
-          width="600"
-          height="600"
-          class="bless-carousel__image bless-carousel__image--primary"
-          data-primary-image
-          loading="lazy"
-        >
-      {% endif %}
-
-      <!-- Secondary Image (shown on hover) -->
-      {% if product.images.size > 1 %}
-        {% assign second_image = product.images[1] %}
-        <img
-          src="{{ second_image | image_url: width: 600 }}"
-          alt="{{ product.title | escape }}"
-          width="600"
-          height="600"
-          class="bless-carousel__image bless-carousel__image--secondary"
-          data-secondary-image
-          loading="lazy"
-        >
-      {% endif %}
-    </div>
-
-    <!-- Card Content -->
-    <div class="bless-carousel__content">
-      <h3 class="bless-carousel__product-title" style="color: white;">
-        {{ product.title | escape }}
-      </h3>
-
-      {% if product.description != blank %}
-        <p class="bless-carousel__product-description" style="color: rgba(255, 255, 255, 0.85);">
-          {{ product.description | strip_html | truncatewords: 20 }}
-        </p>
-      {% endif %}
-
-      <!-- View product link -->
-      <a
-        href="{{ product.url }}"
-        class="bless-carousel__link"
-        style="color: white; border-color: white; margin-bottom: 0.5rem;"
+<div
+  class="bless-carousel__card"
+  data-product-id="{{ product.id }}"
+  data-product-url="{{ product.url }}"
+>
+  <!-- Image Container with hover swap -->
+  <div class="bless-carousel__image-container">
+    {% if product.featured_image %}
+      <!-- Primary Image -->
+      <img
+        src="{{ product.featured_image | image_url: width: 600 }}"
+        alt="{{ product.title | escape }}"
+        width="600"
+        height="600"
+        class="bless-carousel__image bless-carousel__image--primary"
+        data-primary-image
+        loading="lazy"
       >
-        View product
-      </a>
+    {% endif %}
 
-      <!-- Add to cart button -->
-      {%- form 'product', product, class: 'bless-carousel__form', novalidate: 'novalidate' -%}
-        <input
-          type="hidden"
-          name="id"
-          value="{{ product.selected_or_first_available_variant.id }}"
-        >
-        <button
-          type="submit"
-          class="bless-carousel__link"
-          style="color: white; border-color: white; margin-top: 0.25rem;"
-        >
-          {{ 'products.product.add_to_cart' | t: default: 'Add to cart' }}
-        </button>
-      {%- endform -%}
-    </div>
+    <!-- Secondary Image (shown on hover) -->
+    {% if product.images.size > 1 %}
+      {% assign second_image = product.images[1] %}
+      <img
+        src="{{ second_image | image_url: width: 600 }}"
+        alt="{{ product.title | escape }}"
+        width="600"
+        height="600"
+        class="bless-carousel__image bless-carousel__image--secondary"
+        data-secondary-image
+        loading="lazy"
+      >
+    {% endif %}
   </div>
-{% endcapture %}
 
-{% render 'slideshow-slide',
-  index: index,
-  slide_id: product.id,
-  class: 'bless-carousel__slide',
-  children: card_content
-%}
+  <!-- Card Content -->
+  <div class="bless-carousel__content">
+    <h3 class="bless-carousel__product-title" style="color: white;">
+      {{ product.title | escape }}
+    </h3>
+
+    {% if product.description != blank %}
+      <p class="bless-carousel__product-description" style="color: rgba(255, 255, 255, 0.85);">
+        {{ product.description | strip_html | truncatewords: 20 }}
+      </p>
+    {% endif %}
+
+    <!-- View product link -->
+    <a
+      href="{{ product.url }}"
+      class="bless-carousel__link"
+      style="color: white; border-color: white; margin-bottom: 0.5rem;"
+    >
+      View product
+    </a>
+
+    <!-- Add to cart button -->
+    {%- form 'product', product, class: 'bless-carousel__form', novalidate: 'novalidate' -%}
+      <input
+        type="hidden"
+        name="id"
+        value="{{ product.selected_or_first_available_variant.id }}"
+      >
+      <button
+        type="submit"
+        class="bless-carousel__link"
+        style="color: white; border-color: white; margin-top: 0.25rem;"
+      >
+        {{ 'products.product.add_to_cart' | t: default: 'Add to cart' }}
+      </button>
+    {%- endform -%}
+  </div>
+</div>
