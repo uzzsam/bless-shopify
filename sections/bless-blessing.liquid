@@ -385,7 +385,8 @@
 
     latestBlessingDetail = normalizedDetail;
 
-    if (signupWrapper) {
+    // Only show email form if email was NOT already collected in chat
+    if (signupWrapper && !normalizedDetail?.emailCollected) {
       signupWrapper.removeAttribute('hidden');
       clearSignupFeedback();
     }
