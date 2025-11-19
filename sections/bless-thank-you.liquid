@@ -4,7 +4,7 @@
   assign content_padding_bottom = section.settings.content_padding_bottom | default: 48
 %}
 
-<section id="BlessThankYou-{{ section.id }}" class="bless-thank-you bless-overlay-30" data-bless-thank-you-section>
+<section id="BlessThankYou-{{ section.id }}" class="bless-thank-you" data-bless-thank-you-section>
   <div
     class="bless-thank-you__content"
     style="padding-top: {{ content_padding_top }}px; padding-bottom: {{ content_padding_bottom }}px;"
@@ -97,6 +97,20 @@
   color: rgb(var(--color-light-flesh, 236, 227, 214));
   padding-top: 0;
   margin-top: -80px;
+  z-index: 0;
+}
+
+/* Custom overlay that starts below header (80px) */
+.bless-thank-you::before {
+  content: "";
+  position: absolute;
+  top: 80px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 0;
+  pointer-events: none;
 }
 
 .bless-thank-you__content {
