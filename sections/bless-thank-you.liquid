@@ -95,17 +95,19 @@
   background-position: center;
   overflow: hidden;
   color: rgb(var(--color-light-flesh, 236, 227, 214));
-  padding-top: 80px;
+  padding-top: 0;
   margin-top: 0;
-  box-sizing: border-box;
   z-index: 0;
 }
 
-/* Dark overlay on the video content */
+/* Dark overlay on the video content - starts below header */
 .bless-thank-you::before {
   content: "";
   position: absolute;
-  inset: 0;
+  top: 80px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.3);
   z-index: -1;
   pointer-events: none;
