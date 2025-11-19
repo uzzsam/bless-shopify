@@ -45,26 +45,51 @@
       </p>
     {% endif %}
 
-    <!-- View product link -->
-    <a
-      href="{{ product.url }}"
-      class="bless-carousel__link"
-      style="color: white; border-color: white; margin-bottom: 0.5rem;"
-    >
-      View product
-    </a>
-
     <!-- Add to cart button -->
     {%- form 'product', product, class: 'bless-carousel__form', novalidate: 'novalidate' -%}
+      {% if product.variants.size > 1 %}
+        <label class="bless-carousel__form-label" style="color: rgba(255, 255, 255, 0.9); font-size: 0.85rem;">
+          Choose option
+        </label>
+        <select
+          name="id"
+          class="bless-carousel__form-select"
+          style="background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; padding: 0.5rem; width: 100%; margin-bottom: 0.75rem; font-size: 0.9rem;"
+        >
+          {% for variant in product.variants %}
+            <option
+              value="{{ variant.id }}"
+              {% if variant.id == product.selected_or_first_available_variant.id %}selected{% endif %}
+              {% unless variant.available %}disabled{% endunless %}
+            >
+              {{ variant.title }}
+            </option>
+          {% endfor %}
+        </select>
+      {% else %}
+        <input
+          type="hidden"
+          name="id"
+          value="{{ product.selected_or_first_available_variant.id }}"
+        >
+      {% endif %}
+
+      <label class="bless-carousel__form-label" style="color: rgba(255, 255, 255, 0.9); font-size: 0.85rem;">
+        Quantity
+      </label>
       <input
-        type="hidden"
-        name="id"
-        value="{{ product.selected_or_first_available_variant.id }}"
+        type="number"
+        name="quantity"
+        value="1"
+        min="1"
+        class="bless-carousel__form-quantity"
+        style="background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; padding: 0.5rem; width: 100%; margin-bottom: 0.75rem; font-size: 0.9rem; text-align: center;"
       >
+
       <button
         type="submit"
         class="bless-carousel__link"
-        style="color: white; border-color: white; margin-top: 0.25rem;"
+        style="color: white; border-color: white;"
       >
         {{ 'products.product.add_to_cart' | t: default: 'Add to cart' }}
       </button>

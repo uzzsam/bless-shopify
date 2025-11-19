@@ -156,10 +156,10 @@
     }
   }
 
-  /* Desktop - 2 slides (bigger cards) */
+  /* Desktop - 3 slides */
   @media (min-width: 900px) {
     .bless-carousel__slide {
-      width: calc((min(100vw, 1400px) - 16rem - 1rem) / 2);
+      width: calc((min(100vw, 1400px) - 16rem - 2rem) / 3);
     }
   }
 
@@ -346,7 +346,7 @@
       const width = window.innerWidth;
       if (width < 600) return 2;
       if (width < 900) return 3;
-      return 2; // desktop: 2 cards only
+      return 3; // desktop: 3 cards
     }
 
     let visibleItems = getVisibleItems();
@@ -401,7 +401,7 @@
       track.style.transform = `translateX(${offset}px)`;
     }
 
-    // Continuous smooth auto-scroll
+    // Continuous smooth auto-scroll with seamless wraparound
     function autoScroll() {
       if (!isAutoScrolling) return;
 
@@ -411,14 +411,17 @@
 
       // When we've scrolled past all slides, wrap to beginning seamlessly
       if (currentIndex >= totalSlides) {
-        currentIndex -= totalSlides; // wrap without jump
-        // Disable transition during wraparound for invisible reset
+        currentIndex -= totalSlides; // wrap without visual jump
+
+        // Temporarily disable transition for invisible reset
         track.classList.add('instant');
-        updatePosition(true);
+        updatePosition(false); // updatePosition with animate=false won't remove instant
+
+        // Force browser to apply the transform immediately
+        track.offsetHeight;
+
         // Re-enable transition on next frame
-        setTimeout(() => {
-          track.classList.remove('instant');
-        }, 16);
+        track.classList.remove('instant');
       } else {
         updatePosition(true);
       }
@@ -437,9 +440,9 @@
 
       // Wrap around seamlessly
       if (currentIndex >= totalSlides) {
-        currentIndex = 0;
+        currentIndex -= totalSlides;
       } else if (currentIndex < 0) {
-        currentIndex = totalSlides - 1;
+        currentIndex += totalSlides;
       }
 
       updatePosition(true);
