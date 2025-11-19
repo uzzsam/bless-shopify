@@ -100,16 +100,13 @@
   z-index: 0;
 }
 
-/* Dark overlay on the video content - starts below header */
+/* Dark overlay - extends from top to bottom */
 .bless-thank-you::before {
   content: "";
   position: absolute;
-  top: 80px;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(0, 0, 0, 0.3);
-  z-index: -1;
+  z-index: 1;
   pointer-events: none;
 }
 
@@ -132,7 +129,7 @@
   height: 100%;
 }
 
-/* Position focus video absolutely behind content */
+/* Position focus video absolutely behind content, above overlay */
 .bless-thank-you__focus {
   position: absolute;
   top: 0;
@@ -144,7 +141,7 @@
   display: flex;
   justify-content: center;
   flex-shrink: 0;
-  z-index: 0;
+  z-index: 1.5;
 }
 
 .bless-thank-you__focus-wrapper {
