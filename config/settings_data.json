@@ -40,6 +40,7 @@
     "secondary_button_border_width": 0,
     "button_border_radius_secondary": 0,
     "cart_type": "drawer",
+    "empty_cart_button_link": "shopify://pages/blessing-thank-you",
     "inputs_border_radius": 0,
     "popover_border_radius": 0,
     "popover_border": "none",
