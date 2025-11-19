@@ -115,7 +115,7 @@
 
 .bless-thank-you__content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   max-width: min(620px, 92vw);
   margin: 0 auto;
   text-align: center;
@@ -129,17 +129,22 @@
   gap: 0.5rem;
   width: 100%;
   box-sizing: border-box;
+  height: 100%;
 }
 
+/* Position focus video absolutely behind content */
 .bless-thank-you__focus {
-  margin: 0 auto;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: auto;
   height: clamp(450px, 75vh, 900px);
   aspect-ratio: 9 / 16;
   display: flex;
   justify-content: center;
-  position: relative;
   flex-shrink: 0;
+  z-index: 0;
 }
 
 .bless-thank-you__focus-wrapper {
