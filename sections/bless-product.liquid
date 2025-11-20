@@ -459,17 +459,75 @@
   const dynamicBody = sectionEl.querySelector('[data-dynamic-body]');
 
 
-// --- ADD: pick up ?name= from the URL and prefill the property ---
+// --- Pick up URL parameters and set product dynamically ---
 const urlParams = new URLSearchParams(window.location.search);
-const urlBlessingRaw = urlParams.get('name');
-if (urlBlessingRaw) {
-  const urlBlessing = urlBlessingRaw.trim().slice(0, 200); // basic guard
-  if (blessingInput) blessingInput.value = urlBlessing;
+const urlName = urlParams.get('name');
+const urlSidthie = urlParams.get('sidthie');
 
-  // store for the dynamic card to mirror
+// Map Sidthie keys to product handles
+const sidthieToProduct = {
+  'NALAMERA': 'nalamera',
+  'LUMASARA': 'lumasara',
+  'WELAMORA': 'welamora',
+  'NIRALUMA': 'niraluma',
+  'RAKAWELA': 'rakawela',
+  'OLANWELA': 'olanwela',
+  'MORASARA': 'morasara'
+};
+
+// Update heading to show chosen Sidthie and name
+if (urlSidthie || urlName) {
+  const headingEl = sectionEl.querySelector('[class*="heading"]');
+  if (headingEl) {
+    let newHeading = 'Your chosen Sidthie';
+    if (urlSidthie) newHeading += ' ' + urlSidthie;
+    if (urlName) newHeading += ', ' + urlName;
+    headingEl.textContent = newHeading;
+  }
+}
+
+// Load product from URL Sidthie (thank-you page)
+if (urlSidthie && dynamicBody) {
+  const label = urlSidthie; // Display name
+  const key = urlSidthie.toUpperCase();
+  const productHandle = sidthieToProduct[key];
+
+  if (productHandle) {
+    // Update the Sidthie label
+    if (sidthieLabelEl) {
+      sidthieLabelEl.hidden = false;
+      sidthieLabelEl.textContent = `Your chosen Sidthie: ${label}`;
+    }
+
+    // Load and render the product dynamically
+    dynamicBody.innerHTML = `<p class="bless-product__empty">Loading ${label}…</p>`;
+
+    // Fetch the product
+    fetch(`/products/${productHandle}.json`)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        const product = data.product;
+        sectionEl.dataset.latestSidthie = key;
+
+        // Render the product card (simplified version for thanks page)
+        renderDynamicCard(product);
+      })
+      .catch(err => {
+        console.error('Failed to load product:', err);
+        dynamicBody.innerHTML = `<p class="bless-product__empty">Could not load product for "${label}".</p>`;
+      });
+  }
+}
+
+// Prefill name from URL
+if (urlName) {
+  const urlBlessing = urlName.trim().slice(0, 200);
+  if (blessingInput) blessingInput.value = urlBlessing;
   sectionEl.dataset.latestBlessing = urlBlessing;
 
-  // if a blessing is required, enable submit now that we have it
   if (requireBlessing) {
     submitButton?.removeAttribute('disabled');
     sectionEl.querySelectorAll('[data-submit]').forEach((b) => (b.disabled = false));
