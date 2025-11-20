@@ -445,10 +445,16 @@
     console.log('[BlessBlessing] normalized detail', normalizedDetail);
     latestBlessingDetail = normalizedDetail;
 
-    // Only show email form if email was NOT already collected in chat
-    if (signupWrapper && !normalizedDetail?.emailCollected) {
-      signupWrapper.removeAttribute('hidden');
-      clearSignupFeedback();
+    // Hide email form if email was already collected in chat
+    if (signupWrapper) {
+      if (normalizedDetail?.emailCollected) {
+        signupWrapper.setAttribute('hidden', 'hidden');
+        console.log('[BlessBlessing] Email collected in chat - hiding signup form');
+      } else {
+        signupWrapper.removeAttribute('hidden');
+        clearSignupFeedback();
+        console.log('[BlessBlessing] Email NOT collected - showing signup form');
+      }
     }
 
     if (placeholderEl) {
@@ -526,6 +532,25 @@
       } else {
         console.warn('[BlessBlessing] continueButtonEl not found');
       }
+
+      // Auto-redirect to thank-you page after 30 seconds
+      console.log('[BlessBlessing] Setting auto-redirect timer for 30 seconds');
+      setTimeout(() => {
+        if (latestBlessingDetail) {
+          const userName = latestBlessingDetail.userName || null;
+          const sidthieKey = latestBlessingDetail.sidthie || null;
+
+          // Build URL
+          const params = new URLSearchParams();
+          if (userName) params.append('name', userName);
+          if (sidthieKey) params.append('sidthie', sidthieKey);
+
+          const thankYouUrl = '/pages/blessing-thank-you' + (params.toString() ? '?' + params.toString() : '');
+
+          console.log('[BlessBlessing] Auto-redirecting to', thankYouUrl);
+          window.location.href = thankYouUrl;
+        }
+      }, 30000); // 30 seconds
     } else {
       console.warn('[BlessBlessing] Email was NOT collected in chat', { emailCollected: normalizedDetail?.emailCollected });
     }
