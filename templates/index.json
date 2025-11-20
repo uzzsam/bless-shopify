@@ -42,7 +42,7 @@
       "settings": {
         "heading": "Your blessing",
         "placeholder_text": "",
-        "show_signup": false,
+        "show_signup": true,
         "signup_prompt": "Would you like to receive your Sidthie & Blessing with free monthly Wisdoms from Sidthah?",
         "signup_placeholder": "Enter your email",
         "signup_button_label": "Receive wisdom",
