@@ -528,14 +528,31 @@
       // Show continue button
       if (continueButtonEl) {
         continueButtonEl.removeAttribute('hidden');
-        console.log('[BlessBlessing] Continue button shown');
+        console.log('[BlessBlessing] Continue button shown and ready for click');
       } else {
         console.warn('[BlessBlessing] continueButtonEl not found');
       }
 
-      // Auto-redirect to thank-you page after 30 seconds
+      // Track if user clicked the continue button
+      let userClickedButton = false;
+
+      // If continue button exists, track when it's clicked
+      if (continueButtonEl) {
+        continueButtonEl.addEventListener('click', function onContinueClick() {
+          console.log('[BlessBlessing] User clicked continue button - preventing auto-redirect');
+          userClickedButton = true;
+          // The button's own click handler will redirect, no need to do it here
+        });
+      }
+
+      // Auto-redirect to thank-you page after 30 seconds (only if button not clicked)
       console.log('[BlessBlessing] Setting auto-redirect timer for 30 seconds');
-      setTimeout(() => {
+      const autoRedirectTimer = setTimeout(() => {
+        if (userClickedButton) {
+          console.log('[BlessBlessing] User already clicked button, skipping auto-redirect');
+          return;
+        }
+
         if (latestBlessingDetail) {
           const userName = latestBlessingDetail.userName || null;
           const sidthieKey = latestBlessingDetail.sidthie || null;
@@ -547,10 +564,12 @@
 
           const thankYouUrl = '/pages/blessing-thank-you' + (params.toString() ? '?' + params.toString() : '');
 
-          console.log('[BlessBlessing] Auto-redirecting to', thankYouUrl);
+          console.log('[BlessBlessing] 30 second timeout elapsed, auto-redirecting to', thankYouUrl);
           window.location.href = thankYouUrl;
         }
       }, 30000); // 30 seconds
+
+      console.log('[BlessBlessing] Auto-redirect timer started - user can click button to skip');
     } else {
       console.warn('[BlessBlessing] Email was NOT collected in chat', { emailCollected: normalizedDetail?.emailCollected });
     }
@@ -698,9 +717,15 @@
   // Continue button handler - redirects to thank-you page
   if (continueButtonEl) {
     continueButtonEl.addEventListener('click', () => {
+      console.log('[BlessBlessing] Continue button clicked by user');
       if (latestBlessingDetail) {
         const userName = latestBlessingDetail.userName || null;
         const sidthieKey = latestBlessingDetail.sidthie || null;
+
+        console.log('[BlessBlessing] Redirecting with user data:', {
+          userName: userName,
+          sidthie: sidthieKey
+        });
 
         // Build URL
         const params = new URLSearchParams();
@@ -709,8 +734,11 @@
 
         const thankYouUrl = '/pages/blessing-thank-you' + (params.toString() ? '?' + params.toString() : '');
 
+        console.log('[BlessBlessing] Redirecting to:', thankYouUrl);
         // Redirect
         window.location.href = thankYouUrl;
+      } else {
+        console.warn('[BlessBlessing] No blessing detail available for redirect');
       }
     });
   }
