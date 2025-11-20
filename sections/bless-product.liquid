@@ -31,7 +31,7 @@
 
   <div class="bless-product__grid" data-product-grid>
     {% assign product = nalamera_product %}
-    <article class="bless-product__item" data-sidthie-key="NALAMERA" style="display: none;">
+    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="NALAMERA" style="display: none;">
       <p class="bless-product__badge">NALAMERA</p>
       {% if product %}
         {% assign default_variant = product.selected_or_first_available_variant %}
@@ -61,7 +61,7 @@
     </article>
 
     {% assign product = lumasara_product %}
-    <article class="bless-product__item" data-sidthie-key="LUMASARA" style="display: none;">
+    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="LUMASARA" style="display: none;">
       <p class="bless-product__badge">LUMASARA</p>
       {% if product %}
         {% assign default_variant = product.selected_or_first_available_variant %}
@@ -91,7 +91,7 @@
     </article>
 
     {% assign product = welamora_product %}
-    <article class="bless-product__item" data-sidthie-key="WELAMORA" style="display: none;">
+    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="WELAMORA" style="display: none;">
       <p class="bless-product__badge">WELAMORA</p>
       {% if product %}
         {% assign default_variant = product.selected_or_first_available_variant %}
@@ -121,7 +121,7 @@
     </article>
 
     {% assign product = niraluma_product %}
-    <article class="bless-product__item" data-sidthie-key="NIRALUMA" style="display: none;">
+    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="NIRALUMA" style="display: none;">
       <p class="bless-product__badge">NIRALUMA</p>
       {% if product %}
         {% assign default_variant = product.selected_or_first_available_variant %}
@@ -151,7 +151,7 @@
     </article>
 
     {% assign product = olanwela_product %}
-    <article class="bless-product__item" data-sidthie-key="OLANWELA" style="display: none;">
+    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="OLANWELA" style="display: none;">
       <p class="bless-product__badge">OLANWELA</p>
       {% if product %}
         {% assign default_variant = product.selected_or_first_available_variant %}
@@ -181,7 +181,7 @@
     </article>
 
     {% assign product = rakawela_product %}
-    <article class="bless-product__item" data-sidthie-key="RAKAWELA" style="display: none;">
+    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="RAKAWELA" style="display: none;">
       <p class="bless-product__badge">RAKAWELA</p>
       {% if product %}
         {% assign default_variant = product.selected_or_first_available_variant %}
@@ -211,7 +211,7 @@
     </article>
 
     {% assign product = morasara_product %}
-    <article class="bless-product__item" data-sidthie-key="MORASARA" style="display: none;">
+    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="MORASARA" style="display: none;">
       <p class="bless-product__badge">MORASARA</p>
       {% if product %}
         {% assign default_variant = product.selected_or_first_available_variant %}
@@ -314,6 +314,12 @@
   text-align: center;
 }
 
+.sidthie-product-wrapper {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
 .bless-product__badge {
   display: inline-flex;
   align-items: center;
@@ -330,7 +336,7 @@
 }
 
 .bless-product__media {
-  aspect-ratio: 1 / 1;
+  width: 100%;
   border-radius: 16px;
   overflow: hidden;
   background: #f4f4ef;
@@ -341,7 +347,7 @@
 
 .bless-product__image {
   width: 100%;
-  height: 100%;
+  height: auto;
   object-fit: cover;
   display: block;
 }
