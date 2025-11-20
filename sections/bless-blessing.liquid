@@ -365,8 +365,9 @@
 
 {% javascript %}
 (function () {
-  const sectionId = '{{ section.id }}';
-  const sectionEl = document.querySelector(`[data-section-id="${sectionId}"]`);
+  const scriptEl = document.currentScript;
+  const sectionEl = scriptEl?.closest('[data-section-id]') || document.querySelector('[data-section-id]');
+  const sectionId = sectionEl?.dataset.sectionId || '';
   if (!sectionEl) return;
 
   const panelEl = sectionEl.querySelector('[data-blessing-panel]');
