@@ -16,7 +16,10 @@
       {% else %}
         {% assign poster_url = '' %}
       {% endif %}
-      <div class="bless-thank-you__focus bless-thank-you__focus-wrapper">
+      <div
+        class="bless-thank-you__focus bless-thank-you__focus-wrapper"
+        style="display: flex; justify-content: center; align-items: center; width: 100%; margin: 0 auto;"
+      >
         {{
           overlay_video
           | video_tag:
@@ -151,6 +154,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .bless-thank-you__focus-video {
@@ -160,6 +164,7 @@
   border-radius: 0 0 32px 32px;
   box-shadow: 0 32px 60px rgba(0, 0, 0, 0.35);
   display: block;
+  margin: 0 auto;
 }
 
 .bless-thank-you__focus-video::-webkit-media-controls {
