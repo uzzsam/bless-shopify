@@ -684,6 +684,51 @@
   window.addEventListener('blessing:update', window[updateKey]);
   console.log('[BlessBlessing] Event listener attached for blessing:update');
 
+  const readyKey = `__blessBlessingReady_${sectionId}`;
+  if (window[readyKey]) {
+    window.removeEventListener('blessing:ready', window[readyKey]);
+  }
+  window[readyKey] = (event) => {
+    const detail = event?.detail || latestBlessingDetail || {};
+    console.log('[BlessBlessing] blessing:ready received', { detail });
+
+    // Ensure success message and continue button are visible
+    const userEmail = detail?.email || (detail?.emailCollected ? (detail.email || 'your email') : null);
+    if (successMessageEl) {
+      if (userEmail) {
+        successMessageEl.textContent = 'Perfect! Your blessing has been sent to ' + userEmail;
+      }
+      successMessageEl.hidden = false;
+      successMessageEl.removeAttribute('hidden');
+    }
+    if (continueButtonEl) {
+      continueButtonEl.hidden = false;
+      continueButtonEl.removeAttribute('hidden');
+    }
+
+    // Inject explanation into meta text if available
+    if (metaTextEl) {
+      const explanation = detail?.explanation || metaTextEl.textContent || '';
+      if (explanation) {
+        metaTextEl.textContent = explanation;
+        metaTextEl.hidden = false;
+        metaTextEl.removeAttribute('hidden');
+        if (metaWrapper) metaWrapper.removeAttribute('hidden');
+      }
+    }
+
+    // Start redirect countdown if available
+    if (typeof startRedirectCountdown === 'function') {
+      try {
+        startRedirectCountdown(detail);
+      } catch (err) {
+        console.warn('[BlessBlessing] startRedirectCountdown failed', err);
+      }
+    }
+  };
+  window.addEventListener('blessing:ready', window[readyKey]);
+  console.log('[BlessBlessing] Event listener attached for blessing:ready');
+
   const errorKey = `__blessBlessingError_${sectionId}`;
   if (window[errorKey]) {
     window.removeEventListener('blessing:error', window[errorKey]);
