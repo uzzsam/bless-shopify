@@ -41,6 +41,19 @@
         <p class="bless-blessing__meta-text" data-sidthie-excerpt hidden></p>
       </div>
 
+      <!-- Success message from email collection in chat -->
+      <p class="bless-blessing__success-message" data-success-message hidden></p>
+
+      <!-- Continue journey CTA button -->
+      <button
+        type="button"
+        class="bless-blessing__continue-button"
+        data-continue-button
+        hidden
+      >
+        Continue your journey
+      </button>
+
       {% if section.settings.show_signup %}
         <form
           class="bless-blessing__signup bless-blessing__signup-form"
@@ -301,6 +314,43 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Success message from email collection */
+.bless-blessing__success-message {
+  margin: 1.5rem 0 0.75rem 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  animation: bless-fade-up 500ms ease forwards;
+}
+
+/* Continue journey button in blessing section */
+.bless-blessing__continue-button {
+  margin-top: 1.75rem;
+  padding: 0.875rem 2.5rem;
+  border-radius: 999px;
+  border: none;
+  background: rgba(var(--color-avocado, 227, 216, 154), 0.95);
+  color: rgb(var(--color-dark-green, 46, 94, 76));
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 200ms ease;
+  box-shadow: 0 4px 12px rgba(227, 216, 154, 0.3);
+  animation: bless-fade-up 600ms ease forwards;
+}
+
+.bless-blessing__continue-button:hover {
+  transform: translateY(-2px);
+  background: rgba(var(--color-avocado, 227, 216, 154), 1);
+  box-shadow: 0 6px 16px rgba(227, 216, 154, 0.4);
+}
+
+.bless-blessing__continue-button:active {
+  transform: translateY(0);
+}
+
 @media (max-width: 520px) {
   .bless-blessing__signup-row {
     flex-direction: column;
@@ -325,6 +375,8 @@
   const metaWrapper = sectionEl.querySelector('[data-blessing-meta]');
   const metaTitleEl = sectionEl.querySelector('[data-sidthie-title]');
   const metaTextEl = sectionEl.querySelector('[data-sidthie-excerpt]');
+  const successMessageEl = sectionEl.querySelector('[data-success-message]');
+  const continueButtonEl = sectionEl.querySelector('[data-continue-button]');
   const signupWrapper = sectionEl.querySelector('[data-blessing-signup]');
   const signupPrompt = sectionEl.querySelector('[data-signup-prompt]');
   const signupSidthieInput = sectionEl.querySelector('[data-signup-sidthie]');
@@ -443,6 +495,21 @@
       if (signupSidthieInput) {
         signupSidthieInput.value =
           normalizedDetail?.sidthie || normalizedDetail?.sidthieLabel || '';
+      }
+    }
+
+    // Show success message and continue button if email was collected in chat
+    if (normalizedDetail?.emailCollected) {
+      // Get email from event detail or show generic message
+      const userEmail = normalizedDetail?.email || 'your email';
+      if (successMessageEl) {
+        successMessageEl.textContent = 'Perfect! Your blessing has been sent to ' + userEmail;
+        successMessageEl.removeAttribute('hidden');
+      }
+
+      // Show continue button
+      if (continueButtonEl) {
+        continueButtonEl.removeAttribute('hidden');
       }
     }
 
@@ -577,6 +644,26 @@
         if (copyFeedback) copyFeedback.hidden = false;
       } catch (error) {
         console.error('Unable to copy blessing', error);
+      }
+    });
+  }
+
+  // Continue button handler - redirects to thank-you page
+  if (continueButtonEl) {
+    continueButtonEl.addEventListener('click', () => {
+      if (latestBlessingDetail) {
+        const userName = latestBlessingDetail.userName || null;
+        const sidthieKey = latestBlessingDetail.sidthie || null;
+
+        // Build URL
+        const params = new URLSearchParams();
+        if (userName) params.append('name', userName);
+        if (sidthieKey) params.append('sidthie', sidthieKey);
+
+        const thankYouUrl = '/pages/blessing-thank-you' + (params.toString() ? '?' + params.toString() : '');
+
+        // Redirect
+        window.location.href = thankYouUrl;
       }
     });
   }
