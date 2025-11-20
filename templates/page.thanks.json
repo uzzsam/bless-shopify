@@ -25,21 +25,14 @@
     "product": {
       "type": "bless-product",
       "settings": {
-        "product": "",
-        "heading": "Your selected product",
-        "panel_background": "65, 65, 65",
-        "panel_opacity": 40,
-        "show_media": true,
-        "show_description": true,
-        "show_price": true,
-        "show_variant_picker": false,
-        "show_variant_prices": true,
-        "show_quantity_selector": false,
-        "require_blessing": false,
-        "variant_label": "Choose your option",
-        "property_key": "Blessing",
-        "button_label": "Add to cart",
-        "cart_note": ""
+        "heading": "Your Sidthie",
+        "nalamera_product": "nalamera",
+        "lumasara_product": "lumasara",
+        "welamora_product": "welamora",
+        "niraluma_product": "niraluma",
+        "olanwela_product": "olanwela",
+        "rakawela_product": "rakawela",
+        "morasara_product": "morasara"
       }
     },
     "carousel": {
