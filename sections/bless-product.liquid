@@ -1,841 +1,450 @@
 {% liquid
-  assign selected_product = section.settings.product
-  assign product = nil
-  assign selected_variant = nil
-
-  if selected_product != blank
-    assign product = selected_product
-    assign selected_variant = selected_product.selected_or_first_available_variant
-  endif
-
-  assign panel_rgb = section.settings.panel_background | default: '65, 65, 65'
-  assign panel_opacity = section.settings.panel_opacity | default: 70 | times: 0.01
-  assign require_blessing = section.settings.require_blessing | default: true
-  assign form_id = 'BlessProductForm-' | append: section.id
+  assign heading = section.settings.heading | default: 'Your Sidthie necklace'
+  assign nalamera_product = section.settings.nalamera_product
+  assign lumasara_product = section.settings.lumasara_product
+  assign welamora_product = section.settings.welamora_product
+  assign niraluma_product = section.settings.niraluma_product
+  assign olanwela_product = section.settings.olanwela_product
+  assign rakawela_product = section.settings.rakawela_product
+  assign morasara_product = section.settings.morasara_product
 %}
 
-<section
-  id="product-section"
-  class="bless-product bless-overlay-30"
-  data-section-id="{{ section.id }}"
-  data-require-blessing="{{ require_blessing }}"
->
-  <div class="bless-product__inner">
-    <h2 class="bless-product__heading">
-      {{ section.settings.heading | default: 'Would you like to affirm your Sidthie by wearing a pendant?' | escape }}
-    </h2>
-    <p class="bless-product__intention" data-product-sidthie hidden></p>
+<section class="bless-product" data-bless-product-section>
+  <div class="bless-product__header">
+    <h2 class="bless-product__heading">{{ heading | escape }}</h2>
+    <p class="bless-product__subtitle" data-name-target hidden></p>
+  </div>
 
-    {% if product and selected_variant %}
-      <!-- Static (Liquid) mode -->
-      <div
-        class="bless-product__card"
-        style="background-color: rgba({{ panel_rgb }}, {{ panel_opacity }})"
-        data-product-card
-      >
-        <div class="bless-product__details">
-          {% if section.settings.show_media and product.featured_media %}
-            <div class="bless-product__media">
-              {% assign featured_media = product.featured_media %}
-              {% case featured_media.media_type %}
-                {% when 'image' %}
-                  <div class="bless-product__image-container">
-                    {{
-                      featured_media
-                      | image_url: width: 960
-                      | image_tag:
-                        widths: '400, 600, 760, 900',
-                        sizes: '(min-width: 768px) 360px, 80vw',
-                        alt: featured_media.alt | default: product.title,
-                        class: 'bless-product__image bless-product__image--primary',
-                        data-primary: true
-                    }}
-                    {% if product.media.size > 1 %}
-                      {% assign secondary_media = product.media[1] %}
-                      {% if secondary_media.media_type == 'image' %}
-                        {{
-                          secondary_media
-                          | image_url: width: 960
-                          | image_tag:
-                            widths: '400, 600, 760, 900',
-                            sizes: '(min-width: 768px) 360px, 80vw',
-                            alt: secondary_media.alt | default: product.title,
-                            class: 'bless-product__image bless-product__image--secondary',
-                            data-secondary: true
-                        }}
-                      {% endif %}
-                    {% endif %}
-                  </div>
-                {% when 'video' %}
-                  {{
-                    featured_media
-                    | video_tag:
-                      controls: true,
-                      muted: true,
-                      loop: false,
-                      playsinline: true,
-                      class: 'bless-product__video'
-                  }}
-                {% when 'external_video' %}
-                  {{
-                    featured_media
-                    | external_video_tag:
-                      class: 'bless-product__video'
-                  }}
-                {% when 'model' %}
-                  {{
-                    featured_media
-                    | model_viewer_tag:
-                      class: 'bless-product__model'
-                  }}
-                {% else %}
-                  <!-- Guard unknown type; avoid media_tag on strings -->
-                  <div class="bless-product__image-container">
-                    <img class="bless-product__image bless-product__image--primary" src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | escape }}" width="900" height="900">
-                  </div>
-              {% endcase %}
-            </div>
+  <div class="bless-product__loading" data-loading>
+    <div class="bless-product__spinner" aria-hidden="true"></div>
+    <p class="bless-product__loading-text">Loading your necklace...</p>
+  </div>
+
+  <div class="bless-product__fallback" data-fallback hidden>
+    <p class="bless-product__fallback-text">
+      We could not find a Sidthie in your link. You can still explore every necklace below.
+    </p>
+    <button type="button" class="bless-product__button bless-product__button--ghost" data-view-all-toggle>
+      View all necklaces
+    </button>
+  </div>
+
+  <div class="bless-product__grid" data-product-grid>
+    {% assign product = nalamera_product %}
+    <article class="bless-product__item" data-sidthie-key="NALAMERA" style="display: none;">
+      <p class="bless-product__badge">NALAMERA</p>
+      {% if product %}
+        {% assign default_variant = product.selected_or_first_available_variant %}
+        <div class="bless-product__media">
+          {% if product.featured_image %}
+            {{
+              product.featured_image
+              | image_url: width: 960
+              | image_tag:
+                widths: '360, 540, 720, 900',
+                sizes: '(min-width: 768px) 320px, 80vw',
+                class: 'bless-product__image',
+                alt: product.title
+            }}
+          {% else %}
+            <div class="bless-product__placeholder">Image coming soon</div>
           {% endif %}
-
-          <div class="bless-product__content">
-            <h3 class="bless-product__title">{{ product.title | escape }}</h3>
-
-            {% if section.settings.show_price and selected_variant %}
-              <p class="bless-product__price">
-                {{ selected_variant.price | money_with_currency }}
-              </p>
-            {% endif %}
-
-            {% if section.settings.show_description and product.description != blank %}
-              <div class="bless-product__description">
-                {{ product.description | strip_html | truncatewords: 80 }}
-              </div>
-            {% endif %}
-
-            {%- form 'product', product, id: form_id, novalidate: 'novalidate', class: 'bless-product__form' -%}
-              {% if selected_variant %}
-                <input type="hidden" name="id" value="{{ selected_variant.id }}" data-variant-input>
-                <input type="hidden" name="properties[{{ section.settings.property_key }}]" data-blessing-input>
-
-              {% endif %}
-              <input type="hidden" name="properties[{{ section.settings.property_key }}]" data-blessing-input>
-
-              {% if section.settings.show_variant_picker and product.has_only_default_variant == false %}
-                <label class="bless-product__label" for="VariantSelect-{{ section.id }}">
-                  {{ section.settings.variant_label | escape }}
-                </label>
-                <select id="VariantSelect-{{ section.id }}" class="bless-product__select" data-variant-select>
-                  {% for variant in product.variants %}
-                    <option
-                      value="{{ variant.id }}"
-                      {% if variant.id == selected_variant.id %}selected{% endif %}
-                      {% unless variant.available %}disabled{% endunless %}
-                    >
-                      {{ variant.title }}{% if section.settings.show_variant_prices %} — {{ variant.price | money }}{% endif %}
-                    </option>
-                  {% endfor %}
-                </select>
-              {% endif %}
-
-              {% if section.settings.show_quantity_selector %}
-                <label class="bless-product__label" for="Quantity-{{ section.id }}">
-                  {{ 'products.product.quantity' | t }}
-                </label>
-                <input
-                  id="Quantity-{{ section.id }}"
-                  class="bless-product__quantity"
-                  type="number"
-                  name="quantity"
-                  min="1"
-                  value="1"
-                >
-              {% endif %}
-
-              <button
-                type="submit"
-                class="bless-product__cta"
-                data-submit
-                {% if require_blessing %}disabled{% endif %}
-              >
-                {{ section.settings.button_label | escape }}
-              </button>
-
-              <p class="bless-product__note">
-                {{ section.settings.cart_note | escape }}
-              </p>
-            {%- endform -%}
-          </div>
         </div>
-      </div>
-    {% else %}
-      <!-- Dynamic (AJAX) mode: waits for Sidthie selection, then renders card -->
-      <div
-        class="bless-product__card"
-        style="background-color: rgba({{ panel_rgb }}, {{ panel_opacity }})"
-        data-dynamic-card
-      >
-        <div class="bless-product__dynamic" data-dynamic-body>
-          <div class="bless-product__empty-state">
-            <div class="bless-product__empty-image">
-              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
-                <rect x="10" y="10" width="80" height="80" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" rx="8"/>
-                <path d="M35 45 L50 30 L65 45 M50 30 V55 M35 55 H65" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <h3 class="bless-product__empty-title">No product selected</h3>
-            <p class="bless-product__empty-message">
-              Select a product from the chat above or choose one using the category picker to see it here.
-            </p>
-          </div>
+        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
+        {% if default_variant %}
+          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
+        {% endif %}
+        <a class="bless-product__button" href="{{ product.url }}">View product</a>
+      {% else %}
+        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
+      {% endif %}
+    </article>
+
+    {% assign product = lumasara_product %}
+    <article class="bless-product__item" data-sidthie-key="LUMASARA" style="display: none;">
+      <p class="bless-product__badge">LUMASARA</p>
+      {% if product %}
+        {% assign default_variant = product.selected_or_first_available_variant %}
+        <div class="bless-product__media">
+          {% if product.featured_image %}
+            {{
+              product.featured_image
+              | image_url: width: 960
+              | image_tag:
+                widths: '360, 540, 720, 900',
+                sizes: '(min-width: 768px) 320px, 80vw',
+                class: 'bless-product__image',
+                alt: product.title
+            }}
+          {% else %}
+            <div class="bless-product__placeholder">Image coming soon</div>
+          {% endif %}
         </div>
-      </div>
-    {% endif %}
+        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
+        {% if default_variant %}
+          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
+        {% endif %}
+        <a class="bless-product__button" href="{{ product.url }}">View product</a>
+      {% else %}
+        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
+      {% endif %}
+    </article>
+
+    {% assign product = welamora_product %}
+    <article class="bless-product__item" data-sidthie-key="WELAMORA" style="display: none;">
+      <p class="bless-product__badge">WELAMORA</p>
+      {% if product %}
+        {% assign default_variant = product.selected_or_first_available_variant %}
+        <div class="bless-product__media">
+          {% if product.featured_image %}
+            {{
+              product.featured_image
+              | image_url: width: 960
+              | image_tag:
+                widths: '360, 540, 720, 900',
+                sizes: '(min-width: 768px) 320px, 80vw',
+                class: 'bless-product__image',
+                alt: product.title
+            }}
+          {% else %}
+            <div class="bless-product__placeholder">Image coming soon</div>
+          {% endif %}
+        </div>
+        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
+        {% if default_variant %}
+          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
+        {% endif %}
+        <a class="bless-product__button" href="{{ product.url }}">View product</a>
+      {% else %}
+        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
+      {% endif %}
+    </article>
+
+    {% assign product = niraluma_product %}
+    <article class="bless-product__item" data-sidthie-key="NIRALUMA" style="display: none;">
+      <p class="bless-product__badge">NIRALUMA</p>
+      {% if product %}
+        {% assign default_variant = product.selected_or_first_available_variant %}
+        <div class="bless-product__media">
+          {% if product.featured_image %}
+            {{
+              product.featured_image
+              | image_url: width: 960
+              | image_tag:
+                widths: '360, 540, 720, 900',
+                sizes: '(min-width: 768px) 320px, 80vw',
+                class: 'bless-product__image',
+                alt: product.title
+            }}
+          {% else %}
+            <div class="bless-product__placeholder">Image coming soon</div>
+          {% endif %}
+        </div>
+        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
+        {% if default_variant %}
+          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
+        {% endif %}
+        <a class="bless-product__button" href="{{ product.url }}">View product</a>
+      {% else %}
+        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
+      {% endif %}
+    </article>
+
+    {% assign product = olanwela_product %}
+    <article class="bless-product__item" data-sidthie-key="OLANWELA" style="display: none;">
+      <p class="bless-product__badge">OLANWELA</p>
+      {% if product %}
+        {% assign default_variant = product.selected_or_first_available_variant %}
+        <div class="bless-product__media">
+          {% if product.featured_image %}
+            {{
+              product.featured_image
+              | image_url: width: 960
+              | image_tag:
+                widths: '360, 540, 720, 900',
+                sizes: '(min-width: 768px) 320px, 80vw',
+                class: 'bless-product__image',
+                alt: product.title
+            }}
+          {% else %}
+            <div class="bless-product__placeholder">Image coming soon</div>
+          {% endif %}
+        </div>
+        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
+        {% if default_variant %}
+          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
+        {% endif %}
+        <a class="bless-product__button" href="{{ product.url }}">View product</a>
+      {% else %}
+        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
+      {% endif %}
+    </article>
+
+    {% assign product = rakawela_product %}
+    <article class="bless-product__item" data-sidthie-key="RAKAWELA" style="display: none;">
+      <p class="bless-product__badge">RAKAWELA</p>
+      {% if product %}
+        {% assign default_variant = product.selected_or_first_available_variant %}
+        <div class="bless-product__media">
+          {% if product.featured_image %}
+            {{
+              product.featured_image
+              | image_url: width: 960
+              | image_tag:
+                widths: '360, 540, 720, 900',
+                sizes: '(min-width: 768px) 320px, 80vw',
+                class: 'bless-product__image',
+                alt: product.title
+            }}
+          {% else %}
+            <div class="bless-product__placeholder">Image coming soon</div>
+          {% endif %}
+        </div>
+        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
+        {% if default_variant %}
+          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
+        {% endif %}
+        <a class="bless-product__button" href="{{ product.url }}">View product</a>
+      {% else %}
+        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
+      {% endif %}
+    </article>
+
+    {% assign product = morasara_product %}
+    <article class="bless-product__item" data-sidthie-key="MORASARA" style="display: none;">
+      <p class="bless-product__badge">MORASARA</p>
+      {% if product %}
+        {% assign default_variant = product.selected_or_first_available_variant %}
+        <div class="bless-product__media">
+          {% if product.featured_image %}
+            {{
+              product.featured_image
+              | image_url: width: 960
+              | image_tag:
+                widths: '360, 540, 720, 900',
+                sizes: '(min-width: 768px) 320px, 80vw',
+                class: 'bless-product__image',
+                alt: product.title
+            }}
+          {% else %}
+            <div class="bless-product__placeholder">Image coming soon</div>
+          {% endif %}
+        </div>
+        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
+        {% if default_variant %}
+          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
+        {% endif %}
+        <a class="bless-product__button" href="{{ product.url }}">View product</a>
+      {% else %}
+        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
+      {% endif %}
+    </article>
   </div>
 </section>
 
+{% # theme-check-disable StaticStylesheetAndJavascriptTags %}
 {% stylesheet %}
 .bless-product {
-  position: relative;
-  isolation: isolate;
-  padding: clamp(3.5rem, 6vw, 7rem) 0;
-  background-color: transparent;
-  color: rgb(var(--color-light-flesh, 236, 227, 214));
-  display: flex;
-  justify-content: center;
+  padding: clamp(2.5rem, 6vw, 4.5rem) 0;
+  color: #0f1b1c;
 }
 
-/* 30% black overlay like chat/blessing */
-.bless-overlay-30 { position: relative; z-index: 0; }
-.bless-overlay-30::before {
-  content: ""; position: absolute; inset: 0;
-  background: rgba(0,0,0,.30); z-index: -1; pointer-events: none;
-}
-
-.bless-product__inner {
-  width: min(960px, 90vw);
-  display: grid;
-  gap: 2rem;
+.bless-product__header {
   text-align: center;
+  margin-bottom: 1.5rem;
 }
 
 .bless-product__heading {
-  color: #fff;
-  text-transform: none;
   font-family: var(--font-heading, 'Cardo', serif);
-  font-size: clamp(2.0rem, 2.6vw + 1rem, 2.8rem);
-  margin: 0;
+  font-size: clamp(2rem, 2vw + 1rem, 2.8rem);
+  margin: 0 0 0.25rem;
 }
 
-.bless-product__intention {
+.bless-product__subtitle {
   margin: 0;
   font-family: var(--font-body, 'Albert Sans', sans-serif);
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(15, 27, 28, 0.7);
 }
 
-.bless-product__card {
-  padding: clamp(2.2rem, 4vw, 3.2rem);
-  border-radius: 36px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 32px 65px rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+.bless-product__loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 1rem 0;
 }
 
-.bless-product__details {
+.bless-product__spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid rgba(15, 27, 28, 0.1);
+  border-top-color: rgba(15, 27, 28, 0.9);
+  animation: bless-spin 1s linear infinite;
+}
+
+.bless-product__loading-text {
+  margin: 0;
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  color: rgba(15, 27, 28, 0.8);
+}
+
+.bless-product__fallback {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.bless-product__fallback-text {
+  margin: 0 0 0.75rem;
+  color: rgba(15, 27, 28, 0.8);
+}
+
+.bless-product__grid {
   display: grid;
-  gap: 2.0rem;
-  align-items: start;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.bless-product__item {
+  background: #fff;
+  border-radius: 20px;
+  padding: 1.25rem;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(15, 27, 28, 0.08);
+  text-align: center;
+}
+
+.bless-product__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(23, 95, 75, 0.08);
+  color: #175f4b;
+  margin: 0 0 0.75rem;
 }
 
 .bless-product__media {
-  border-radius: 24px;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
-  position: relative;
-}
-
-.bless-product__image-container {
-  position: relative;
-  width: 100%;
-  padding-bottom: 100%; /* 1:1 aspect ratio */
-  overflow: hidden;
-  border-radius: 24px;
+  background: #f4f4ef;
+  display: grid;
+  place-items: center;
+  margin-bottom: 0.75rem;
 }
 
 .bless-product__image {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
-  display: block;
-  transition: opacity 300ms ease-out;
-}
-
-.bless-product__image--primary {
-  opacity: 1;
-  z-index: 1;
-}
-
-.bless-product__image--secondary {
-  opacity: 0;
-  z-index: 0;
-}
-
-/* Hover effect: swap images on desktop */
-@media (hover: hover) and (pointer: fine) {
-  .bless-product__media:hover .bless-product__image--primary {
-    opacity: 0;
-  }
-
-  .bless-product__media:hover .bless-product__image--secondary {
-    opacity: 1;
-  }
-}
-
-.bless-product__video,
-.bless-product__model,
-.bless-product__media-generic {
-  width: 100%;
-  height: auto;
   display: block;
 }
 
-.bless-product__content {
-  text-align: left;
-  display: grid;
-  gap: 1.0rem;
-  color: #fff;
+.bless-product__placeholder {
+  font-family: var(--font-body, 'Albert Sans', sans-serif);
+  color: rgba(15, 27, 28, 0.5);
+}
+
+.bless-product__placeholder--empty {
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(15, 27, 28, 0.25);
+  background: rgba(15, 27, 28, 0.02);
 }
 
 .bless-product__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.1rem;
   font-family: var(--font-heading, 'Cardo', serif);
-  font-size: clamp(1.6rem, 1.8vw + 0.8rem, 2.15rem);
-  margin: 0;
 }
 
 .bless-product__price {
+  margin: 0 0 0.85rem;
+  font-weight: 700;
+  color: #1f2a2b;
   font-family: var(--font-body, 'Albert Sans', sans-serif);
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0;
-  color: #fff;
 }
 
-.bless-product__description {
-  font-family: var(--font-body, 'Albert Sans', sans-serif);
-  font-size: 1rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.bless-product__form { display: grid; gap: 1rem; }
-
-.bless-product__label {
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-.bless-product__select,
-.bless-product__quantity {
-  width: 100%;
-  padding: 0.85rem 1rem;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255, 0.35);
-  background: rgba(255, 255, 255, 0.18);
-  color: #fff;
-  font-size: 1rem;
-}
-
-.bless-product__cta {
-  justify-self: start;
-  padding: 0.95rem 2.2rem;
+.bless-product__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.4rem;
   border-radius: 999px;
   border: none;
-  background: rgba(227, 216, 154, 0.95);
-  color: #175F4B;
-  font-family: var(--font-body, 'Albert Sans', sans-serif);
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 200ms ease, opacity 200ms ease, box-shadow 200ms ease;
-  box-shadow: 0 12px 28px rgba(0,0,0,.28);
-}
-
-.bless-product__cta[disabled] { cursor: not-allowed; opacity: .6; }
-
-.bless-product__cta:not([disabled]):hover,
-.bless-product__cta:not([disabled]):focus {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 36px rgba(0,0,0,.34);
-}
-
-.bless-product__note {
-  font-size: 0.9rem;
-  color: rgba(255,255,255, .85);
-  margin: 0;
-}
-
-.bless-product__empty {
-  padding: 1rem 0;
-  opacity: .9;
-}
-
-.bless-product__dynamic {
-  text-align: left;
+  background: #175f4b;
   color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
-.bless-product__empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  padding: 3rem 2rem;
-  text-align: center;
-  min-height: 300px;
+.bless-product__button:hover,
+.bless-product__button:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
 }
 
-.bless-product__empty-image {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100px;
-  height: 100px;
-  opacity: 0.5;
+.bless-product__button--ghost {
+  background: transparent;
+  color: #175f4b;
+  border: 1px solid rgba(23, 95, 75, 0.3);
 }
 
-.bless-product__empty-image svg {
-  width: 100%;
-  height: 100%;
-}
-
-.bless-product__empty-title {
-  font-family: var(--font-heading, 'Cardo', serif);
-  font-size: 1.4rem;
-  font-weight: 500;
-  margin: 0;
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.bless-product__empty-message {
-  font-family: var(--font-body, 'Albert Sans', sans-serif);
-  font-size: 0.95rem;
-  margin: 0;
-  color: rgba(255, 255, 255, 0.75);
-  max-width: 280px;
-  line-height: 1.5;
-}
-
-@media (min-width: 900px) {
-  .bless-product__details {
-    grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr);
-  }
-}
-@media (max-width: 600px) {
-  .bless-product__card { border-radius: 28px; }
+@keyframes bless-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 {% endstylesheet %}
 
-{% # theme-check-disable StaticStylesheetAndJavascriptTags %}
 {% javascript %}
 (function () {
-  const sectionId = '{{ section.id }}';
-  const sectionEl = document.querySelector(`[data-section-id="${sectionId}"]`);
-  if (!sectionEl) return;
+  const section = document.querySelector('[data-bless-product-section]');
+  if (!section) return;
 
-  // Common elements (may or may not exist depending on mode)
-  const formEl = sectionEl.querySelector('form');
-  const variantInput = sectionEl.querySelector('[data-variant-input]');
-  const variantSelect = sectionEl.querySelector('[data-variant-select]');
-  const blessingInput = sectionEl.querySelector('[data-blessing-input]');
-  const submitButton = sectionEl.querySelector('[data-submit]');
-  const requireBlessing = sectionEl.dataset.requireBlessing === 'true';
-  const sidthieLabelEl = sectionEl.querySelector('[data-product-sidthie]');
-  const dynamicBody = sectionEl.querySelector('[data-dynamic-body]');
+  const wrappers = Array.from(section.querySelectorAll('[data-sidthie-key]'));
+  const loading = section.querySelector('[data-loading]');
+  const fallback = section.querySelector('[data-fallback]');
+  const viewAllButton = section.querySelector('[data-view-all-toggle]');
+  const nameTarget = section.querySelector('[data-name-target]');
 
+  const params = new URLSearchParams(window.location.search);
+  const sidthieParam = (params.get('sidthie') || '').trim();
+  const nameParam = (params.get('name') || '').trim();
+  const normalizedKey = sidthieParam.toUpperCase();
 
-// --- Pick up URL parameters and set product dynamically ---
-const urlParams = new URLSearchParams(window.location.search);
-const urlName = urlParams.get('name');
-const urlSidthie = urlParams.get('sidthie');
-
-// Map Sidthie keys to product handles
-const sidthieToProduct = {
-  'NALAMERA': 'nalamera',
-  'LUMASARA': 'lumasara',
-  'WELAMORA': 'welamora',
-  'NIRALUMA': 'niraluma',
-  'RAKAWELA': 'rakawela',
-  'OLANWELA': 'olanwela',
-  'MORASARA': 'morasara'
-};
-
-// Update heading to show chosen Sidthie and name
-if (urlSidthie || urlName) {
-  const headingEl = sectionEl.querySelector('[class*="heading"]');
-  if (headingEl) {
-    let newHeading = 'Your chosen Sidthie';
-    if (urlSidthie) newHeading += ' ' + urlSidthie;
-    if (urlName) newHeading += ', ' + urlName;
-    headingEl.textContent = newHeading;
+  if (nameParam && nameTarget) {
+    nameTarget.textContent = `For ${nameParam}`;
+    nameTarget.hidden = false;
   }
-}
 
-// Load product from URL Sidthie (thank-you page)
-if (urlSidthie && dynamicBody) {
-  const label = urlSidthie; // Display name
-  const key = urlSidthie.toUpperCase();
-  const productHandle = sidthieToProduct[key];
+  const matchingWrapper = normalizedKey
+    ? wrappers.find((wrapper) => wrapper.dataset.sidthieKey === normalizedKey)
+    : null;
 
-  if (productHandle) {
-    // Update the Sidthie label
-    if (sidthieLabelEl) {
-      sidthieLabelEl.hidden = false;
-      sidthieLabelEl.textContent = `Your chosen Sidthie: ${label}`;
-    }
+  if (matchingWrapper) {
+    matchingWrapper.style.display = 'block';
+  } else if (fallback) {
+    fallback.hidden = false;
+  }
 
-    // Load and render the product dynamically
-    dynamicBody.innerHTML = `<p class="bless-product__empty">Loading ${label}…</p>`;
-
-    // Fetch the product
-    fetch(`/products/${productHandle}.json`)
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then(data => {
-        const product = data.product;
-        sectionEl.dataset.latestSidthie = key;
-
-        // Render the product card (simplified version for thanks page)
-        renderDynamicCard(product);
-      })
-      .catch(err => {
-        console.error('Failed to load product:', err);
-        dynamicBody.innerHTML = `<p class="bless-product__empty">Could not load product for "${label}".</p>`;
+  if (viewAllButton) {
+    viewAllButton.addEventListener('click', () => {
+      wrappers.forEach((wrapper) => {
+        wrapper.style.display = 'block';
       });
-  }
-}
-
-// Prefill name from URL
-if (urlName) {
-  const urlBlessing = urlName.trim().slice(0, 200);
-  if (blessingInput) blessingInput.value = urlBlessing;
-  sectionEl.dataset.latestBlessing = urlBlessing;
-
-  if (requireBlessing) {
-    submitButton?.removeAttribute('disabled');
-    sectionEl.querySelectorAll('[data-submit]').forEach((b) => (b.disabled = false));
-  }
-}
-
-
-
-
-  // Gate purchase until blessing arrives
-  function enableFormWithBlessing(text, detail) {
-    if (blessingInput) blessingInput.value = text;
-    sectionEl.dataset.latestBlessing = text;
-    if (detail?.sidthie) {
-      sectionEl.dataset.latestSidthie = detail.sidthie;
-    }
-    // Dynamic card buttons also use [data-submit]
-    if (requireBlessing && submitButton) submitButton.disabled = false;
-    if (requireBlessing) {
-      sectionEl.querySelectorAll('[data-submit]').forEach((button) => {
-        button.disabled = false;
-      });
-    }
-    sectionEl.classList.add('bless-product--active');
-
-    if (sidthieLabelEl) {
-      const label = detail?.sidthieLabel || detail?.sidthie;
-      if (label) {
-        sidthieLabelEl.hidden = false;
-        sidthieLabelEl.textContent = `Your chosen Sidthie: ${label}`;
-      }
-    }
-  }
-  const updateKey = `__blessProductUpdate_${sectionId}`;
-  if (window[updateKey]) window.removeEventListener('blessing:update', window[updateKey]);
-  window[updateKey] = (event) => {
-    const detail = event?.detail;
-    const text = detail?.text;
-    if (!text) return;
-    enableFormWithBlessing(text, detail);
-  };
-  window.addEventListener('blessing:update', window[updateKey]);
-
-  const errorKey = `__blessProductError_${sectionId}`;
-  if (window[errorKey]) window.removeEventListener('blessing:error', window[errorKey]);
-  window[errorKey] = () => {
-    if (requireBlessing && submitButton) submitButton.disabled = true;
-    if (requireBlessing) {
-      sectionEl.querySelectorAll('[data-submit]').forEach((button) => {
-        button.disabled = true;
-      });
-    }
-    if (sidthieLabelEl) sidthieLabelEl.hidden = true;
-  };
-  window.addEventListener('blessing:error', window[errorKey]);
-
-  // Variant select (static mode)
-  if (variantSelect && variantInput) {
-    variantSelect.addEventListener('change', () => {
-      const selected = variantSelect.value;
-      if (selected) variantInput.value = selected;
+      if (fallback) fallback.hidden = true;
     });
   }
 
-  // Handle form submission (static mode)
-  if (formEl) {
-    formEl.addEventListener('submit', (event) => {
-      // Prevent submit without blessing if required
-      if (requireBlessing && !blessingInput?.value) {
-        event.preventDefault();
-        console.warn('Form submission blocked: blessing required but not provided');
-        return false;
-      }
-
-      // Ensure variant ID is set
-      const variantId = variantInput?.value || variantSelect?.value;
-      if (!variantId) {
-        event.preventDefault();
-        console.error('Form submission blocked: no variant selected');
-        return false;
-      }
-
-      // Update button state for visual feedback
-      const btn = formEl.querySelector('[data-submit]');
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = 'Adding to cart...';
-      }
-    });
-  }
-
-  // -------- Dynamic (AJAX) product card ----------
-  // Map Sidthie -> product handle (override if your handles differ)
-  const SIDTHIE_TO_HANDLE = {
-    NALAMERA: {{ section.settings.nalamera_handle | default: 'nalamera' | json }},
-    LUMASARA: {{ section.settings.lumasara_handle | default: 'lumasara' | json }},
-    WELAMORA: {{ section.settings.welamora_handle | default: 'welamora' | json }},
-    NIRALUMA: {{ section.settings.niraluma_handle | default: 'niraluma' | json }},
-    RAKAWELA: {{ section.settings.rakawela_handle | default: 'rakawela' | json }},
-    OLANWELA: {{ section.settings.olanwela_handle | default: 'olanwela' | json }},
-    MORASARA: {{ section.settings.morasara_handle | default: 'morasara' | json }}
-  };
-
-  async function fetchProductByHandle(handle) {
-    const res = await fetch(`/products/${handle}.json`, { credentials: 'same-origin' });
-    if (!res.ok) throw new Error('Product not found');
-    const data = await res.json();
-    return data.product;
-  }
-
-  function money(cents) {
-    // Simple money helper using shop's default format
-    return (cents / 100).toLocaleString(undefined, { style: 'currency', currency: '{{ shop.currency }}' });
-  }
-
-  function renderDynamicCard(p) {
-    const firstAvailable = p.variants.find(v => v.available) || p.variants[0];
-    const price = firstAvailable ? money(firstAvailable.price) : '';
-    const hasSecondaryImage = p?.images && p.images.length > 1;
-    const description = p.body_html ? p.body_html.replace(/<[^>]*>/g, '').substring(0, 150).trim() : '';
-    const showVariantPrices = {{ section.settings.show_variant_prices | json }};
-    const cartNoteText = {{ section.settings.cart_note | json }};
-
-    dynamicBody.innerHTML = `
-      <div class="bless-product__details">
-        <div class="bless-product__media">
-          <div class="bless-product__image-container">
-            ${p?.images?.[0]?.src
-              ? `<img class="bless-product__image bless-product__image--primary" src="${p.images[0].src}" alt="${p.title}" data-primary>`
-              : ``}
-            ${hasSecondaryImage && p.images[1]?.src
-              ? `<img class="bless-product__image bless-product__image--secondary" src="${p.images[1].src}" alt="${p.title}" data-secondary>`
-              : ``}
-          </div>
-        </div>
-        <div class="bless-product__content">
-          <h3 class="bless-product__title">${p.title}</h3>
-          ${price ? `<p class="bless-product__price">${price}</p>` : ``}
-          ${description ? `<div class="bless-product__description">${description}...</div>` : ``}
-
-          <div class="bless-product__form" data-ajax-form>
-            ${p.variants.length > 1 ? `
-              <label class="bless-product__label">{{ section.settings.variant_label | escape }}</label>
-              <select class="bless-product__select" data-ajax-variant>
-                ${p.variants.map(v => `
-                  <option value="${v.id}" ${v.id===firstAvailable?.id?'selected':''} ${v.available?'':'disabled'}>
-                    ${v.title}${showVariantPrices && v.price ? ` — ${money(v.price)}` : ''}
-                  </option>
-                `).join('')}
-              </select>
-            ` : ``}
-
-            <label class="bless-product__label">{{ 'products.product.quantity' | t }}</label>
-            <input type="number" class="bless-product__quantity" min="1" value="1" data-ajax-qty>
-
-            <!-- blessing captured as cart line property -->
-            <input type="hidden" data-ajax-blessing name="properties[{{ section.settings.property_key | escape }}]">
-
-            <button class="bless-product__cta" data-submit ${requireBlessing ? 'disabled' : ''}>
-              {{ section.settings.button_label | escape }}
-            </button>
-
-            ${cartNoteText ? `<p class="bless-product__note">${cartNoteText}</p>` : ``}
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Wire up add-to-cart
-    const btn = dynamicBody.querySelector('[data-submit]');
-    const select = dynamicBody.querySelector('[data-ajax-variant]');
-    const qty = dynamicBody.querySelector('[data-ajax-qty]');
-    const blessing = dynamicBody.querySelector('[data-ajax-blessing]');
-
-    // Mirror blessing from event gate
-    /*
-    const storedBlessing = sectionEl.dataset.latestBlessing;
-    if (blessingInput?.value) blessing.value = blessingInput.value;
-    else if (storedBlessing) blessing.value = storedBlessing;   
-   
-    if (requireBlessing && btn) {
-      btn.disabled = !blessing.value;
-    }
-      */
-// --- UPDATE: pick blessing in this order: URL -> static input -> stored dataset ---
-const urlParams2 = new URLSearchParams(window.location.search);
-const urlBlessing2 = urlParams2.get('name')?.trim().slice(0, 200) || '';
-
-if (urlBlessing2) {
-  blessing.value = urlBlessing2;
-} else if (blessingInput?.value) {
-  blessing.value = blessingInput.value;
-} else if (sectionEl.dataset.latestBlessing) {
-  blessing.value = sectionEl.dataset.latestBlessing;
-}
-
-// If blessing is required, enable/disable button accordingly
-if (requireBlessing && btn) {
-  btn.disabled = !blessing.value;
-}     
-
-    btn?.addEventListener('click', async (e) => {
-      e.preventDefault();
-      if (requireBlessing && !blessing.value) {
-        console.warn('Blessing required but not provided');
-        return;
-      }
-
-      btn.disabled = true;
-      const originalText = btn.textContent;
-      btn.textContent = 'Adding to cart...';
-
-      try {
-        // Use FormData for more robust handling
-        const formData = new FormData();
-        formData.set('id', select?.value || firstAvailable?.id);
-        formData.set('quantity', qty?.value || '1');
-
-        // Add blessing property if present
-        if (blessing.value) {
-          formData.set('properties[{{ section.settings.property_key | escape }}]', blessing.value);
-        }
-
-        const res = await fetch('/cart/add.js', {
-          method: 'POST',
-          body: formData,
-          credentials: 'same-origin'
-        });
-
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => ({}));
-          throw new Error(errorData.message || 'Failed to add product to cart');
-        }
-
-        // Success - refresh cart and dispatch event
-        window.dispatchEvent(new CustomEvent('cart:refresh'));
-
-        // Show success feedback
-        btn.textContent = 'Added to cart!';
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.disabled = false;
-        }, 1500);
-
-      } catch (err) {
-        console.error('Add to cart error:', err);
-        btn.textContent = 'Error adding to cart';
-
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.disabled = false;
-        }, 2000);
-      }
-    });
-  }
-
-  // Listen for Sidthie selection to load product (when no static product is set)
-  if (dynamicBody) {
-    const sKey = `__sidthieToProduct_${sectionId}`;
-    if (window[sKey]) window.removeEventListener('sidthie:selected', window[sKey]);
-
-    window[sKey] = async (ev) => {
-      const rawSidthie = (ev?.detail?.sidthie || '').toString().trim();
-      if (!rawSidthie) return;
-
-      const label = (ev?.detail?.sidthieLabel || '').toString().trim();
-      sectionEl.dataset.latestSidthie = rawSidthie;
-      if (sidthieLabelEl) {
-        sidthieLabelEl.hidden = false;
-        sidthieLabelEl.textContent = `Your chosen Sidthie: ${label || rawSidthie}`;
-      }
-
-      const key = rawSidthie.toUpperCase();
-      const mappedHandle = (SIDTHIE_TO_HANDLE[key] || '').trim();
-      const handle = mappedHandle ? mappedHandle : rawSidthie.toLowerCase();
-
-      dynamicBody.innerHTML = `<p class="bless-product__empty">Loading ${rawSidthie}…</p>`;
-      try {
-        const p = await fetchProductByHandle(handle);
-        renderDynamicCard(p);
-      } catch (e) {
-        dynamicBody.innerHTML = `<p class="bless-product__empty">Could not find a product for “${rawSidthie}”.</p>`;
-      }
-    };
-
-    window.addEventListener('sidthie:selected', window[sKey]);
-  }
-
-  // Cleanup for Theme Editor
-  document.addEventListener('shopify:section:unload', (event) => {
-    if (event.detail?.sectionId === sectionId) {
-      if (window[updateKey]) {
-        window.removeEventListener('blessing:update', window[updateKey]);
-        delete window[updateKey];
-      }
-      if (window[errorKey]) {
-        window.removeEventListener('blessing:error', window[errorKey]);
-        delete window[errorKey];
-      }
-      if (dynamicBody) {
-        const sKey = `__sidthieToProduct_${sectionId}`;
-        if (window[sKey]) {
-          window.removeEventListener('sidthie:selected', window[sKey]);
-          delete window[sKey];
-        }
-      }
-    }
-  });
+  if (loading) loading.hidden = true;
 })();
 {% endjavascript %}
 {% # theme-check-enable StaticStylesheetAndJavascriptTags %}
@@ -845,104 +454,46 @@ if (requireBlessing && btn) {
   "name": "Bless product",
   "settings": [
     {
-      "type": "product",
-      "id": "product",
-      "label": "Product (optional)",
-      "info": "Select a static product OR leave empty to load dynamically by Sidthie handle."
-    },
-    {
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "Would you like to affirm your Sidthie by wearing a pendant?"
+      "default": "Your Sidthie necklace"
     },
     {
-      "type": "text",
-      "id": "panel_background",
-      "label": "Panel background RGB",
-      "default": "65, 65, 65",
-      "info": "RGB value without opacity (e.g. 65, 65, 65)."
+      "type": "product",
+      "id": "nalamera_product",
+      "label": "Nalamera product"
     },
     {
-      "type": "range",
-      "id": "panel_opacity",
-      "label": "Panel opacity",
-      "default": 70,
-      "min": 20,
-      "max": 95,
-      "step": 5,
-      "unit": "%"
+      "type": "product",
+      "id": "lumasara_product",
+      "label": "Lumasara product"
     },
     {
-      "type": "checkbox",
-      "id": "show_media",
-      "label": "Show featured media",
-      "default": true
+      "type": "product",
+      "id": "welamora_product",
+      "label": "Welamora product"
     },
     {
-      "type": "checkbox",
-      "id": "show_description",
-      "label": "Show description excerpt",
-      "default": false
+      "type": "product",
+      "id": "niraluma_product",
+      "label": "Niraluma product"
     },
     {
-      "type": "checkbox",
-      "id": "show_price",
-      "label": "Show price",
-      "default": true
+      "type": "product",
+      "id": "olanwela_product",
+      "label": "Olanwela product"
     },
     {
-      "type": "checkbox",
-      "id": "show_variant_picker",
-      "label": "Show variant selector",
-      "default": true
+      "type": "product",
+      "id": "rakawela_product",
+      "label": "Rakawela product"
     },
     {
-      "type": "checkbox",
-      "id": "show_variant_prices",
-      "label": "Show variant price inside selector",
-      "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "show_quantity_selector",
-      "label": "Show quantity selector",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "require_blessing",
-      "label": "Require blessing before enabling purchase",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "variant_label",
-      "label": "Variant label",
-      "default": "Choose your option"
-    },
-    {
-      "type": "text",
-      "id": "property_key",
-      "label": "Line item property key",
-      "default": "Blessing"
-    },
-    {
-      "type": "text",
-      "id": "button_label",
-      "label": "Button label",
-      "default": "Add blessing to cart"
-    },
-    {
-      "type": "text",
-      "id": "cart_note",
-      "label": "Cart note",
-      "default": "We will include this blessing with your order."
-    },
-    {
-      "type": "header",
-      "content": "Sidthie product handles"
-    },
+      "type": "product",
+      "id": "morasara_product",
+      "label": "Morasara product"
+    }
   ],
   "presets": [
     {
