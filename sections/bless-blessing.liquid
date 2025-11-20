@@ -425,7 +425,11 @@
   }
 
   function revealBlessing(detail) {
-    if (!contentEl || !panelEl) return;
+    console.log('[BlessBlessing] revealBlessing called with detail', detail);
+    if (!contentEl || !panelEl) {
+      console.warn('[BlessBlessing] Missing contentEl or panelEl', { contentEl, panelEl });
+      return;
+    }
     const normalizedDetail = detail
       ? Object.assign({}, detail, {
           blessing: detail.blessing || detail.text || '',
@@ -433,8 +437,12 @@
         })
       : null;
     const blessing = normalizedDetail?.blessing;
-    if (!blessing) return;
+    if (!blessing) {
+      console.warn('[BlessBlessing] No blessing in normalized detail');
+      return;
+    }
 
+    console.log('[BlessBlessing] normalized detail', normalizedDetail);
     latestBlessingDetail = normalizedDetail;
 
     // Only show email form if email was NOT already collected in chat
@@ -500,17 +508,26 @@
 
     // Show success message and continue button if email was collected in chat
     if (normalizedDetail?.emailCollected) {
+      console.log('[BlessBlessing] Email was collected in chat, showing success message and button');
       // Get email from event detail or show generic message
       const userEmail = normalizedDetail?.email || 'your email';
       if (successMessageEl) {
         successMessageEl.textContent = 'Perfect! Your blessing has been sent to ' + userEmail;
         successMessageEl.removeAttribute('hidden');
+        console.log('[BlessBlessing] Success message shown:', successMessageEl.textContent);
+      } else {
+        console.warn('[BlessBlessing] successMessageEl not found');
       }
 
       // Show continue button
       if (continueButtonEl) {
         continueButtonEl.removeAttribute('hidden');
+        console.log('[BlessBlessing] Continue button shown');
+      } else {
+        console.warn('[BlessBlessing] continueButtonEl not found');
       }
+    } else {
+      console.warn('[BlessBlessing] Email was NOT collected in chat', { emailCollected: normalizedDetail?.emailCollected });
     }
 
     if (autoScroll) {
@@ -612,11 +629,16 @@
   }
   window[updateKey] = (event) => {
     const detail = event?.detail;
-    if (!detail) return;
+    console.log('[BlessBlessing] blessing:update received', { detail });
+    if (!detail) {
+      console.warn('[BlessBlessing] No detail in event');
+      return;
+    }
     revealBlessing(detail);
     resetCopyFeedback();
   };
   window.addEventListener('blessing:update', window[updateKey]);
+  console.log('[BlessBlessing] Event listener attached for blessing:update');
 
   const errorKey = `__blessBlessingError_${sectionId}`;
   if (window[errorKey]) {
