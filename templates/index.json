@@ -42,19 +42,19 @@
       "settings": {
         "heading": "Your blessing",
         "placeholder_text": "",
-        "show_signup": true,
+        "show_signup": false,
         "signup_prompt": "Would you like to receive your Sidthie & Blessing with free monthly Wisdoms from Sidthah?",
         "signup_placeholder": "Enter your email",
         "signup_button_label": "Receive wisdom",
         "signup_success": "Thank you. Your wisdom will arrive soon.",
         "signup_consent_label": "Yes, send me this blessing and future wisdom emails.",
-        "signup_consent_default": true,
+        "signup_consent_default": false,
         "signup_error": "We could not save your email. Please try again.",
         "signup_invalid": "Please enter a valid email address.",
         "signup_endpoint": "",
         "panel_background": "236, 227, 214",
         "panel_opacity": 10,
-        "show_copy_button": false,
+        "show_copy_button": true,
         "copy_button_label": "Copy blessing",
         "copy_feedback": "Copied!",
         "auto_scroll": true
@@ -76,7 +76,6 @@
         "product_7": "welamora",
         "carousel_height": 750,
         "show_arrows": true,
-        "carousel_behavior": "infinite",
         "scroll_speed": 0.9
       }
     }
