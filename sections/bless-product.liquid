@@ -1,5 +1,4 @@
 {% liquid
-  assign heading = section.settings.heading | default: 'Your Sidthie necklace'
   assign nalamera_product = section.settings.nalamera_product
   assign lumasara_product = section.settings.lumasara_product
   assign welamora_product = section.settings.welamora_product
@@ -9,695 +8,596 @@
   assign morasara_product = section.settings.morasara_product
 %}
 
-<section class="bless-product" data-bless-product-section>
-  <div class="bless-product__header">
-    <h2 class="bless-product__heading">{{ heading | escape }}</h2>
-    <p class="bless-product__subtitle" data-name-target hidden></p>
-  </div>
+<section class="bless-split" data-split-container>
+  <div class="bless-split__inner">
+    <div class="bless-split__column bless-split__column--blessing" id="blessing-display-area"></div>
 
-  <div class="bless-product__loading" data-loading>
-    <div class="bless-product__spinner" aria-hidden="true"></div>
-    <p class="bless-product__loading-text">Loading your necklace...</p>
-  </div>
+    <div class="bless-split__column bless-split__column--product">
+      <div class="bless-product-grid">
+        {% assign product = nalamera_product %}
+        <article class="bless-product-card" data-sidthie-key="NALAMERA" style="display: none;">
+          {% if product %}
+            {% assign default_variant = product.selected_or_first_available_variant %}
+            <div class="bless-product-media">
+              {% assign primary_image = product.images[0] %}
+              {% assign secondary_image = product.images[1] %}
+              {% if primary_image %}
+                <div class="bless-product-image">
+                  {{
+                    primary_image
+                    | image_url: width: 1200
+                    | image_tag:
+                      widths: '400, 600, 800, 1200',
+                      sizes: '(min-width: 960px) 440px, 90vw',
+                      class: 'bless-product-image__img bless-product-image__img--primary',
+                      alt: product.title
+                  }}
+                  {% if secondary_image %}
+                    {{
+                      secondary_image
+                      | image_url: width: 1200
+                      | image_tag:
+                        widths: '400, 600, 800, 1200',
+                        sizes: '(min-width: 960px) 440px, 90vw',
+                        class: 'bless-product-image__img bless-product-image__img--secondary',
+                        alt: product.title
+                    }}
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+            <h3 class="bless-product-title">{{ product.title | escape }}</h3>
+            {% if default_variant %}
+              <p class="bless-product-price">{{ default_variant.price | money_with_currency }}</p>
+            {% endif %}
+            <form method="post" action="/cart/add" class="bless-product-form">
+              <label class="bless-product-label" for="VariantSelect-{{ section.id }}-NALAMERA">Choose option</label>
+              <select id="VariantSelect-{{ section.id }}-NALAMERA" name="id" class="bless-product-field">
+                {% for variant in product.variants %}
+                  <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
+                    {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
+                  </option>
+                {% endfor %}
+              </select>
 
-  <div class="bless-product__fallback" data-fallback hidden>
-    <p class="bless-product__fallback-text">
-      We could not find a Sidthie in your link. You can still explore every necklace below.
-    </p>
-    <button type="button" class="bless-product__button bless-product__button--ghost" data-view-all-toggle>
-      View all necklaces
-    </button>
-  </div>
+              <label class="bless-product-label" for="Quantity-{{ section.id }}-NALAMERA">Quantity</label>
+              <input id="Quantity-{{ section.id }}-NALAMERA" class="bless-product-field bless-product-quantity" type="number" name="quantity" min="1" value="1">
 
-  <div class="bless-product__grid" data-product-grid>
-    {% assign product = nalamera_product %}
-    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="NALAMERA" style="display: none;">
-      <p class="bless-product__badge">NALAMERA</p>
-      {% if product %}
-        {% assign default_variant = product.selected_or_first_available_variant %}
-        <div class="bless-product__media">
-          {% if product.featured_image %}
-            {{
-              product.featured_image
-              | image_url: width: 960
-              | image_tag:
-                widths: '360, 540, 720, 900',
-                sizes: '(min-width: 768px) 320px, 80vw',
-                class: 'bless-product__image',
-                alt: product.title
-            }}
+              <button type="submit" class="bless-product-button bless-product-button--outline">Add to cart</button>
+            </form>
           {% else %}
-            <div class="bless-product__placeholder">Image coming soon</div>
+            <div class="bless-product-placeholder">Assign a product for Nalamera.</div>
           {% endif %}
-        </div>
-        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
-        {% if default_variant %}
-          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
-        {% endif %}
-        <form method="post" action="/cart/add" class="bless-product__form">
-          {% assign variants = product.variants %}
-          <label class="bless-product__label" for="VariantSelect-{{ product.id }}-NALAMERA">Choose option</label>
-          <select
-            id="VariantSelect-{{ product.id }}-NALAMERA"
-            name="id"
-            class="bless-product__field"
-          >
-            {% for variant in variants %}
-              <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
-                {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
-              </option>
-            {% endfor %}
-          </select>
+        </article>
 
-          <label class="bless-product__label" for="Quantity-{{ product.id }}-NALAMERA">Quantity</label>
-          <input
-            id="Quantity-{{ product.id }}-NALAMERA"
-            class="bless-product__field bless-product__quantity"
-            type="number"
-            name="quantity"
-            min="1"
-            value="1"
-          >
+        {% assign product = lumasara_product %}
+        <article class="bless-product-card" data-sidthie-key="LUMASARA" style="display: none;">
+          {% if product %}
+            {% assign default_variant = product.selected_or_first_available_variant %}
+            <div class="bless-product-media">
+              {% assign primary_image = product.images[0] %}
+              {% assign secondary_image = product.images[1] %}
+              {% if primary_image %}
+                <div class="bless-product-image">
+                  {{
+                    primary_image
+                    | image_url: width: 1200
+                    | image_tag:
+                      widths: '400, 600, 800, 1200',
+                      sizes: '(min-width: 960px) 440px, 90vw',
+                      class: 'bless-product-image__img bless-product-image__img--primary',
+                      alt: product.title
+                  }}
+                  {% if secondary_image %}
+                    {{
+                      secondary_image
+                      | image_url: width: 1200
+                      | image_tag:
+                        widths: '400, 600, 800, 1200',
+                        sizes: '(min-width: 960px) 440px, 90vw',
+                        class: 'bless-product-image__img bless-product-image__img--secondary',
+                        alt: product.title
+                    }}
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+            <h3 class="bless-product-title">{{ product.title | escape }}</h3>
+            {% if default_variant %}
+              <p class="bless-product-price">{{ default_variant.price | money_with_currency }}</p>
+            {% endif %}
+            <form method="post" action="/cart/add" class="bless-product-form">
+              <label class="bless-product-label" for="VariantSelect-{{ section.id }}-LUMASARA">Choose option</label>
+              <select id="VariantSelect-{{ section.id }}-LUMASARA" name="id" class="bless-product-field">
+                {% for variant in product.variants %}
+                  <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
+                    {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
+                  </option>
+                {% endfor %}
+              </select>
 
-          <button type="submit" class="bless-product__button bless-product__button--outline">Add to cart</button>
-        </form>
-      {% else %}
-        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
-      {% endif %}
-    </article>
+              <label class="bless-product-label" for="Quantity-{{ section.id }}-LUMASARA">Quantity</label>
+              <input id="Quantity-{{ section.id }}-LUMASARA" class="bless-product-field bless-product-quantity" type="number" name="quantity" min="1" value="1">
 
-    {% assign product = lumasara_product %}
-    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="LUMASARA" style="display: none;">
-      <p class="bless-product__badge">LUMASARA</p>
-      {% if product %}
-        {% assign default_variant = product.selected_or_first_available_variant %}
-        <div class="bless-product__media">
-          {% if product.featured_image %}
-            {{
-              product.featured_image
-              | image_url: width: 960
-              | image_tag:
-                widths: '360, 540, 720, 900',
-                sizes: '(min-width: 768px) 320px, 80vw',
-                class: 'bless-product__image',
-                alt: product.title
-            }}
+              <button type="submit" class="bless-product-button bless-product-button--outline">Add to cart</button>
+            </form>
           {% else %}
-            <div class="bless-product__placeholder">Image coming soon</div>
+            <div class="bless-product-placeholder">Assign a product for Lumasara.</div>
           {% endif %}
-        </div>
-        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
-        {% if default_variant %}
-          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
-        {% endif %}
-        <form method="post" action="/cart/add" class="bless-product__form">
-          {% assign variants = product.variants %}
-          <label class="bless-product__label" for="VariantSelect-{{ product.id }}-LUMASARA">Choose option</label>
-          <select
-            id="VariantSelect-{{ product.id }}-LUMASARA"
-            name="id"
-            class="bless-product__field"
-          >
-            {% for variant in variants %}
-              <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
-                {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
-              </option>
-            {% endfor %}
-          </select>
+        </article>
 
-          <label class="bless-product__label" for="Quantity-{{ product.id }}-LUMASARA">Quantity</label>
-          <input
-            id="Quantity-{{ product.id }}-LUMASARA"
-            class="bless-product__field bless-product__quantity"
-            type="number"
-            name="quantity"
-            min="1"
-            value="1"
-          >
+        {% assign product = welamora_product %}
+        <article class="bless-product-card" data-sidthie-key="WELAMORA" style="display: none;">
+          {% if product %}
+            {% assign default_variant = product.selected_or_first_available_variant %}
+            <div class="bless-product-media">
+              {% assign primary_image = product.images[0] %}
+              {% assign secondary_image = product.images[1] %}
+              {% if primary_image %}
+                <div class="bless-product-image">
+                  {{
+                    primary_image
+                    | image_url: width: 1200
+                    | image_tag:
+                      widths: '400, 600, 800, 1200',
+                      sizes: '(min-width: 960px) 440px, 90vw',
+                      class: 'bless-product-image__img bless-product-image__img--primary',
+                      alt: product.title
+                  }}
+                  {% if secondary_image %}
+                    {{
+                      secondary_image
+                      | image_url: width: 1200
+                      | image_tag:
+                        widths: '400, 600, 800, 1200',
+                        sizes: '(min-width: 960px) 440px, 90vw',
+                        class: 'bless-product-image__img bless-product-image__img--secondary',
+                        alt: product.title
+                    }}
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+            <h3 class="bless-product-title">{{ product.title | escape }}</h3>
+            {% if default_variant %}
+              <p class="bless-product-price">{{ default_variant.price | money_with_currency }}</p>
+            {% endif %}
+            <form method="post" action="/cart/add" class="bless-product-form">
+              <label class="bless-product-label" for="VariantSelect-{{ section.id }}-WELAMORA">Choose option</label>
+              <select id="VariantSelect-{{ section.id }}-WELAMORA" name="id" class="bless-product-field">
+                {% for variant in product.variants %}
+                  <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
+                    {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
+                  </option>
+                {% endfor %}
+              </select>
 
-          <button type="submit" class="bless-product__button bless-product__button--outline">Add to cart</button>
-        </form>
-      {% else %}
-        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
-      {% endif %}
-    </article>
+              <label class="bless-product-label" for="Quantity-{{ section.id }}-WELAMORA">Quantity</label>
+              <input id="Quantity-{{ section.id }}-WELAMORA" class="bless-product-field bless-product-quantity" type="number" name="quantity" min="1" value="1">
 
-    {% assign product = welamora_product %}
-    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="WELAMORA" style="display: none;">
-      <p class="bless-product__badge">WELAMORA</p>
-      {% if product %}
-        {% assign default_variant = product.selected_or_first_available_variant %}
-        <div class="bless-product__media">
-          {% if product.featured_image %}
-            {{
-              product.featured_image
-              | image_url: width: 960
-              | image_tag:
-                widths: '360, 540, 720, 900',
-                sizes: '(min-width: 768px) 320px, 80vw',
-                class: 'bless-product__image',
-                alt: product.title
-            }}
+              <button type="submit" class="bless-product-button bless-product-button--outline">Add to cart</button>
+            </form>
           {% else %}
-            <div class="bless-product__placeholder">Image coming soon</div>
+            <div class="bless-product-placeholder">Assign a product for Welamora.</div>
           {% endif %}
-        </div>
-        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
-        {% if default_variant %}
-          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
-        {% endif %}
-        <form method="post" action="/cart/add" class="bless-product__form">
-          {% assign variants = product.variants %}
-          <label class="bless-product__label" for="VariantSelect-{{ product.id }}-WELAMORA">Choose option</label>
-          <select
-            id="VariantSelect-{{ product.id }}-WELAMORA"
-            name="id"
-            class="bless-product__field"
-          >
-            {% for variant in variants %}
-              <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
-                {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
-              </option>
-            {% endfor %}
-          </select>
+        </article>
 
-          <label class="bless-product__label" for="Quantity-{{ product.id }}-WELAMORA">Quantity</label>
-          <input
-            id="Quantity-{{ product.id }}-WELAMORA"
-            class="bless-product__field bless-product__quantity"
-            type="number"
-            name="quantity"
-            min="1"
-            value="1"
-          >
+        {% assign product = niraluma_product %}
+        <article class="bless-product-card" data-sidthie-key="NIRALUMA" style="display: none;">
+          {% if product %}
+            {% assign default_variant = product.selected_or_first_available_variant %}
+            <div class="bless-product-media">
+              {% assign primary_image = product.images[0] %}
+              {% assign secondary_image = product.images[1] %}
+              {% if primary_image %}
+                <div class="bless-product-image">
+                  {{
+                    primary_image
+                    | image_url: width: 1200
+                    | image_tag:
+                      widths: '400, 600, 800, 1200',
+                      sizes: '(min-width: 960px) 440px, 90vw',
+                      class: 'bless-product-image__img bless-product-image__img--primary',
+                      alt: product.title
+                  }}
+                  {% if secondary_image %}
+                    {{
+                      secondary_image
+                      | image_url: width: 1200
+                      | image_tag:
+                        widths: '400, 600, 800, 1200',
+                        sizes: '(min-width: 960px) 440px, 90vw',
+                        class: 'bless-product-image__img bless-product-image__img--secondary',
+                        alt: product.title
+                    }}
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+            <h3 class="bless-product-title">{{ product.title | escape }}</h3>
+            {% if default_variant %}
+              <p class="bless-product-price">{{ default_variant.price | money_with_currency }}</p>
+            {% endif %}
+            <form method="post" action="/cart/add" class="bless-product-form">
+              <label class="bless-product-label" for="VariantSelect-{{ section.id }}-NIRALUMA">Choose option</label>
+              <select id="VariantSelect-{{ section.id }}-NIRALUMA" name="id" class="bless-product-field">
+                {% for variant in product.variants %}
+                  <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
+                    {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
+                  </option>
+                {% endfor %}
+              </select>
 
-          <button type="submit" class="bless-product__button bless-product__button--outline">Add to cart</button>
-        </form>
-      {% else %}
-        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
-      {% endif %}
-    </article>
+              <label class="bless-product-label" for="Quantity-{{ section.id }}-NIRALUMA">Quantity</label>
+              <input id="Quantity-{{ section.id }}-NIRALUMA" class="bless-product-field bless-product-quantity" type="number" name="quantity" min="1" value="1">
 
-    {% assign product = niraluma_product %}
-    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="NIRALUMA" style="display: none;">
-      <p class="bless-product__badge">NIRALUMA</p>
-      {% if product %}
-        {% assign default_variant = product.selected_or_first_available_variant %}
-        <div class="bless-product__media">
-          {% if product.featured_image %}
-            {{
-              product.featured_image
-              | image_url: width: 960
-              | image_tag:
-                widths: '360, 540, 720, 900',
-                sizes: '(min-width: 768px) 320px, 80vw',
-                class: 'bless-product__image',
-                alt: product.title
-            }}
+              <button type="submit" class="bless-product-button bless-product-button--outline">Add to cart</button>
+            </form>
           {% else %}
-            <div class="bless-product__placeholder">Image coming soon</div>
+            <div class="bless-product-placeholder">Assign a product for Niraluma.</div>
           {% endif %}
-        </div>
-        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
-        {% if default_variant %}
-          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
-        {% endif %}
-        <form method="post" action="/cart/add" class="bless-product__form">
-          {% assign variants = product.variants %}
-          <label class="bless-product__label" for="VariantSelect-{{ product.id }}-NIRALUMA">Choose option</label>
-          <select
-            id="VariantSelect-{{ product.id }}-NIRALUMA"
-            name="id"
-            class="bless-product__field"
-          >
-            {% for variant in variants %}
-              <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
-                {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
-              </option>
-            {% endfor %}
-          </select>
+        </article>
 
-          <label class="bless-product__label" for="Quantity-{{ product.id }}-NIRALUMA">Quantity</label>
-          <input
-            id="Quantity-{{ product.id }}-NIRALUMA"
-            class="bless-product__field bless-product__quantity"
-            type="number"
-            name="quantity"
-            min="1"
-            value="1"
-          >
+        {% assign product = olanwela_product %}
+        <article class="bless-product-card" data-sidthie-key="OLANWELA" style="display: none;">
+          {% if product %}
+            {% assign default_variant = product.selected_or_first_available_variant %}
+            <div class="bless-product-media">
+              {% assign primary_image = product.images[0] %}
+              {% assign secondary_image = product.images[1] %}
+              {% if primary_image %}
+                <div class="bless-product-image">
+                  {{
+                    primary_image
+                    | image_url: width: 1200
+                    | image_tag:
+                      widths: '400, 600, 800, 1200',
+                      sizes: '(min-width: 960px) 440px, 90vw',
+                      class: 'bless-product-image__img bless-product-image__img--primary',
+                      alt: product.title
+                  }}
+                  {% if secondary_image %}
+                    {{
+                      secondary_image
+                      | image_url: width: 1200
+                      | image_tag:
+                        widths: '400, 600, 800, 1200',
+                        sizes: '(min-width: 960px) 440px, 90vw',
+                        class: 'bless-product-image__img bless-product-image__img--secondary',
+                        alt: product.title
+                    }}
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+            <h3 class="bless-product-title">{{ product.title | escape }}</h3>
+            {% if default_variant %}
+              <p class="bless-product-price">{{ default_variant.price | money_with_currency }}</p>
+            {% endif %}
+            <form method="post" action="/cart/add" class="bless-product-form">
+              <label class="bless-product-label" for="VariantSelect-{{ section.id }}-OLANWELA">Choose option</label>
+              <select id="VariantSelect-{{ section.id }}-OLANWELA" name="id" class="bless-product-field">
+                {% for variant in product.variants %}
+                  <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
+                    {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
+                  </option>
+                {% endfor %}
+              </select>
 
-          <button type="submit" class="bless-product__button bless-product__button--outline">Add to cart</button>
-        </form>
-      {% else %}
-        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
-      {% endif %}
-    </article>
+              <label class="bless-product-label" for="Quantity-{{ section.id }}-OLANWELA">Quantity</label>
+              <input id="Quantity-{{ section.id }}-OLANWELA" class="bless-product-field bless-product-quantity" type="number" name="quantity" min="1" value="1">
 
-    {% assign product = olanwela_product %}
-    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="OLANWELA" style="display: none;">
-      <p class="bless-product__badge">OLANWELA</p>
-      {% if product %}
-        {% assign default_variant = product.selected_or_first_available_variant %}
-        <div class="bless-product__media">
-          {% if product.featured_image %}
-            {{
-              product.featured_image
-              | image_url: width: 960
-              | image_tag:
-                widths: '360, 540, 720, 900',
-                sizes: '(min-width: 768px) 320px, 80vw',
-                class: 'bless-product__image',
-                alt: product.title
-            }}
+              <button type="submit" class="bless-product-button bless-product-button--outline">Add to cart</button>
+            </form>
           {% else %}
-            <div class="bless-product__placeholder">Image coming soon</div>
+            <div class="bless-product-placeholder">Assign a product for Olanwela.</div>
           {% endif %}
-        </div>
-        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
-        {% if default_variant %}
-          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
-        {% endif %}
-        <form method="post" action="/cart/add" class="bless-product__form">
-          {% assign variants = product.variants %}
-          <label class="bless-product__label" for="VariantSelect-{{ product.id }}-OLANWELA">Choose option</label>
-          <select
-            id="VariantSelect-{{ product.id }}-OLANWELA"
-            name="id"
-            class="bless-product__field"
-          >
-            {% for variant in variants %}
-              <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
-                {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
-              </option>
-            {% endfor %}
-          </select>
+        </article>
 
-          <label class="bless-product__label" for="Quantity-{{ product.id }}-OLANWELA">Quantity</label>
-          <input
-            id="Quantity-{{ product.id }}-OLANWELA"
-            class="bless-product__field bless-product__quantity"
-            type="number"
-            name="quantity"
-            min="1"
-            value="1"
-          >
+        {% assign product = rakawela_product %}
+        <article class="bless-product-card" data-sidthie-key="RAKAWELA" style="display: none;">
+          {% if product %}
+            {% assign default_variant = product.selected_or_first_available_variant %}
+            <div class="bless-product-media">
+              {% assign primary_image = product.images[0] %}
+              {% assign secondary_image = product.images[1] %}
+              {% if primary_image %}
+                <div class="bless-product-image">
+                  {{
+                    primary_image
+                    | image_url: width: 1200
+                    | image_tag:
+                      widths: '400, 600, 800, 1200',
+                      sizes: '(min-width: 960px) 440px, 90vw',
+                      class: 'bless-product-image__img bless-product-image__img--primary',
+                      alt: product.title
+                  }}
+                  {% if secondary_image %}
+                    {{
+                      secondary_image
+                      | image_url: width: 1200
+                      | image_tag:
+                        widths: '400, 600, 800, 1200',
+                        sizes: '(min-width: 960px) 440px, 90vw',
+                        class: 'bless-product-image__img bless-product-image__img--secondary',
+                        alt: product.title
+                    }}
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+            <h3 class="bless-product-title">{{ product.title | escape }}</h3>
+            {% if default_variant %}
+              <p class="bless-product-price">{{ default_variant.price | money_with_currency }}</p>
+            {% endif %}
+            <form method="post" action="/cart/add" class="bless-product-form">
+              <label class="bless-product-label" for="VariantSelect-{{ section.id }}-RAKAWELA">Choose option</label>
+              <select id="VariantSelect-{{ section.id }}-RAKAWELA" name="id" class="bless-product-field">
+                {% for variant in product.variants %}
+                  <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
+                    {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
+                  </option>
+                {% endfor %}
+              </select>
 
-          <button type="submit" class="bless-product__button bless-product__button--outline">Add to cart</button>
-        </form>
-      {% else %}
-        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
-      {% endif %}
-    </article>
+              <label class="bless-product-label" for="Quantity-{{ section.id }}-RAKAWELA">Quantity</label>
+              <input id="Quantity-{{ section.id }}-RAKAWELA" class="bless-product-field bless-product-quantity" type="number" name="quantity" min="1" value="1">
 
-    {% assign product = rakawela_product %}
-    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="RAKAWELA" style="display: none;">
-      <p class="bless-product__badge">RAKAWELA</p>
-      {% if product %}
-        {% assign default_variant = product.selected_or_first_available_variant %}
-        <div class="bless-product__media">
-          {% if product.featured_image %}
-            {{
-              product.featured_image
-              | image_url: width: 960
-              | image_tag:
-                widths: '360, 540, 720, 900',
-                sizes: '(min-width: 768px) 320px, 80vw',
-                class: 'bless-product__image',
-                alt: product.title
-            }}
+              <button type="submit" class="bless-product-button bless-product-button--outline">Add to cart</button>
+            </form>
           {% else %}
-            <div class="bless-product__placeholder">Image coming soon</div>
+            <div class="bless-product-placeholder">Assign a product for Rakawela.</div>
           {% endif %}
-        </div>
-        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
-        {% if default_variant %}
-          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
-        {% endif %}
-        <form method="post" action="/cart/add" class="bless-product__form">
-          {% assign variants = product.variants %}
-          <label class="bless-product__label" for="VariantSelect-{{ product.id }}-RAKAWELA">Choose option</label>
-          <select
-            id="VariantSelect-{{ product.id }}-RAKAWELA"
-            name="id"
-            class="bless-product__field"
-          >
-            {% for variant in variants %}
-              <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
-                {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
-              </option>
-            {% endfor %}
-          </select>
+        </article>
 
-          <label class="bless-product__label" for="Quantity-{{ product.id }}-RAKAWELA">Quantity</label>
-          <input
-            id="Quantity-{{ product.id }}-RAKAWELA"
-            class="bless-product__field bless-product__quantity"
-            type="number"
-            name="quantity"
-            min="1"
-            value="1"
-          >
+        {% assign product = morasara_product %}
+        <article class="bless-product-card" data-sidthie-key="MORASARA" style="display: none;">
+          {% if product %}
+            {% assign default_variant = product.selected_or_first_available_variant %}
+            <div class="bless-product-media">
+              {% assign primary_image = product.images[0] %}
+              {% assign secondary_image = product.images[1] %}
+              {% if primary_image %}
+                <div class="bless-product-image">
+                  {{
+                    primary_image
+                    | image_url: width: 1200
+                    | image_tag:
+                      widths: '400, 600, 800, 1200',
+                      sizes: '(min-width: 960px) 440px, 90vw',
+                      class: 'bless-product-image__img bless-product-image__img--primary',
+                      alt: product.title
+                  }}
+                  {% if secondary_image %}
+                    {{
+                      secondary_image
+                      | image_url: width: 1200
+                      | image_tag:
+                        widths: '400, 600, 800, 1200',
+                        sizes: '(min-width: 960px) 440px, 90vw',
+                        class: 'bless-product-image__img bless-product-image__img--secondary',
+                        alt: product.title
+                    }}
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+            <h3 class="bless-product-title">{{ product.title | escape }}</h3>
+            {% if default_variant %}
+              <p class="bless-product-price">{{ default_variant.price | money_with_currency }}</p>
+            {% endif %}
+            <form method="post" action="/cart/add" class="bless-product-form">
+              <label class="bless-product-label" for="VariantSelect-{{ section.id }}-MORASARA">Choose option</label>
+              <select id="VariantSelect-{{ section.id }}-MORASARA" name="id" class="bless-product-field">
+                {% for variant in product.variants %}
+                  <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
+                    {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
+                  </option>
+                {% endfor %}
+              </select>
 
-          <button type="submit" class="bless-product__button bless-product__button--outline">Add to cart</button>
-        </form>
-      {% else %}
-        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
-      {% endif %}
-    </article>
+              <label class="bless-product-label" for="Quantity-{{ section.id }}-MORASARA">Quantity</label>
+              <input id="Quantity-{{ section.id }}-MORASARA" class="bless-product-field bless-product-quantity" type="number" name="quantity" min="1" value="1">
 
-    {% assign product = morasara_product %}
-    <article class="bless-product__item sidthie-product-wrapper" data-sidthie-key="MORASARA" style="display: none;">
-      <p class="bless-product__badge">MORASARA</p>
-      {% if product %}
-        {% assign default_variant = product.selected_or_first_available_variant %}
-        <div class="bless-product__media">
-          {% if product.featured_image %}
-            {{
-              product.featured_image
-              | image_url: width: 960
-              | image_tag:
-                widths: '360, 540, 720, 900',
-                sizes: '(min-width: 768px) 320px, 80vw',
-                class: 'bless-product__image',
-                alt: product.title
-            }}
+              <button type="submit" class="bless-product-button bless-product-button--outline">Add to cart</button>
+            </form>
           {% else %}
-            <div class="bless-product__placeholder">Image coming soon</div>
+            <div class="bless-product-placeholder">Assign a product for Morasara.</div>
           {% endif %}
-        </div>
-        <h3 class="bless-product__title">{{ product.title | escape }}</h3>
-        {% if default_variant %}
-          <p class="bless-product__price">{{ default_variant.price | money_with_currency }}</p>
-        {% endif %}
-        <form method="post" action="/cart/add" class="bless-product__form">
-          {% assign variants = product.variants %}
-          <label class="bless-product__label" for="VariantSelect-{{ product.id }}-MORASARA">Choose option</label>
-          <select
-            id="VariantSelect-{{ product.id }}-MORASARA"
-            name="id"
-            class="bless-product__field"
-          >
-            {% for variant in variants %}
-              <option value="{{ variant.id }}" {% if variant.id == default_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
-                {{ variant.title }}{% unless variant.available %} — Sold out{% endunless %}
-              </option>
-            {% endfor %}
-          </select>
-
-          <label class="bless-product__label" for="Quantity-{{ product.id }}-MORASARA">Quantity</label>
-          <input
-            id="Quantity-{{ product.id }}-MORASARA"
-            class="bless-product__field bless-product__quantity"
-            type="number"
-            name="quantity"
-            min="1"
-            value="1"
-          >
-
-          <button type="submit" class="bless-product__button bless-product__button--outline">Add to cart</button>
-        </form>
-      {% else %}
-        <div class="bless-product__placeholder bless-product__placeholder--empty">Assign a product for this Sidthie.</div>
-      {% endif %}
-    </article>
+        </article>
+      </div>
+    </div>
   </div>
 </section>
 
-{% # theme-check-disable StaticStylesheetAndJavascriptTags %}
 {% stylesheet %}
-.bless-product {
-  padding: clamp(2.5rem, 6vw, 4.5rem) 0;
-  color: #0f1b1c;
+.bless-split {
+  padding: clamp(2rem, 5vw, 4rem) 0;
+  color: #ffffff;
 }
 
-.bless-product__header {
+.bless-split__inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.bless-split__column {
+  flex: 1 1 300px;
+  min-width: 280px;
+  background: rgba(20, 20, 20, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 40px;
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+}
+
+.bless-split__column--blessing {
+  order: 1;
+  font-family: 'Cardo', serif;
+  font-size: clamp(1.4rem, 2vw + 1rem, 2.2rem);
+  line-height: 1.5;
   text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.bless-product__heading {
-  font-family: var(--font-heading, 'Cardo', serif);
-  font-size: clamp(2rem, 2vw + 1rem, 2.8rem);
-  margin: 0 0 0.25rem;
-  color: #fff;
-}
-
-.bless-product__subtitle {
-  margin: 0;
-  font-family: var(--font-body, 'Albert Sans', sans-serif);
-  color: rgba(15, 27, 28, 0.7);
-}
- 
-#bless-product-display h2,
-#bless-product-display p,
-#bless-loading h2,
-#bless-loading p {
-  color: #ffffff !important;
-}
-
-.bless-product__loading {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
   justify-content: center;
-  padding: 1rem 0;
 }
 
-.bless-product__spinner {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 3px solid rgba(15, 27, 28, 0.1);
-  border-top-color: rgba(15, 27, 28, 0.9);
-  animation: bless-spin 1s linear infinite;
+.bless-split__column--product {
+  order: 2;
 }
 
-.bless-product__loading-text {
-  margin: 0;
-  font-family: var(--font-body, 'Albert Sans', sans-serif);
-  color: rgba(15, 27, 28, 0.8);
+@media (min-width: 900px) {
+  .bless-split__column--blessing,
+  .bless-split__column--product {
+    flex: 0 0 calc(50% - 0.75rem);
+  }
 }
 
-.bless-product__fallback {
-  text-align: center;
-  margin-bottom: 1.5rem;
+@media (max-width: 768px) {
+  .bless-split__column--blessing { order: 1; }
+  .bless-split__column--product { order: 2; }
 }
 
-.bless-product__fallback-text {
-  margin: 0 0 0.75rem;
-  color: rgba(15, 27, 28, 0.8);
-}
-
-.bless-product__grid {
+.bless-product-grid {
   display: grid;
-  gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
-.bless-product__item {
-  border-radius: 20px;
-  padding: 1.25rem;
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.18);
+.bless-product-card {
+  background: rgba(20, 20, 20, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  text-align: center;
-  color: #fff;
-}
-
-.sidthie-product-wrapper {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.6);
-}
-
-.bless-product__badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  background: rgba(23, 95, 75, 0.08);
-  color: #175f4b;
-  margin: 0 0 0.75rem;
-}
-
-.bless-product__media {
-  width: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-  background: transparent;
-  display: grid;
-  place-items: center;
-  margin-bottom: 0.75rem;
-}
-
-.bless-product__image {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  display: block;
-}
-
-.bless-product__placeholder {
-  font-family: var(--font-body, 'Albert Sans', sans-serif);
-  color: rgba(15, 27, 28, 0.5);
-}
-
-.bless-product__placeholder--empty {
-  padding: 1rem;
   border-radius: 12px;
-  border: 1px dashed rgba(15, 27, 28, 0.25);
-  background: rgba(15, 27, 28, 0.02);
+  padding: 0;
+  color: #ffffff;
 }
 
-.bless-product__title {
-  margin: 0 0 0.35rem;
-  font-size: 1.1rem;
-  font-family: var(--font-heading, 'Cardo', serif);
-  color: #fff;
+.bless-product-media {
+  margin-bottom: 1rem;
 }
 
-.bless-product__price {
-  margin: 0 0 0.85rem;
-  font-weight: 700;
-  color: #fff;
-  font-family: var(--font-body, 'Albert Sans', sans-serif);
+.bless-product-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
 }
 
-.bless-product__button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.4rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  background: transparent;
-  color: #fff;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+.bless-product-image__img {
   width: 100%;
-  margin-top: 10px;
+  display: block;
+  height: auto;
+  transition: opacity 200ms ease;
 }
 
-.bless-product__button:hover,
-.bless-product__button:focus {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.26);
-  background: rgba(255, 255, 255, 0.08);
+.bless-product-image__img--secondary {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
 }
 
-.bless-product__button--ghost {
-  background: transparent;
-  border-color: rgba(255, 255, 255, 0.4);
+.bless-product-image:hover .bless-product-image__img--secondary {
+  opacity: 1;
 }
 
-.bless-product__form {
+.bless-product-image:hover .bless-product-image__img--primary {
+  opacity: 0;
+}
+
+.bless-product-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.25rem;
+  font-family: 'Cardo', serif;
+  color: #ffffff;
+}
+
+.bless-product-price {
+  margin: 0 0 1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.bless-product-form {
   display: grid;
   gap: 0.75rem;
-  margin-top: 1rem;
-  text-align: left;
 }
 
-.bless-product__label {
+.bless-product-label {
   font-size: 0.95rem;
-  color: #fff;
   font-weight: 600;
-  display: block;
+  color: #ffffff;
 }
 
-.bless-product__field {
+.bless-product-field {
   width: 100%;
-  padding: 0.6rem 0.8rem;
+  padding: 0.7rem 0.9rem;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-  font-family: var(--font-body, 'Albert Sans', sans-serif);
-  box-sizing: border-box;
+  background: transparent;
+  color: #ffffff;
 }
 
-.bless-product__field:focus {
-  outline: 2px solid rgba(255, 255, 255, 0.4);
-}
-
-.bless-product__quantity {
+.bless-product-quantity {
   appearance: textfield;
 }
 
-.bless-product__quantity::-webkit-outer-spin-button,
-.bless-product__quantity::-webkit-inner-spin-button {
+.bless-product-quantity::-webkit-outer-spin-button,
+.bless-product-quantity::-webkit-inner-spin-button {
   appearance: none;
   margin: 0;
 }
 
-@keyframes bless-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.bless-product-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.85rem 1.4rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: transparent;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.bless-product-button:hover,
+.bless-product-button:focus {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.bless-product-placeholder {
+  color: rgba(255, 255, 255, 0.75);
 }
 {% endstylesheet %}
 
 {% javascript %}
-(function () {
-  const section = document.querySelector('[data-bless-product-section]');
-  if (!section) return;
+document.addEventListener('DOMContentLoaded', () => {
+  const blessingArea = document.getElementById('blessing-display-area');
+  const blessedText = sessionStorage.getItem('blessed_text');
+  const sidthieKey = (new URLSearchParams(window.location.search).get('sidthie') || '').toUpperCase();
 
-  const wrappers = Array.from(section.querySelectorAll('[data-sidthie-key]'));
-  const loading = section.querySelector('[data-loading]');
-  const fallback = section.querySelector('[data-fallback]');
-  const viewAllButton = section.querySelector('[data-view-all-toggle]');
-  const nameTarget = section.querySelector('[data-name-target]');
-
-  const params = new URLSearchParams(window.location.search);
-  const sidthieParam = (params.get('sidthie') || '').trim();
-  const nameParam = (params.get('name') || '').trim();
-  const normalizedKey = sidthieParam.toUpperCase();
-
-  if (nameParam && nameTarget) {
-    nameTarget.textContent = `For ${nameParam}`;
-    nameTarget.hidden = false;
+  if (blessingArea) {
+    const content = blessedText || 'Your blessing waits quietly. Continue your journey to see it unfold.';
+    blessingArea.textContent = content;
   }
 
-  const matchingWrapper = normalizedKey
-    ? wrappers.find((wrapper) => wrapper.dataset.sidthieKey === normalizedKey)
-    : null;
-
-  if (matchingWrapper) {
-    matchingWrapper.style.display = 'block';
-  } else if (fallback) {
-    fallback.hidden = false;
-  }
-
-  if (viewAllButton) {
-    viewAllButton.addEventListener('click', () => {
-      wrappers.forEach((wrapper) => {
-        wrapper.style.display = 'block';
-      });
-      if (fallback) fallback.hidden = true;
-    });
-  }
-
-  if (loading) loading.hidden = true;
-})();
+  const productCards = document.querySelectorAll('[data-sidthie-key]');
+  productCards.forEach((card) => {
+    if (card instanceof HTMLElement) {
+      card.style.display = 'none';
+      if (card.dataset.sidthieKey === sidthieKey) {
+        card.style.display = 'block';
+      }
+    }
+  });
+});
 {% endjavascript %}
-{% # theme-check-enable StaticStylesheetAndJavascriptTags %}
 
 {% schema %}
 {
   "name": "Bless product",
   "settings": [
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading",
-      "default": "Your Sidthie necklace"
-    },
     {
       "type": "product",
       "id": "nalamera_product",
