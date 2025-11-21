@@ -39,6 +39,7 @@
     },
     "blessing": {
       "type": "bless-blessing",
+      "disabled": true,
       "settings": {
         "heading": "Your blessing",
         "placeholder_text": "",
